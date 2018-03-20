@@ -25,7 +25,7 @@ def dump_cfg():
 
     return '''{}Bot is up. Configuration:```
 Withdraw fee: {}
-Required confirmations per withdrawl: {}
+Required confirmations per withdraw: {}
 Block height: {}
 Latest hash: {}```'''.format(e.ONLINE, g.tx_fee, g.tx_timeout, block_height, block_hash)
 
@@ -47,6 +47,8 @@ def donate(selection, amount, userobj):
         return '{}Invalid selection.'.format(e.ERROR)
     if amount == None:
         return '{}Amount provided is invalid.'.format(e.ERROR)
+    if userobj.balance < amount:
+        return '{}Insufficient funds to donate. You have `{} GRC`'.format(e.ERROR, round(userobj.balance, 8))
     if 0 <= selection < len(g.donation_accts):
         acct_dict = g.donation_accts[selection]
         address = acct_dict[list(acct_dict.keys())[0]]
@@ -63,33 +65,31 @@ def fetch_donation_addrs():
     return big_string.format(e.GIVE, acc[1:])
 
 def withdraw(amount, addr, userobj):
-    if amount == None:
-        return '{}Amount provided is invalid.'.format(e.ERROR)
-    if amount <= 0:
+    if amount is None or amount <= 0:
         return '{}Amount provided is invalid.'.format(e.ERROR)
     if amount-g.tx_fee <= 0:
         return '{}Invalid amount, withdrawl an amount higher than the fee. (Fee: `{} GRC`)'.format(e.ERROR, g.tx_fee)
     if userobj.balance < amount:
-        return '{}Insufficient funds to withdraw. You have {} GRC'.format(e.ERROR, userobj.balance)
+        return '{}Insufficient funds to withdraw. You have `{} GRC`'.format(e.ERROR, round(userobj.balance, 8))
     return userobj.withdraw(amount, addr)
 
-def give(amount, current_userobj, rec_user):
+def give(amount, current_usrobj, rec_usrobj):
     amount = amt_filter(amount, current_usrobj)
     if amount != None:
         if amount <= current_usrobj.balance:
             current_usrobj.balance -= amount
-            rec_userobj.balance += amount
-            return '{}In-server transaction successful.'.format(e.GOOD)
+            rec_usrobj.balance += amount
+            return '{}In-server transaction of `{} GRC` successful.'.format(e.GOOD, round(amount, 8))
         else:
-            return '{}Insufficient funds to give.'.format(e.ERROR)
+            return '{}Insufficient funds to give. You have `{} GRC`'.format(e.ERROR, round(current_usrobj.balance, 8))
     else:
         return '{}Amount provided was not a number.'.format(e.ERROR)
 
 def faucet(faucet_usr, current_usr):
-    if faucet_usr.balance = 0:
-        return '{} Unfortunately the faucet is out of GRC. Try again soon.'.format(e.DOWN)
-    elif current_usr.last_active < round(time())+3600*g.FCT_REQ_LIM:
-        return '{} Request too recent. Faucet timeout is {} hours.'.format(g.FCT_REQ_LIM)
+    if faucet_usr.balance == 0:
+        return '{}Unfortunately the faucet is out of GRC. Try again soon.'.format(e.DOWN)
+    elif round(time()) < current_usr.last_active+3600*g.FCT_REQ_LIM:
+        return '{}Request too recent. Faucet timeout is {} hours.'.format(e.CANNOT, g.FCT_REQ_LIM)
     else:
         current_usr.last_active = round(time())
-        return give(round(uniform(g.FCT_MIN, g.FCT_MAX), 8), faucet_usr, current_usr)
+        return give(round(uniform(g.FCT_MIN, min(g.FCT_MAX, faucet_usr.balance)), 8), faucet_usr, current_usr)

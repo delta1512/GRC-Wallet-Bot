@@ -172,20 +172,23 @@ async def on_message(msg):
                     reply = bot.fetch_donation_addrs()
                 await client.send_message(chan, reply)
             elif cmd.startswith('give'):
-                args = cmd.split()
-                if (len(msg.mentions) != 1) or (not (len(args) == 3)):
+                args = cmd.split()[1:]
+                if (len(args) != 2) or (len(msg.mentions) != 1):
                     await client.send_message(chan, '{}To give funds to a member in the server, type `%give [discord mention of user] [amount to give]`.\nThe person must also have an account with the bot.'.format(e.INFO))
-                elif not ((args[2].upper() == FCT) ^ (msg.mentions[0].id in UDB)):
+                elif not msg.mentions[0].id in UDB:
                     await client.send_message(chan, '{}Invalid user specified.'.format(e.ERROR))
                 else:
-                    if args[2].upper() == FCT:
-                        recipient = FCT
-                    else:
-                        recipient = UDB[msg.mentions[0].id]
-                    userobj = UDB[user]
-                    await client.send_message(chan, bot.give(args[2], userobj, recipient))
+                    await client.send_message(chan, bot.give(args[1], USROBJ, UDB[msg.mentions[0].id]))
+            elif cmd.startswith('fgive'):
+                args = cmd.split()[1:]
+                if len(args) < 1:
+                    await client.send_message(chan, '{}Please specify an amount to give.'.format(e.ERROR))
+                else:
+                    await client.send_message(chan, bot.give(args[0], USROBJ, UDB[FCT]))
             elif cmd in ['faucet', 'fct', 'get']:
-                await send_message(chan, bot.faucet(UDB[FCT], UDB[user]))
+                fctobj = UDB[FCT]
+                await client.send_message(chan, docs.faucetmsg.format(round(fctobj.balance, 8), g.FCT_REQ_LIM, fctobj.address))
+                await client.send_message(chan, bot.faucet(fctobj, USROBJ))
             else:
                 await client.send_message(chan, '{}Invalid command.'.format(e.INFO))
         else:
