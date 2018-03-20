@@ -1,7 +1,21 @@
+from random import uniform
+from time import time
 from user import usr
 import grcconf as g
 import emotes as e
 import wallet as w
+
+def amt_filter(inp, userobj):
+    if inp == 'all':
+        return round(userobj.balance, 8)
+    try:
+        inp = float(inp)
+        if (inp < 0) or (inp <= g.MIN_TX) or (inp == float('inf')):
+            return None
+        else:
+            return round(inp, 8)
+    except:
+        return None
 
 def dump_cfg():
     block_height = w.query('getblockcount', [])
@@ -58,3 +72,24 @@ def withdraw(amount, addr, userobj):
     if userobj.balance < amount:
         return '{}Insufficient funds to withdraw. You have {} GRC'.format(e.ERROR, userobj.balance)
     return userobj.withdraw(amount, addr)
+
+def give(amount, current_userobj, rec_user):
+    amount = amt_filter(amount, current_usrobj)
+    if amount != None:
+        if amount <= current_usrobj.balance:
+            current_usrobj.balance -= amount
+            rec_userobj.balance += amount
+            return '{}In-server transaction successful.'.format(e.GOOD)
+        else:
+            return '{}Insufficient funds to give.'.format(e.ERROR)
+    else:
+        return '{}Amount provided was not a number.'.format(e.ERROR)
+
+def faucet(faucet_usr, current_usr):
+    if faucet_usr.balance = 0:
+        return '{} Unfortunately the faucet is out of GRC. Try again soon.'.format(e.DOWN)
+    elif current_usr.last_active < round(time())+3600*g.FCT_REQ_LIM:
+        return '{} Request too recent. Faucet timeout is {} hours.'.format(g.FCT_REQ_LIM)
+    else:
+        current_usr.last_active = round(time())
+        return give(round(uniform(g.FCT_MIN, g.FCT_MAX), 8), faucet_usr, current_usr)

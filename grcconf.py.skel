@@ -22,3 +22,6 @@ MIN_TX = 0.001
 FEE_WDR_THRESH = 0.5 # When to send out the collected fees to admin
 SLP_SML = 30 # Save interval
 SLP_BIG = SLP_SML * 10
+FCT_REQ_LIM = 24 # Hours
+FCT_MAX = 1
+FCT_MIN = 0.1

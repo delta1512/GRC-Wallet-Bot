@@ -13,19 +13,8 @@ import docs
 
 client = discord.Client()
 LAST_BLK = 0
+FCT = 'FAUCET'
 UDB = {}
-
-def amt_filter(inp, userobj):
-    if inp == 'all':
-        return round(userobj.balance, 8)
-    try:
-        inp = float(inp)
-        if (inp < 0) or (inp <= g.MIN_TX) or (inp == float('inf')):
-            return None
-        else:
-            return round(inp, 8)
-    except:
-        return None
 
 def check_tx(txid):
     tx = w.query('gettransaction', [txid])
@@ -109,24 +98,6 @@ def blk_searcher():
                 print('[ERROR] Block searcher ran into an error: {}'.format(E))
         LAST_BLK = newblock
 
-def give(amount, current_user, rec_user):
-    global UDB
-    current_usrobj = UDB[current_user]
-    amount = amt_filter(amount, current_usrobj)
-    if not rec_user in UDB:
-        return '{}User does not have an account.'.format(e.ERROR)
-    else:
-        rec_userobj = UDB[rec_user]
-        if amount != None:
-            if amount <= current_usrobj.balance:
-                current_usrobj.balance -= amount
-                rec_userobj.balance += amount
-                return '{}In-server transaction successful.'.format(e.GOOD)
-            else:
-                return '{}Insufficient funds to give.'.format(e.ERROR)
-        else:
-            return '{}Amount provided was not a number.'.format(e.ERROR)
-
 async def pluggable_loop():
     sleepcount = 0
     while True:
@@ -163,7 +134,7 @@ async def on_message(msg):
     user = msg.author.id
     INDB = user in UDB
     if cmd.startswith(g.pre) and chan.server.id in g.LCK_SRVS:
-        await client.send_message(chan, '{} This server is currently not taking commands. The bot is under maintinence.'.format(e.SETTING))
+        await client.send_message(chan, docs.server_lock_msg)
     elif cmd.startswith(g.pre) and (len(cmd) > 1):
         await client.send_message(chan, '{} **DISCLAIMER**: The bot currently uses the testnet. **DO NOT SEND REAL GRIDCOIN TO THE BOT** {}'.format(e.INFO, e.INFO[:-2]))
         cmd = cmd[1:]
@@ -185,31 +156,46 @@ async def on_message(msg):
         elif INDB:
             USROBJ = UDB[user]
             if cmd in ['bal', 'balance']:
-                reply = bot.fetch_balance(USROBJ)
-                await client.send_message(chan, reply)
+                await client.send_message(chan, bot.fetch_balance(USROBJ))
             elif cmd.split()[0] in ['wdr', 'withdraw', 'send']:
                 args = cmd.split()[1:]
                 if len(args) == 2:
-                    reply = bot.withdraw(amt_filter(args[1], USROBJ), args[0], USROBJ)
+                    reply = bot.withdraw(bot.amt_filter(args[1], USROBJ), args[0], USROBJ)
                 else:
                     reply = '{}To withdraw from your account type: `%wdr [address to send to] [amount-GRC]`\nA service fee of {} is subtracted from what you send. If you wish to send GRC to someone in the server, use `%give`'.format(e.INFO, str(g.tx_fee))
                 await client.send_message(chan, reply)
             elif cmd.startswith('donate'):
                 args = cmd.split()[1:]
                 if len(args) == 2:
-                    reply = bot.donate(args[0], amt_filter(args[1], USROBJ), USROBJ)
+                    reply = bot.donate(args[0], bot.amt_filter(args[1], USROBJ), USROBJ)
                 else:
                     reply = bot.fetch_donation_addrs()
                 await client.send_message(chan, reply)
             elif cmd.startswith('give'):
-                if (len(msg.mentions) != 1) or (not (len(cmd.split()) == 3)):
+                args = cmd.split()
+                if (len(msg.mentions) != 1) or (not (len(args) == 3)):
                     await client.send_message(chan, '{}To give funds to a member in the server, type `%give [discord mention of user] [amount to give]`.\nThe person must also have an account with the bot.'.format(e.INFO))
+                elif not ((args[2].upper() == FCT) ^ (msg.mentions[0].id in UDB)):
+                    await client.send_message(chan, '{}Invalid user specified.'.format(e.ERROR))
                 else:
-                    await client.send_message(chan, give(cmd.split()[2], user, msg.mentions[0].id))
+                    if args[2].upper() == FCT:
+                        recipient = FCT
+                    else:
+                        recipient = UDB[msg.mentions[0].id]
+                    userobj = UDB[user]
+                    await client.send_message(chan, bot.give(args[2], userobj, recipient))
+            elif cmd in ['faucet', 'fct', 'get']:
+                await send_message(chan, bot.faucet(UDB[FCT], UDB[user]))
             else:
                 await client.send_message(chan, '{}Invalid command.'.format(e.INFO))
         else:
             await client.send_message(chan, '{}Either incorrect command or not in user database (try `%new`)'.format(e.ERROR))
+
+if w.query('getblockcount', []) > 5: # 5 is largest error return value
+    print('[DEBUG] Gridcoin client is online')
+else:
+    print('[ERROR] GRC client is not online')
+    exit(1)
 
 if path.exists(g.MEM_DB):
     read_db(g.MEM_DB)
@@ -219,6 +205,9 @@ else:
     create_db(g.MEM_DB)
     print('[DEBUG] Created template table')
 
+if not FCT in UDB:
+    UDB[FCT] = usr(FCT)
+
 if path.exists(g.LST_BLK_MEM):
     with open(g.LST_BLK_MEM, 'r') as last_block:
         LAST_BLK = int(last_block.read())
@@ -226,7 +215,9 @@ elif path.exists(g.LST_BLK_COLD):
     with open(g.LST_BLK_COLD, 'r') as last_block:
         LAST_BLK = int(last_block.read())
 else:
-    print('[ERROR] No start block specified')
+    with open(g.LST_BLK_COLD, 'w') as last_block:
+        last_block.write(str(w.query('getblockcount', [])))
+    print('[DEBUG] No start block specified. Setting block to client latest')
     exit(1)
 
 if not path.exists(g.FEE_POOL):
@@ -244,14 +235,9 @@ except:
 try:
     import grcconf as g
     print('[DEBUG] Successfully loaded the configuration file')
+
 except:
     print('[ERROR] Failed to load config file')
-    exit(1)
-
-if w.query('getblockcount', []) > 5: # 5 is largest error return value
-    print('[DEBUG] Gridcoin client is online')
-else:
-    print('[ERROR] GRC client is not online')
     exit(1)
 
 client.run(APIkey)

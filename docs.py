@@ -1,4 +1,5 @@
 import grcconf as g
+import emotes as e
 
 hlp = '''
 ```Commands:
@@ -41,3 +42,12 @@ Notable mentions:
 - Foxifi
 - Jorkermc https://github.com/jorkermc
 '''
+
+faucetmsg = '''
+The faucet currently contains `{} GRC` and has a timeout of {} hours.
+
+Donate GRC to this address `{}`
+or type `%give faucet [amount-GRC]` to help refill the faucet
+'''
+
+server_lock_msg = '{} This server is currently not taking commands. The bot is under maintenance.'.format(e.SETTING)
