@@ -1,0 +1,24 @@
+### ADMINISTRATION
+admin_wallet = ''
+tx_fee = 0.5
+tx_timeout = 1 # Confirmations
+rpc_usr = ''
+rpc_pass = ''
+rpc_url = 'http://[host]:[port]/'
+donation_accts = [
+    {'[name]' : '[addr]'},
+    ]
+
+### CONFIGURATION CONSTANTS
+pre = '%'
+MEM_DB = '[database cache directory]'
+COLD_DB = '[database storage directory]'
+TMP_DIR = '[place to store files used for overwriting the databases]'
+FEE_POOL = '[location of amount of fees owed file]'
+LST_BLK_MEM = '[location of last block height file (temporary)]'
+LST_BLK_COLD = '[location of last block height file (fixed)]'
+LCK_SRVS = []
+MIN_TX = 0.001
+FEE_WDR_THRESH = 0.5 # When to send out the collected fees to admin
+SLP_SML = 30 # Save interval
+SLP_BIG = SLP_SML * 10

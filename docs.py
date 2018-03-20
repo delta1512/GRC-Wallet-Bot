@@ -1,0 +1,31 @@
+import grcconf as g
+
+hlp = '''
+```Commands:
+    Create an new account: %new
+        An account is required to use the bot. (No personal details required)
+
+    Balance: %bal, %balance
+        Checks your current balance and shows your deposit address.
+        Deposits should arrive within 5 minutes of a transaction taking place.
+
+    Withdraw: %wdr, %withdraw, %send
+        Format: %wdr [address to send to] [amount-GRC]
+        Takes your GRC out of the bot's wallet.
+        Fee for withdraw is {} GRC and is automatically deducted.
+
+    Donate: %donate
+        Format: %donate [selection no.] [amount-GRC]
+        A list of possible donation addresses.
+        Choose a number from the list of selections and then the amount to donate.
+
+    Give: %give
+        Format: %give [discord mention of user] [amount-GRC]
+        Give some GRC to another person within the server. (no fees apply)
+        Requires the mentioned user to also have an account with the bot through %new.
+
+    Bot and network status: %status
+
+Authors and Contributors:
+    - Delta https://delta1512.github.io/BOINCOS/
+    - Foxifi```'''.format(g.tx_fee)
