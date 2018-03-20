@@ -26,6 +26,18 @@ hlp = '''
 
     Bot and network status: %status
 
+    Info about author and this bot: %info
+
 Authors and Contributors:
     - Delta https://delta1512.github.io/BOINCOS/
     - Foxifi```'''.format(g.tx_fee)
+
+info = '''
+**This bot is the original work of Delta and various contributors.**
+
+The source code for the bot can be found here: https://github.com/delta1512/GRC-Wallet-Bot
+
+Notable mentions:
+- Foxifi
+- Jorkermc https://github.com/jorkermc
+'''

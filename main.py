@@ -180,6 +180,8 @@ async def on_message(msg):
                 await client.send_message(chan, '{}Cannot create new account, you already have one.'.format(e.CANNOT))
         elif cmd.startswith('help'):
             await client.send_message(chan, docs.hlp)
+        elif cmd.startswith('info'):
+            await client.send_message(chan, docs.info)
         elif INDB:
             USROBJ = UDB[user]
             if cmd in ['bal', 'balance']:
