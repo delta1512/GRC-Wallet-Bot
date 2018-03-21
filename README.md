@@ -1,6 +1,6 @@
 # GRC-Wallet-Bot
 
-Discord bot by [Delta]() for the [Gridcoin Discord chat]().
+Discord bot by [Delta](https://github.com/delta1512) for the [Gridcoin Discord chat](https://discord.me/page/gridcoin).
 
 ### TODO
 
@@ -12,11 +12,13 @@ Discord bot by [Delta]() for the [Gridcoin Discord chat]().
 
 ### Feature ideas:
 
+These are just ideas, not all of them may be implemented in the future. Any suggestions are welcome.
+
 * Interactive donation presentation
 
 * Site to view donation ranks
 
-* Faucet
+* ~~Faucet~~
 
 * Random donations
 
