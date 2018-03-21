@@ -133,9 +133,12 @@ async def on_message(msg):
     chan = msg.channel
     user = msg.author.id
     INDB = user in UDB
-    if cmd.startswith(g.pre) and chan.server.id in g.LCK_SRVS:
+    iscommand = cmd.startswith(g.pre)
+    if iscommand and chan.is_private:
+        await client.send_message(chan, docs.PM_msg)
+    elif iscommand and chan.server.id in g.LCK_SRVS:
         await client.send_message(chan, docs.server_lock_msg)
-    elif cmd.startswith(g.pre) and (len(cmd) > 1):
+    elif iscommand and (len(cmd) > 1):
         await client.send_message(chan, '{} **DISCLAIMER**: The bot currently uses the testnet. **DO NOT SEND REAL GRIDCOIN TO THE BOT** {}'.format(e.INFO, e.INFO[:-2]))
         cmd = cmd[1:]
         if cmd.startswith('status'):

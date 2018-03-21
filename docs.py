@@ -94,3 +94,5 @@ or type `%fgive [amount-GRC]` to help refill the faucet
 '''
 
 server_lock_msg = '{} This server is currently not taking commands. The bot is under maintenance.'.format(e.SETTING)
+
+PM_msg = '{} The bot does not take commands through private messages.'.format(e.CANNOT)
