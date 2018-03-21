@@ -1,17 +1,18 @@
 import subprocess as sp
 import commands as bot
 from user import usr
-from sys import exit
+import sys
 import grcconf as g
 from os import path
 import emotes as e
 import wallet as w
 import sqlite3
 import discord
+from discord.ext import commands
 import asyncio
 import docs
 
-client = discord.Client()
+client = commands.Bot(g.PRE)
 LAST_BLK = 0
 FCT = 'FAUCET'
 UDB = {}
