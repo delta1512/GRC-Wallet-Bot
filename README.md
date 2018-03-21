@@ -14,9 +14,9 @@ Discord bot by [Delta](https://github.com/delta1512) for the [Gridcoin Discord c
 
 These are just ideas, not all of them may be implemented in the future. Any suggestions are welcome.
 
-* Interactive donation presentation
+[] Interactive donation presentation
 
-* Site to view donation ranks
+[] Site to view donation ranks
 
 * ~~Faucet~~
 
