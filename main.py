@@ -200,6 +200,10 @@ else:
     print('[ERROR] GRC client is not online')
     exit(1)
 
+if not (path.exists(g.MEMORY_ROOT) or path.exists(g.COLD_DB)):
+    print('[ERROR] Root data directory doesn\'t exist')
+    exit(1)
+
 if path.exists(g.MEM_DB):
     read_db(g.MEM_DB)
 elif path.exists(g.COLD_DB):
