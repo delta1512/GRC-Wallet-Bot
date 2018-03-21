@@ -51,7 +51,7 @@ Give funds to another user: %give
 
 faucet = '''```
 Get some free GRC: %faucet
-    Type this command to get some free gridcoins.
+    Type this command to get some free Gridcoins.
     Amounts are random and you can only request once per {} hours.
     To help fund the faucet, you can type `%fgive [amount-GRC]`.
 ```'''.format(g.FCT_REQ_LIM)
@@ -77,7 +77,7 @@ Notable mentions:
 help_dict = {
     'default'   :   hlp,
     'new'       :   new,
-    'bal'       :   bal,
+    'balance'   :   bal,
     'withdraw'  :   wdr,
     'donate'    :   donate,
     'give'      :   give,

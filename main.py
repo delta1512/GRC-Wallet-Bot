@@ -242,7 +242,6 @@ except:
 try:
     import grcconf as g
     print('[DEBUG] Successfully loaded the configuration file')
-
 except:
     print('[ERROR] Failed to load config file')
     exit(1)

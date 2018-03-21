@@ -69,7 +69,7 @@ def withdraw(amount, addr, userobj):
     if amount is None or amount <= 0:
         return '{}Amount provided is invalid.'.format(e.ERROR)
     if amount-g.tx_fee <= 0:
-        return '{}Invalid amount, withdrawl an amount higher than the fee. (Fee: `{} GRC`)'.format(e.ERROR, g.tx_fee)
+        return '{}Invalid amount, withdraw an amount higher than the fee. (Fee: `{} GRC`)'.format(e.ERROR, g.tx_fee)
     if userobj.balance < amount:
         return '{}Insufficient funds to withdraw. You have `{} GRC`'.format(e.ERROR, round(userobj.balance, 8))
     return userobj.withdraw(amount, addr)
