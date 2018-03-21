@@ -150,7 +150,7 @@ async def on_message(msg):
             else:
                 await client.send_message(chan, '{}Cannot create new account, you already have one.'.format(e.CANNOT))
         elif cmd.startswith('help'):
-            await client.send_message(chan, docs.hlp)
+            await client.send_message(chan, bot.help_interface(cmd.split().pop()))
         elif cmd.startswith('info'):
             await client.send_message(chan, docs.info)
         elif INDB:

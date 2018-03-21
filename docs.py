@@ -1,37 +1,68 @@
 import grcconf as g
 import emotes as e
 
-hlp = '''
-```Commands:
-    Create an new account: %new
-        An account is required to use the bot. (No personal details required)
+hlp = '''```
+- new
+- balance
+- withdraw
+- donate
+- give
+- faucet
+- status
+- info
+```'''
 
-    Balance: %bal, %balance
-        Checks your current balance and shows your deposit address.
-        Deposits should arrive within 5 minutes of a transaction taking place.
+new = '''```
+Create an new account: %new
+    An account is required to use the bot. (No personal details required)
+```'''
 
-    Withdraw: %wdr, %withdraw, %send
-        Format: %wdr [address to send to] [amount-GRC]
-        Takes your GRC out of the bot's wallet.
-        Fee for withdraw is {} GRC and is automatically deducted.
+bal = '''```
+Balance: %bal, %balance
+    Checks your current balance and shows your deposit address.
+    Deposits should arrive within 5 minutes of a transaction taking place.
+    If the bot is offline, you are still safe to make deposits.
+```'''
 
-    Donate: %donate
-        Format: %donate [selection no.] [amount-GRC]
-        A list of possible donation addresses.
-        Choose a number from the list of selections and then the amount to donate.
+wdr = '''```
+Withdraw your funds: %wdr, %withdraw, %send
+    Format: %wdr [address to send to] [amount-GRC]
 
-    Give: %give
-        Format: %give [discord mention of user] [amount-GRC]
-        Give some GRC to another person within the server. (no fees apply)
-        Requires the mentioned user to also have an account with the bot through %new.
+    Takes your GRC out of the bot's wallet.
+    Fee for withdraw is {} GRC and is automatically deducted.
+    If you wish to transfer to another user, use %give instead.
+```'''.format(g.tx_fee)
 
-    Bot and network status: %status
+donate = '''```
+Donate to someone: %donate
+    Format: %donate [selection no.] [amount-GRC]
 
-    Info about author and this bot: %info
+    A list of possible donation addresses to encourage generosity.
+    Choose a number from the list of selections and then the amount to donate.
+```'''
 
-Authors and Contributors:
-    - Delta https://delta1512.github.io/BOINCOS/
-    - Foxifi```'''.format(g.tx_fee)
+give = '''```
+Give funds to another user: %give
+    Format: %give [discord mention of user] [amount-GRC]
+
+    Give some GRC to another person within the server. (no fees apply)
+    Requires the mentioned user to also have an account with the bot through %new.
+```'''
+
+faucet = '''```
+Get some free GRC: %faucet
+    Type this command to get some free gridcoins.
+    Amounts are random and you can only request once per {} hours.
+    To help fund the faucet, you can type `%fgive [amount-GRC]`.
+```'''.format(g.FCT_REQ_LIM)
+
+status = '''```
+Bot and network status: %status
+```'''
+
+info_help = '''```
+Info about author and this bot: %info
+```'''
 
 info = '''
 **This bot is the original work of Delta and various contributors.**
@@ -42,6 +73,18 @@ Notable mentions:
 - Foxifi
 - Jorkermc https://github.com/jorkermc
 '''
+
+help_dict = {
+    'default'   :   hlp,
+    'new'       :   new,
+    'bal'       :   bal,
+    'withdraw'  :   wdr,
+    'donate'    :   donate,
+    'give'      :   give,
+    'faucet'    :   faucet,
+    'status'    :   status,
+    'info'      :   info_help
+}
 
 faucetmsg = '''
 The faucet currently contains `{} GRC` and has a timeout of {} hours.

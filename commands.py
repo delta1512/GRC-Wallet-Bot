@@ -4,6 +4,7 @@ from user import usr
 import grcconf as g
 import emotes as e
 import wallet as w
+import docs
 
 def amt_filter(inp, userobj):
     if inp == 'all':
@@ -93,3 +94,9 @@ def faucet(faucet_usr, current_usr):
     else:
         current_usr.last_active = round(time())
         return give(round(uniform(g.FCT_MIN, min(g.FCT_MAX, faucet_usr.balance)), 8), faucet_usr, current_usr)
+
+def help_interface(query):
+    try:
+        return docs.help_dict[query]
+    except:
+        return docs.help_dict['default']
