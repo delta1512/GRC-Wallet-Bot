@@ -74,13 +74,15 @@ def withdraw(amount, addr, userobj):
         return '{}Insufficient funds to withdraw. You have `{} GRC`'.format(e.ERROR, round(userobj.balance, 8))
     return userobj.withdraw(amount, addr)
 
-def give(amount, current_usrobj, rec_usrobj):
+def give(amount, current_usrobj, rec_usrobj, add_success_msg='', donation=False):
     amount = amt_filter(amount, current_usrobj)
     if amount != None:
         if amount <= current_usrobj.balance:
             current_usrobj.balance -= amount
             rec_usrobj.balance += amount
-            return '{}In-server transaction of `{} GRC` successful.'.format(e.GOOD, round(amount, 8))
+            if donation:
+                current_usrobj.donations += amount
+            return '{}In-server transaction of `{} GRC` successful.{}'.format(e.GOOD, round(amount, 8), add_success_msg)
         else:
             return '{}Insufficient funds to give. You have `{} GRC`'.format(e.ERROR, round(current_usrobj.balance, 8))
     else:
