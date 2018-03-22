@@ -26,9 +26,10 @@ def dump_cfg():
 
     return '''{}Bot is up. Configuration:```
 Withdraw fee: {}
+Transfer limit: {}
 Required confirmations per withdraw: {}
 Block height: {}
-Latest hash: {}```'''.format(e.ONLINE, g.tx_fee, g.tx_timeout, block_height, block_hash)
+Latest hash: {}```'''.format(e.ONLINE, g.tx_fee, g.MIN_TX, g.tx_timeout, block_height, block_hash)
 
 def new_user(uid):
     try:
@@ -42,6 +43,7 @@ def fetch_balance(userobj):
 ```Wallet: {} GRC```'''.format(e.BAL, userobj.address, round(userobj.balance, 8))
 
 def donate(selection, amount, userobj):
+    amount = amt_filter(amount, userobj)
     try:
         selection = int(selection)-1
     except:
@@ -76,17 +78,19 @@ def withdraw(amount, addr, userobj):
 
 def give(amount, current_usrobj, rec_usrobj, add_success_msg='', donation=False):
     amount = amt_filter(amount, current_usrobj)
+    if current_usrobj.usrID == rec_usrobj.usrID:
+        return '{}Cannot give funds to yourself.'.format(e.CANNOT)
     if amount != None:
         if amount <= current_usrobj.balance:
             current_usrobj.balance -= amount
             rec_usrobj.balance += amount
             if donation:
                 current_usrobj.donations += amount
-            return '{}In-server transaction of `{} GRC` successful.{}'.format(e.GOOD, round(amount, 8), add_success_msg)
+            return '{}In-server transaction of `{} GRC` successful.{}'.format(e.GOOD, amount, add_success_msg)
         else:
             return '{}Insufficient funds to give. You have `{} GRC`'.format(e.ERROR, round(current_usrobj.balance, 8))
     else:
-        return '{}Amount provided was not a number.'.format(e.ERROR)
+        return '{}Amount provided was invalid.'.format(e.ERROR)
 
 def faucet(faucet_usr, current_usr):
     if faucet_usr.balance == 0:

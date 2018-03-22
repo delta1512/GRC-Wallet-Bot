@@ -170,7 +170,7 @@ async def on_message(msg):
             elif cmd.startswith('donate'):
                 args = cmd.split()[1:]
                 if len(args) == 2:
-                    reply = bot.donate(args[0], bot.amt_filter(args[1], USROBJ), USROBJ)
+                    reply = bot.donate(args[0], args[1], USROBJ)
                 else:
                     reply = bot.fetch_donation_addrs()
                 await client.send_message(chan, reply)
