@@ -70,7 +70,7 @@ def fetch_donation_addrs():
 def withdraw(amount, addr, userobj):
     if amount is None or amount <= 0:
         return '{}Amount provided is invalid.'.format(e.ERROR)
-    if amount-g.tx_fee <= 0:
+    if amount-g.tx_fee-g.MIN_TX <= 0:
         return '{}Invalid amount, withdraw an amount higher than the fee. (Fee: `{} GRC`)'.format(e.ERROR, g.tx_fee)
     if userobj.balance < amount:
         return '{}Insufficient funds to withdraw. You have `{} GRC`'.format(e.ERROR, round(userobj.balance, 8))
