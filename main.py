@@ -118,6 +118,7 @@ async def pluggable_loop():
             if not isinstance(txid, str):
                 print('[ERROR] Admin fees could not be sent')
             else:
+                print('[DEBUG] Admin fees sent')
                 with open(g.FEE_POOL, 'w') as fees:
                     fees.write('0')
         sleepcount += 5
@@ -139,7 +140,7 @@ async def on_message(msg):
     elif iscommand and chan.server.id in g.LCK_SRVS:
         await client.send_message(chan, docs.server_lock_msg)
     elif iscommand and (len(cmd) > 1):
-        await client.send_message(chan, '{} **DISCLAIMER**: The bot currently uses the testnet. **DO NOT SEND REAL GRIDCOIN TO THE BOT** {}'.format(e.INFO, e.INFO[:-2]))
+        #await client.send_message(chan, '{} **DISCLAIMER**: The bot currently uses the testnet. **DO NOT SEND REAL GRIDCOIN TO THE BOT** {}'.format(e.INFO, e.INFO[:-2]))
         cmd = cmd[1:]
         if cmd.startswith('status'):
             await client.send_message(chan, bot.dump_cfg())
@@ -228,7 +229,6 @@ else:
     with open(g.LST_BLK_COLD, 'w') as last_block:
         last_block.write(str(w.query('getblockcount', [])))
     print('[DEBUG] No start block specified. Setting block to client latest')
-    exit(1)
 
 if not path.exists(g.FEE_POOL):
     with open(g.FEE_POOL, 'w') as fees:

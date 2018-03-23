@@ -7,8 +7,8 @@ import wallet as w
 import docs
 
 def amt_filter(inp, userobj):
-    if inp == 'all':
-        return round(userobj.balance, 8)
+    #if inp == 'all':
+        #return round(userobj.balance, 8)
     try:
         inp = float(inp)
         if (inp < 0) or (inp <= g.MIN_TX) or (inp == float('inf')):
@@ -64,7 +64,7 @@ def fetch_donation_addrs():
     acc = ''
     for count, acct in enumerate(g.donation_accts):
         name = list(acct.keys())[0]
-        acc += '\n{}. {}\t\t{}'.format(str(count+1), name, acct[name])
+        acc += '\n{}. {}'.format(str(count+1), name)
     return big_string.format(e.GIVE, acc[1:])
 
 def withdraw(amount, addr, userobj):
