@@ -30,7 +30,7 @@ class usr:
             else:
                 return '{}Error: The withdraw operation failed. Try again soon.'.format(e.ERROR)
         else:
-            return '{}Please wait for your previous transaction to be confirmed.'.format(e.INFO)
+            return '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
 
     def donate(self, addr, amount):
         self.last_active = round(time())
@@ -44,4 +44,4 @@ class usr:
             else:
                 return '{}Error: Transaction was unsuccessful.'.format(e.ERROR)
         else:
-            return '{}Please wait for your previous transaction to be confirmed.'.format(e.INFO)
+            return '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
