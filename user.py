@@ -26,9 +26,9 @@ class usr:
                     fees.write(str(owed+g.tx_fee))
                 self.active_tx = [amount, round(time()), txid]
                 self.balance -= amount
-                return '{}Transaction of `{} GRC` (inc. {} GRC fee) was successful, ID: `{}`'.format(e.GOOD, round(amount, 8), g.tx_fee, txid)
+                return '{}Transaction of `{} GRC` (inc. {} GRC fee) was successful, ID: `{}`{}'.format(e.GOOD, round(amount, 8), g.tx_fee, txid, '\n\nYour new balance is {} GRC.'.format(self.balance))
             else:
-                return '{}Error: The withdraw operation failed. Try again soon.'.format(e.ERROR)
+                return '{}Error: The withdraw operation failed.'.format(e.ERROR)
         else:
             return '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
 
@@ -40,7 +40,7 @@ class usr:
                 self.active_tx = [amount, round(time()), txid]
                 self.donations += amount
                 self.balance -= amount
-                return '{}Donation of `{} GRC` was successful, ID: `{}`'.format(e.GOOD, round(amount, 8), txid)
+                return '{}Donation of `{} GRC` was successful, ID: `{}`{}'.format(e.GOOD, round(amount, 8), txid, '\n\nThankyou for donating! Your new balance is {} GRC.'.format(self.balance))
             else:
                 return '{}Error: Transaction was unsuccessful.'.format(e.ERROR)
         else:
