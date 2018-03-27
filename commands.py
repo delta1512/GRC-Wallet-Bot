@@ -42,7 +42,7 @@ def new_user(uid):
 def fetch_balance(userobj, price_fetcher):
     usrbal = userobj.balance
     return '''{}Your balance for: `{}`
-```Wallet: {} GRC (${} USD)```'''.format(e.BAL, userobj.address, round(usrbal, 8), price_fetcher.conv(usrbal))
+```{} GRC (${} USD)```'''.format(e.BAL, userobj.address, round(usrbal, 8), price_fetcher.conv(usrbal))
 
 def donate(selection, amount, userobj):
     amount = amt_filter(amount, userobj)

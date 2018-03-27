@@ -163,6 +163,8 @@ async def on_message(msg):
             USROBJ = UDB[user]
             if cmd in ['bal', 'balance']:
                 await client.send_message(chan, bot.fetch_balance(USROBJ, price_fetcher))
+            elif cmd.startswith('addr'):
+                await client.send_message(chan, USROBJ.address)
             elif cmd.split()[0] in ['wdr', 'withdraw', 'send']:
                 args = cmd.split()[1:]
                 if len(args) == 2:

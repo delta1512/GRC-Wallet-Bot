@@ -9,7 +9,7 @@ class price_bot:
     price_url = 'https://api.coinmarketcap.com/v1/ticker/gridcoin/'
 
     def price(self):
-        if round(time()) > self.last_updated+self.timeout:
+        if round(time()) > self.last_updated+self.timeout_sec:
             try:
                 self.last_price = float(json.loads(urlopen(self.price_url).read().decode())[0]['price_usd'])
             except Exception as E:
