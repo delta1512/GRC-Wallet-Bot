@@ -20,6 +20,7 @@ Create an new account: %new
 bal = '''```
 Balance: %bal, %balance
     Checks your current balance and shows your deposit address.
+    To get a clipboard friendly address, use %addr.
     Deposits should arrive within 5 minutes of a transaction taking place.
     If the bot is offline, you are still safe to make deposits.
 ```'''
@@ -70,8 +71,8 @@ info = '''
 The source code for the bot can be found here: https://github.com/delta1512/GRC-Wallet-Bot
 
 Notable mentions:
-- Foxifi
 - Jorkermc https://github.com/jorkermc
+- Foxifi
 '''
 
 help_dict = {
