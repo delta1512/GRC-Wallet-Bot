@@ -52,7 +52,7 @@ def donate(selection, amount, userobj):
         return '{}Invalid selection.'.format(e.ERROR)
     if amount == None:
         return '{}Amount provided is invalid.'.format(e.ERROR)
-    if userobj.balance < amount:
+    if round(userobj.balance, 8) < amount:
         return '{}Insufficient funds to donate. You have `{} GRC`'.format(e.ERROR, round(userobj.balance, 8))
     if 0 <= selection < len(g.donation_accts):
         acct_dict = g.donation_accts[selection]
@@ -74,7 +74,7 @@ def withdraw(amount, addr, userobj):
         return '{}Amount provided is invalid.'.format(e.ERROR)
     if amount-g.tx_fee-g.MIN_TX <= 0:
         return '{}Invalid amount, withdraw an amount higher than the fee and minimum. (`{} GRC`)'.format(e.ERROR, g.tx_fee+g.MIN_TX)
-    if userobj.balance < amount:
+    if round(userobj.balance, 8) < amount:
         return '{}Insufficient funds to withdraw. You have `{} GRC`'.format(e.ERROR, round(userobj.balance, 8))
     return userobj.withdraw(amount, addr)
 
@@ -83,7 +83,7 @@ def give(amount, current_usrobj, rec_usrobj, add_success_msg='', donation=False)
     if current_usrobj.usrID == rec_usrobj.usrID:
         return '{}Cannot give funds to yourself.'.format(e.CANNOT)
     if amount != None:
-        if amount <= current_usrobj.balance:
+        if amount <= round(current_usrobj.balance, 8):
             current_usrobj.balance -= amount
             rec_usrobj.balance += amount
             if donation:
