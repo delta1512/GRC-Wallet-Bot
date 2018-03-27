@@ -1,3 +1,4 @@
+from GRC_pricebot import price_bot
 import subprocess as sp
 import commands as bot
 from user import usr
@@ -14,6 +15,7 @@ import docs
 client = discord.Client()
 LAST_BLK = 0
 FCT = 'FAUCET'
+price_fetcher = price_bot()
 UDB = {}
 
 def check_tx(txid):
@@ -143,7 +145,7 @@ async def on_message(msg):
         #await client.send_message(chan, '{} **DISCLAIMER**: The bot currently uses the testnet. **DO NOT SEND REAL GRIDCOIN TO THE BOT** {}'.format(e.INFO, e.INFO[:-2]))
         cmd = cmd[1:]
         if cmd.startswith('status'):
-            await client.send_message(chan, bot.dump_cfg())
+            await client.send_message(chan, bot.dump_cfg(price_fetcher))
         elif cmd.startswith('new'):
             if not INDB:
                 await client.send_message(chan, '{}Creating your account now...'.format(e.SETTING))
@@ -160,7 +162,7 @@ async def on_message(msg):
         elif INDB:
             USROBJ = UDB[user]
             if cmd in ['bal', 'balance']:
-                await client.send_message(chan, bot.fetch_balance(USROBJ))
+                await client.send_message(chan, bot.fetch_balance(USROBJ, price_fetcher))
             elif cmd.split()[0] in ['wdr', 'withdraw', 'send']:
                 args = cmd.split()[1:]
                 if len(args) == 2:

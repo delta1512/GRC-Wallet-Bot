@@ -18,7 +18,7 @@ def amt_filter(inp, userobj):
     except:
         return None
 
-def dump_cfg():
+def dump_cfg(price_fetcher):
     block_height = w.query('getblockcount', [])
     block_hash = w.query('getblockhash', [block_height])
     if block_height < 5 or not isinstance(block_hash, str): # 5 is largest error return value
@@ -29,7 +29,8 @@ Withdraw fee: {}
 Transfer limit: {}
 Required confirmations per withdraw: {}
 Block height: {}
-Latest hash: {}```'''.format(e.ONLINE, g.tx_fee, g.MIN_TX, g.tx_timeout, block_height, block_hash)
+Latest hash: {}
+Price (USD): {}```'''.format(e.ONLINE, g.tx_fee, g.MIN_TX, g.tx_timeout, block_height, block_hash, round(price_fetcher.price(), 4))
 
 def new_user(uid):
     try:
@@ -38,9 +39,10 @@ def new_user(uid):
     except:
         return 1, '{}Error: Something went wrong when attempting to make your user account.'.format(e.ERROR), None
 
-def fetch_balance(userobj):
+def fetch_balance(userobj, price_fetcher):
+    usrbal = userobj.balance
     return '''{}Your balance for: `{}`
-```Wallet: {} GRC```'''.format(e.BAL, userobj.address, round(userobj.balance, 8))
+```Wallet: {} GRC (${} USD)```'''.format(e.BAL, userobj.address, round(usrbal, 8), price_fetcher.conv(usrbal))
 
 def donate(selection, amount, userobj):
     amount = amt_filter(amount, userobj)
