@@ -9,14 +9,13 @@ class usr:
         self.balance = k.get('balance', 0.0)
         self.active_tx = k.get('lastTX', [None, 0, None]) # [amount, timestamp, txid]
         self.donations = k.get('donations', 0.0)
-        self.last_active = k.get('last_active', 0)
+        self.last_faucet = k.get('last_faucet', 0)
         addr = w.query('getnewaddress', [])
         if not isinstance(addr, str):
             raise Exception('Client down')
         self.address = k.get('address', addr)
 
     def withdraw(self, amount, addr):
-        self.last_active = round(time())
         if round(time()) > self.active_tx[1]+1.5*60*g.tx_timeout:
             txid = w.tx(addr, amount-g.tx_fee)
             if isinstance(txid, str):
@@ -33,7 +32,6 @@ class usr:
             return '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
 
     def donate(self, addr, amount):
-        self.last_active = round(time())
         if round(time()) > self.active_tx[1]+1.5*60:
             txid = w.tx(addr, amount-0.0001)
             if isinstance(txid, str):

@@ -95,10 +95,10 @@ def give(amount, current_usrobj, rec_usrobj, add_success_msg='', donation=False)
 def faucet(faucet_usr, current_usr):
     if faucet_usr.balance == 0:
         return '{}Unfortunately the faucet is out of GRC. Try again soon.'.format(e.DOWN)
-    elif round(time()) < current_usr.last_active+3600*g.FCT_REQ_LIM:
+    elif round(time()) < current_usr.last_faucet+3600*g.FCT_REQ_LIM:
         return '{}Request too recent. Faucet timeout is {} hours.'.format(e.CANNOT, g.FCT_REQ_LIM)
     else:
-        current_usr.last_active = round(time())
+        current_usr.last_faucet = round(time())
         return give(round(uniform(g.FCT_MIN, min(g.FCT_MAX, faucet_usr.balance)), 8), faucet_usr, current_usr)
 
 def help_interface(query):

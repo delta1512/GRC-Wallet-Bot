@@ -53,7 +53,7 @@ def read_db(dbdir):
     for record in c.fetchall():
         UDB[record[0]] = usr(record[0],
         address=record[1],
-        last_active=record[2],
+        last_faucet=record[2],
         balance=record[3],
         donations=record[4],
         lastTX=[record[5], record[6], record[7]])
@@ -65,7 +65,7 @@ def save_db(dbdir):
     c = db.cursor()
     for u in UDB:
         c.execute('INSERT INTO udb VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (
-        UDB[u].usrID, UDB[u].address, UDB[u].last_active, UDB[u].balance, UDB[u].donations,
+        UDB[u].usrID, UDB[u].address, UDB[u].last_faucet, UDB[u].balance, UDB[u].donations,
         UDB[u].active_tx[0], UDB[u].active_tx[1], UDB[u].active_tx[2]))
     db.commit()
     db.close()
