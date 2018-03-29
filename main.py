@@ -179,6 +179,13 @@ async def on_message(msg):
                 else:
                     reply = bot.fetch_donation_addrs()
                 await client.send_message(chan, reply)
+            elif cmd.startswith('rdonate'):
+                args = cmd.split()[1:]
+                if len(args) == 1:
+                    reply = bot.rdonate(args[0], USROBJ)
+                else:
+                    reply = '{}To donate to a random contributor type: `%rdonate [amount-GRC]`'
+                await client.send_message(chan, reply)
             elif cmd.startswith('give'):
                 args = cmd.split()[1:]
                 if (len(args) != 2) or (len(msg.mentions) != 1):

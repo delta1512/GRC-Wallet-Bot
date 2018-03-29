@@ -1,9 +1,9 @@
-from random import uniform
 from time import time
 from user import usr
 import grcconf as g
 import emotes as e
 import wallet as w
+import random as r
 import docs
 
 def amt_filter(inp, userobj):
@@ -61,6 +61,14 @@ def donate(selection, amount, userobj):
     else:
         return '{}Invalid selection.'.format(e.ERROR)
 
+def rdonate(amount, userobj):
+    selection = r.randint(0, len(g.donation_accts))
+    reply = donate(selection, amount, userobj)
+    if reply.startswith(e.GOOD):
+        acct_dict = g.donation_accts[selection]
+        return reply + '\n\nYou donated to: {}'.format(list(acct_dict.keys())[0])
+    return reply
+
 def fetch_donation_addrs():
     big_string = '{}Be generous! Below are possible donation options.```{}```\nTo donate, type `%donate [selection no.] [amount-GRC]`'
     acc = ''
@@ -101,7 +109,7 @@ def faucet(faucet_usr, current_usr):
         return '{}Request too recent. Faucet timeout is {} hours.'.format(e.CANNOT, g.FCT_REQ_LIM)
     else:
         current_usr.last_faucet = round(time())
-        return give(round(uniform(g.FCT_MIN, g.FCT_MAX), 8), faucet_usr, current_usr)
+        return give(round(r.uniform(g.FCT_MIN, g.FCT_MAX), 8), faucet_usr, current_usr)
 
 def help_interface(query):
     try:

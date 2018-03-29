@@ -6,6 +6,7 @@ hlp = '''```
 - balance
 - withdraw
 - donate
+- rdonate
 - give
 - faucet
 - status
@@ -40,6 +41,13 @@ Donate to someone: %donate
 
     A list of possible donation addresses to encourage generosity.
     Choose a number from the list of selections and then the amount to donate.
+```'''
+
+rdonate = '''```
+Donate to a random contributor: %rdonate
+    Format: %rdonate [amount-GRC]
+
+    Same as %donate but a random person on the bot's donation list is chosen for you.
 ```'''
 
 give = '''```

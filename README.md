@@ -14,22 +14,22 @@ Discord bot by [Delta](https://github.com/delta1512) for the [Gridcoin Discord c
 
 These are just ideas, not all of them may be implemented in the future. Any suggestions are welcome.
 
-* Interactive donation presentation
+- [ ] Interactive donation presentation
 
-* Site to view donation ranks
+- [ ] Site to view donation ranks
 
-* ~~Faucet~~
+- [x] Faucet
 
-* Random donations
+- [x] Random donations
 
-* Dice and other assorted features
+- [ ] Dice and other assorted features
 
-* Rain/soak
+- [ ] Rain/soak
 
-* Help topics such as getting started with GRC
+- [ ] Help topics such as getting started with GRC
 
-* Block exploring features
+- [ ] Block exploring features
 
-* BOINC stats
+- [ ] BOINC stats
 
-* Links to featured sites
+- [ ] Links to featured sites
