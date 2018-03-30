@@ -1,5 +1,4 @@
 from GRC_pricebot import price_bot
-import subprocess as sp
 import commands as bot
 from user import usr
 from sys import exit
@@ -7,7 +6,6 @@ import grcconf as g
 from os import path
 import emotes as e
 import wallet as w
-import sqlite3
 import discord
 import asyncio
 import docs
@@ -30,48 +28,6 @@ def check_tx(txid):
     except:
         pass
     return final_addrs, final_vals
-
-def create_db(dbdir):
-    db = sqlite3.connect(dbdir)
-    c = db.cursor()
-    c.execute('''CREATE TABLE udb (
-    userID text,
-    address text,
-    last_active int,
-    balance float,
-    donations float,
-    lastTX_amt float,
-    lastTX_time int,
-    lastTX_txid text
-    )''')
-    db.commit()
-    db.close()
-
-def read_db(dbdir):
-    global UDB
-    db = sqlite3.connect(dbdir)
-    c = db.cursor()
-    c.execute('SELECT * FROM udb')
-    for record in c.fetchall():
-        UDB[record[0]] = usr(record[0],
-        address=record[1],
-        last_faucet=record[2],
-        balance=record[3],
-        donations=record[4],
-        lastTX=[record[5], record[6], record[7]])
-    db.close()
-
-def save_db(dbdir):
-    create_db(g.TMP_DIR)
-    db = sqlite3.connect(g.TMP_DIR)
-    c = db.cursor()
-    for u in UDB:
-        c.execute('INSERT INTO udb VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (
-        UDB[u].usrID, UDB[u].address, UDB[u].last_faucet, UDB[u].balance, UDB[u].donations,
-        UDB[u].active_tx[0], UDB[u].active_tx[1], UDB[u].active_tx[2]))
-    db.commit()
-    db.close()
-    sp.call('mv {} {}'.format(g.TMP_DIR, dbdir), shell=True)
 
 def blk_searcher():
     global UDB, LAST_BLK
@@ -105,11 +61,11 @@ async def pluggable_loop():
     while True:
         await asyncio.sleep(5)
         if sleepcount % g.SLP_SML == 0:
-            save_db(g.MEM_DB)
+            db.save_db(g.MEM_DB)
             with open(g.LST_BLK_MEM, 'w') as last_block:
                 last_block.write(str(LAST_BLK))
         if sleepcount % g.SLP_BIG == 0:
-            save_db(g.COLD_DB)
+            db.save_db(g.COLD_DB)
             with open(g.LST_BLK_COLD, 'w') as last_block:
                 last_block.write(str(LAST_BLK))
         blk_searcher()
@@ -220,11 +176,11 @@ if not (path.exists(g.MEMORY_ROOT) or path.exists(g.COLD_DB)):
     exit(1)
 
 if path.exists(g.MEM_DB):
-    read_db(g.MEM_DB)
+    db.read_db(g.MEM_DB)
 elif path.exists(g.COLD_DB):
-    read_db(g.COLD_DB)
+    db.read_db(g.COLD_DB)
 else:
-    create_db(g.MEM_DB)
+    db.create_db(g.MEM_DB)
     print('[DEBUG] Created template table')
 
 if not FCT in UDB:
