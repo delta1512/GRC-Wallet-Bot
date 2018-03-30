@@ -1,5 +1,6 @@
 import grcconf as g
-import requests
+import aiohttp
+import asyncio
 import json
 
 '''
@@ -9,13 +10,15 @@ import json
 4 - invalid type
 '''
 
-def query(cmd, params):
+async def query(cmd, params):
     if not all([isinstance(cmd, str), isinstance(params, list)]):
         print('[WARN] Invalid data sent to wallet query')
         return 2
     command = json.dumps({'method' : cmd, 'params' : params})
     try:
-        response = json.loads(requests.request("POST", g.rpc_url, data=command, headers={'content-type': "application/json", 'cache-control': "no-cache"}, auth=(g.rpc_usr, g.rpc_pass)).text)
+        async with aiohttp.ClientSession() as session:
+            async with session.post(g.rpc_url, data=command, headers={'content-type': "application/json", 'cache-control': "no-cache"}, auth=(g.rpc_usr, g.rpc_pass)) as resp:
+                response = await resp.json()
     except Exception as E:
         print('[WARN] Exception triggered in communication with GRC client\n', E)
         return 3
@@ -24,12 +27,8 @@ def query(cmd, params):
     else:
         return response['result']
 
-def tx(addr, amount):
-    try:
-        amount = float(amount)
-    except:
-        return 4
+async def tx(addr, amount):
     if isinstance(addr, str) and len(addr) > 1:
-        return query('sendtoaddress', [addr, float(amount)])
+        return await query('sendtoaddress', [addr, float(amount)])
     else:
         return 4

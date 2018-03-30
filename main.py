@@ -16,8 +16,8 @@ FCT = 'FAUCET'
 price_fetcher = price_bot()
 UDB = {}
 
-def check_tx(txid):
-    tx = w.query('gettransaction', [txid])
+async def check_tx(txid):
+    tx = await w.query('gettransaction', [txid])
     final_addrs = []
     final_vals = []
     try:
@@ -29,16 +29,16 @@ def check_tx(txid):
         pass
     return final_addrs, final_vals
 
-def blk_searcher():
+async def blk_searcher():
     global UDB, LAST_BLK
-    newblock = w.query('getblockcount', [])
+    newblock = await w.query('getblockcount', [])
     if newblock > LAST_BLK:
         for blockheight in range(LAST_BLK+1, newblock+1):
             try:
-                blockhash = w.query('getblockhash', [blockheight])
-                blockdata = w.query('getblock', [blockhash])
+                blockhash = await w.query('getblockhash', [blockheight])
+                blockdata = await w.query('getblock', [blockhash])
                 for txid in blockdata['tx']:
-                    addrs, vals = check_tx(txid)
+                    addrs, vals = await check_tx(txid)
                     if len(addrs) > 0:
                         for uid in UDB:
                             found = False
@@ -68,11 +68,11 @@ async def pluggable_loop():
             db.save_db(g.COLD_DB)
             with open(g.LST_BLK_COLD, 'w') as last_block:
                 last_block.write(str(LAST_BLK))
-        blk_searcher()
+        await blk_searcher()
         with open(g.FEE_POOL, 'r') as fees:
             owed = float(fees.read())
         if owed >= g.FEE_WDR_THRESH:
-            txid = w.tx(g.admin_wallet, owed)
+            txid = await w.tx(g.admin_wallet, owed)
             if not isinstance(txid, str):
                 print('[ERROR] Admin fees could not be sent')
             else:
@@ -83,6 +83,57 @@ async def pluggable_loop():
 
 @client.event
 async def on_ready():
+    if await w.query('getblockcount', []) > 5: # 5 is largest error return value
+        print('[DEBUG] Gridcoin client is online')
+    else:
+        print('[ERROR] GRC client is not online')
+        exit(1)
+
+    if not (path.exists(g.MEMORY_ROOT) or path.exists(g.COLD_DB)):
+        print('[ERROR] Root data directory doesn\'t exist')
+        exit(1)
+
+    if path.exists(g.MEM_DB):
+        db.read_db(g.MEM_DB)
+    elif path.exists(g.COLD_DB):
+        db.read_db(g.COLD_DB)
+    else:
+        db.create_db(g.MEM_DB)
+        print('[DEBUG] Created template table')
+
+    if not FCT in UDB:
+        UDB[FCT] = usr(FCT)
+
+    if path.exists(g.LST_BLK_MEM):
+        with open(g.LST_BLK_MEM, 'r') as last_block:
+            LAST_BLK = int(last_block.read())
+    elif path.exists(g.LST_BLK_COLD):
+        with open(g.LST_BLK_COLD, 'r') as last_block:
+            LAST_BLK = int(last_block.read())
+    else:
+        with open(g.LST_BLK_COLD, 'w') as last_block:
+            last_block.write(str(await w.query('getblockcount', [])))
+        print('[DEBUG] No start block specified. Setting block to client latest')
+
+    if not path.exists(g.FEE_POOL):
+        with open(g.FEE_POOL, 'w') as fees:
+            fees.write('0')
+
+    try:
+        with open('API.key', 'r') as APIkeyfile:
+            APIkey = str(APIkeyfile.read().replace('\n', ''))
+        print('[DEBUG] API Key loaded')
+    except:
+        print('[ERROR] Failed to load API key')
+        exit(1)
+
+    try:
+        import grcconf as g
+        print('[DEBUG] Successfully loaded the configuration file')
+    except:
+        print('[ERROR] Failed to load config file')
+        exit(1)
+
     await pluggable_loop()
 
 @client.event
@@ -98,7 +149,6 @@ async def on_message(msg):
     elif iscommand and chan.server.id in g.LCK_SRVS:
         await client.send_message(chan, docs.server_lock_msg)
     elif iscommand and (len(cmd) > 1):
-        #await client.send_message(chan, '{} **DISCLAIMER**: The bot currently uses the testnet. **DO NOT SEND REAL GRIDCOIN TO THE BOT** {}'.format(e.INFO, e.INFO[:-2]))
         cmd = cmd[1:]
         if cmd.startswith('status'):
             await client.send_message(chan, bot.dump_cfg(price_fetcher))
@@ -165,59 +215,4 @@ async def on_message(msg):
         else:
             await client.send_message(chan, '{}Either incorrect command or not in user database (try `%new`)'.format(e.ERROR))
 
-if w.query('getblockcount', []) > 5: # 5 is largest error return value
-    print('[DEBUG] Gridcoin client is online')
-else:
-    print('[ERROR] GRC client is not online')
-    exit(1)
-
-if not (path.exists(g.MEMORY_ROOT) or path.exists(g.COLD_DB)):
-    print('[ERROR] Root data directory doesn\'t exist')
-    exit(1)
-
-if path.exists(g.MEM_DB):
-    db.read_db(g.MEM_DB)
-elif path.exists(g.COLD_DB):
-    db.read_db(g.COLD_DB)
-else:
-    db.create_db(g.MEM_DB)
-    print('[DEBUG] Created template table')
-
-if not FCT in UDB:
-    UDB[FCT] = usr(FCT)
-
-if path.exists(g.LST_BLK_MEM):
-    with open(g.LST_BLK_MEM, 'r') as last_block:
-        LAST_BLK = int(last_block.read())
-elif path.exists(g.LST_BLK_COLD):
-    with open(g.LST_BLK_COLD, 'r') as last_block:
-        LAST_BLK = int(last_block.read())
-else:
-    with open(g.LST_BLK_COLD, 'w') as last_block:
-        last_block.write(str(w.query('getblockcount', [])))
-    print('[DEBUG] No start block specified. Setting block to client latest')
-
-if not path.exists(g.FEE_POOL):
-    with open(g.FEE_POOL, 'w') as fees:
-        fees.write('0')
-
-try:
-    with open('API.key', 'r') as APIkeyfile:
-        APIkey = str(APIkeyfile.read().replace('\n', ''))
-    print('[DEBUG] API Key loaded')
-except:
-    print('[ERROR] Failed to load API key')
-    exit(1)
-
-try:
-    import grcconf as g
-    print('[DEBUG] Successfully loaded the configuration file')
-except:
-    print('[ERROR] Failed to load config file')
-    exit(1)
-
 client.run(APIkey)
-
-'''
-- https://github.com/Rapptz/discord.py/blob/master/examples
-'''

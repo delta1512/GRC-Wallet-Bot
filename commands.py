@@ -20,8 +20,8 @@ def amt_filter(inp, userobj):
         return None
 
 def dump_cfg(price_fetcher):
-    block_height = w.query('getblockcount', [])
-    block_hash = w.query('getblockhash', [block_height])
+    block_height = await w.query('getblockcount', [])
+    block_hash = await w.query('getblockhash', [block_height])
     if block_height < 5 or not isinstance(block_hash, str): # 5 is largest error return value
         return '{}Could not access the Gridcoin client.'.format(e.ERROR)
 
