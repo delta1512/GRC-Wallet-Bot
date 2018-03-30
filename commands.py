@@ -1,3 +1,4 @@
+import UDB_tools as db
 from time import time
 from user import usr
 import grcconf as g
@@ -30,7 +31,7 @@ Transfer limit: {}
 Required confirmations per withdraw: {}
 Block height: {}
 Latest hash: {}
-Price (USD): {}```'''.format(e.ONLINE, g.tx_fee, g.MIN_TX, g.tx_timeout, block_height, block_hash, round(price_fetcher.price(), 4))
+Price (USD): {}```'''.format(e.ONLINE, g.tx_fee, g.MIN_TX, g.tx_timeout, block_height, block_hash, round(await price_fetcher.price(), 4))
 
 def new_user(uid):
     try:
@@ -42,7 +43,7 @@ def new_user(uid):
 def fetch_balance(userobj, price_fetcher):
     usrbal = userobj.balance
     return '''{}Your balance for: `{}`
-```{} GRC (${} USD)```'''.format(e.BAL, userobj.address, round(usrbal, 8), price_fetcher.conv(usrbal))
+```{} GRC (${} USD)```'''.format(e.BAL, userobj.address, round(usrbal, 8), await price_fetcher.conv(usrbal))
 
 def donate(selection, amount, userobj):
     amount = amt_filter(amount, userobj)
