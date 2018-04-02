@@ -1,4 +1,5 @@
 import subprocess as sp
+from user import usr
 import sqlite3
 
 def create_db(dbdir):

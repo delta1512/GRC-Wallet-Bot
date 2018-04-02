@@ -1,4 +1,5 @@
 from GRC_pricebot import price_bot
+import UDB_tools as db
 import commands as bot
 from user import usr
 from sys import exit
@@ -83,6 +84,7 @@ async def pluggable_loop():
 
 @client.event
 async def on_ready():
+    global g
     if await w.query('getblockcount', []) > 5: # 5 is largest error return value
         print('[DEBUG] Gridcoin client is online')
     else:
@@ -118,14 +120,6 @@ async def on_ready():
     if not path.exists(g.FEE_POOL):
         with open(g.FEE_POOL, 'w') as fees:
             fees.write('0')
-
-    try:
-        with open('API.key', 'r') as APIkeyfile:
-            APIkey = str(APIkeyfile.read().replace('\n', ''))
-        print('[DEBUG] API Key loaded')
-    except:
-        print('[ERROR] Failed to load API key')
-        exit(1)
 
     try:
         import grcconf as g
@@ -222,5 +216,13 @@ async def on_message(msg):
                 await client.send_message(chan, '{}Invalid command.'.format(e.INFO))
         else:
             await client.send_message(chan, '{}Either incorrect command or not in user database (try `%new`)'.format(e.ERROR))
+
+try:
+    with open('API.key', 'r') as APIkeyfile:
+        APIkey = str(APIkeyfile.read().replace('\n', ''))
+    print('[DEBUG] API Key loaded')
+except:
+    print('[ERROR] Failed to load API key')
+    exit(1)
 
 client.run(APIkey)

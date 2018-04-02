@@ -20,7 +20,7 @@ def amt_filter(inp, userobj):
     except:
         return None
 
-def dump_cfg(price_fetcher):
+async def dump_cfg(price_fetcher):
     block_height = await w.query('getblockcount', [])
     block_hash = await w.query('getblockhash', [block_height])
     if block_height < 5 or not isinstance(block_hash, str): # 5 is largest error return value
@@ -41,7 +41,7 @@ def new_user(uid):
     except:
         return 1, '{}Error: Something went wrong when attempting to make your user account.'.format(e.ERROR), None
 
-def fetch_balance(userobj, price_fetcher):
+async def fetch_balance(userobj, price_fetcher):
     usrbal = userobj.balance
     return '''{}Your balance for: `{}`
 ```{} GRC (${} USD)```'''.format(e.BAL, userobj.address, round(usrbal, 8), await price_fetcher.conv(usrbal))
@@ -122,7 +122,7 @@ def get_qr(string, uid):
     qr.add_data(string)
     qr.make(fit=True)
     savedir = '/tmp/{}.png'.format(uid)
-    qr.make_image(fill_color='#330063', back_color='white').save(savedir)
+    qr.make_image(fill_color='#5c00b3', back_color='white').save(savedir)
     return savedir
 
 def help_interface(query):

@@ -17,7 +17,7 @@ async def query(cmd, params):
     command = json.dumps({'method' : cmd, 'params' : params})
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.post(g.rpc_url, data=command, headers={'content-type': "application/json", 'cache-control': "no-cache"}, auth=(g.rpc_usr, g.rpc_pass)) as resp:
+            async with session.post(g.rpc_url, data=command, headers={'content-type': "application/json", 'cache-control': "no-cache"}, auth=aiohttp.BasicAuth(g.rpc_usr, password=g.rpc_pass)) as resp:
                 response = await resp.json()
     except Exception as E:
         print('[WARN] Exception triggered in communication with GRC client\n', E)
