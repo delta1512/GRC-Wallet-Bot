@@ -5,6 +5,7 @@ import grcconf as g
 import emotes as e
 import wallet as w
 import random as r
+import qrcode
 import docs
 
 def amt_filter(inp, userobj):
@@ -111,6 +112,18 @@ def faucet(faucet_usr, current_usr):
     else:
         current_usr.last_faucet = round(time())
         return give(round(r.uniform(g.FCT_MIN, g.FCT_MAX), 8), faucet_usr, current_usr)
+
+def get_qr(string, uid):
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=2,)
+    qr.add_data(string)
+    qr.make(fit=True)
+    savedir = '/tmp/{}.png'.format(uid)
+    qr.make_image(fill_color='#330063', back_color='white').save(savedir)
+    return savedir
 
 def help_interface(query):
     try:

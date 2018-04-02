@@ -210,6 +210,14 @@ async def on_message(msg):
                 fctobj = UDB[FCT]
                 await client.send_message(chan, docs.faucetmsg.format(round(fctobj.balance, 8), g.FCT_REQ_LIM, fctobj.address))
                 await client.send_message(chan, bot.faucet(fctobj, USROBJ))
+            elif cmd.startswith('qr'):
+                args = cmd.split()[1:]
+                if len(args) == 1:
+                    await client.send_file(chan, bot.get_qr(args[0], user))
+                elif len(args) > 1:
+                    await client.send_message(chan, '{}Too many arguments provided')
+                else:
+                    await client.send_file(chan, bot.get_qr(USROBJ.address, user))
             else:
                 await client.send_message(chan, '{}Invalid command.'.format(e.INFO))
         else:
