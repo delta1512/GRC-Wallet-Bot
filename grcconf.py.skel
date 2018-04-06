@@ -5,25 +5,21 @@ tx_timeout = 1 # Confirmations
 rpc_usr = ''
 rpc_pass = ''
 rpc_url = 'http://[host]:[port]/'
+sql_db_host = '[host]'
+sql_db_usr = '[username]'
+sql_db_pass = '[password]'
 donation_accts = [
     {'[name]' : '[addr]'},
     ]
 
 ### CONFIGURATION CONSTANTS
 pre = '%'
-MEMORY_ROOT = '[Base cache directory (with trailing /)]'
-COLD_ROOT = '[Base storage directory (with trailing /)]'
-MEM_DB = f'{MEMORY_ROOT}[database file cache directory]'
-COLD_DB = f'{COLD_ROOT}[database file storage directory]'
-TMP_DIR = f'{MEMORY_ROOT}[place to store files used for overwriting the databases]'
-FEE_POOL = f'{MEMORY_ROOT}[location of amount of fees owed file]'
-LST_BLK_MEM = f'{MEMORY_ROOT}[location of last block height file (temporary)]'
-LST_BLK_COLD = f'{COLD_ROOT}[location of last block height file (fixed)]'
+FEE_POOL = '[location of amount of fees owed file]'
+LST_BLK = '[location of last block height file (temporary)]'
 LCK_SRVS = []
 MIN_TX = 0.001
-FEE_WDR_THRESH = 0.5 # When to send out the collected fees to admin
-SLP_SML = 30 # Save interval
-SLP_BIG = SLP_SML * 10
+FEE_WDR_THRESH = 10 # When to send out the collected fees to admin
+SLP = 30 # Save interval
 FCT_REQ_LIM = 24 # Hours
 FCT_MAX = 1
 FCT_MIN = 0.1

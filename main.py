@@ -61,25 +61,21 @@ async def pluggable_loop():
     sleepcount = 0
     while True:
         await asyncio.sleep(5)
-        if sleepcount % g.SLP_SML == 0:
-            db.save_db(g.MEM_DB)
-            with open(g.LST_BLK_MEM, 'w') as last_block:
-                last_block.write(str(LAST_BLK))
-        if sleepcount % g.SLP_BIG == 0:
-            db.save_db(g.COLD_DB)
+        await blk_searcher()
+        if sleepcount % g.SLP == 0:
+            await db.save_db(UDB)
             with open(g.LST_BLK_COLD, 'w') as last_block:
                 last_block.write(str(LAST_BLK))
-        await blk_searcher()
-        with open(g.FEE_POOL, 'r') as fees:
-            owed = float(fees.read())
-        if owed >= g.FEE_WDR_THRESH:
-            txid = await w.tx(g.admin_wallet, owed)
-            if not isinstance(txid, str):
-                print('[ERROR] Admin fees could not be sent')
-            else:
-                print('[DEBUG] Admin fees sent')
-                with open(g.FEE_POOL, 'w') as fees:
-                    fees.write('0')
+            with open(g.FEE_POOL, 'r') as fees:
+                owed = float(fees.read())
+            if owed >= g.FEE_WDR_THRESH:
+                txid = await w.tx(g.admin_wallet, owed)
+                if not isinstance(txid, str):
+                    print('[ERROR] Admin fees could not be sent')
+                else:
+                    print('[DEBUG] Admin fees sent')
+                    with open(g.FEE_POOL, 'w') as fees:
+                        fees.write('0')
         sleepcount += 5
 
 @client.event

@@ -8,7 +8,7 @@ async def check_db():
         conn = await aiomysql.connect(host=g.sql_db_host, port=3306, user=g.sql_db_usr,
                                     password=g.sql_db_pass, db='mysql')
         c = await conn.cursor()
-        await c.execute('SELECT * FROM grcbot.udb')
+        await c.execute('SELECT * FROM {}'.format(g.udb_name))
     except:
         return 1
     conn.close()
@@ -19,7 +19,7 @@ async def read_db():
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr,
                                 password=g.sql_db_pass, db='mysql')
     c = await db.cursor()
-    await c.execute('SELECT * FROM grcbot.udb')
+    await c.execute('SELECT * FROM {}'.format(g.udb_name))
     for record in await c.fetchall():
         tmpdb[record[0]] = usr(record[0],
         address=record[1],
@@ -35,20 +35,20 @@ async def save_db(udb):
                                 password=g.sql_db_pass, db='mysql')
     c = await db.cursor()
     for u in udb:
-        await c.execute('SELECT * FROM grcbot.udb WHERE uid=%s', (u,))
+        await c.execute('SELECT * FROM {} WHERE uid=%s'.format(g.udb_name), (u,))
         if len(await c.fetchall()) > 0:
-            await c.execute('''UPDATE grcbot.udb SET
+            await c.execute('''UPDATE {} SET
                             last_faucet=%s,
                             balance=%s,
                             donations=%s,
                             lastTX_amt=%s,
                             lastTX_time=%s,
                             lastTX_txid=%s;
-                            WHERE uid=%s''',
+                            WHERE uid=%s'''.format(g.udb_name),
                 (udb[u].last_faucet, udb[u].balance, udb[u].donations,
                 udb[u].active_tx[0], udb[u].active_tx[1], udb[u].active_tx[2], udb[u].usrID))
         else:
-            await c.execute('INSERT INTO grcbot.udb VALUES (%s, %s, %s, %s, %s, %s, %s, %s)', (
+            await c.execute('INSERT INTO {} VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'.format(g.udb_name), (
             udb[u].usrID, udb[u].address, udb[u].last_faucet, udb[u].balance, udb[u].donations,
             udb[u].active_tx[0], udb[u].active_tx[1], udb[u].active_tx[2]))
     await db.commit()
