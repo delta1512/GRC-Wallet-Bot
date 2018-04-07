@@ -8,6 +8,7 @@ rpc_url = 'http://[host]:[port]/'
 sql_db_host = '[host]'
 sql_db_usr = '[username]'
 sql_db_pass = '[password]'
+udb_name = '[name of database and table]'
 donation_accts = [
     {'[name]' : '[addr]'},
     ]

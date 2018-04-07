@@ -5,8 +5,7 @@ import asyncio
 
 async def check_db():
     try:
-        conn = await aiomysql.connect(host=g.sql_db_host, port=3306, user=g.sql_db_usr,
-                                    password=g.sql_db_pass, db='mysql')
+        conn = await aiomysql.connect(host=g.sql_db_host, port=3306, user=g.sql_db_usr, password=g.sql_db_pass)
         c = await conn.cursor()
         await c.execute('SELECT * FROM {}'.format(g.udb_name))
     except:
@@ -16,8 +15,7 @@ async def check_db():
 
 async def read_db():
     tmpdb = {}
-    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr,
-                                password=g.sql_db_pass, db='mysql')
+    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
     await c.execute('SELECT * FROM {}'.format(g.udb_name))
     for record in await c.fetchall():
@@ -31,8 +29,7 @@ async def read_db():
     return tmpdb
 
 async def save_db(udb):
-    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr,
-                                password=g.sql_db_pass, db='mysql')
+    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
     for u in udb:
         await c.execute('SELECT * FROM {} WHERE uid=%s'.format(g.udb_name), (u,))
