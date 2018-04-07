@@ -4,11 +4,9 @@ import emotes as e
 import wallet as w
 import asyncio
 
-# This class requires a rewrite according to the specs of the solution in:
-# https://stackoverflow.com/questions/33128325/how-to-set-class-attribute-with-await-in-init
-
 class usr:
-    async def __init__(self, uid, **k):
+    def __init__(self, uid, **k):
+        self.loop = asyncio.get_event_loop()
         self.usrID = uid
         self.balance = k.get('balance', 0.0)
         self.active_tx = k.get('lastTX', [None, 0, None]) # [amount, timestamp, txid]
@@ -16,7 +14,7 @@ class usr:
         self.last_faucet = k.get('last_faucet', 0)
         self.address = k.get('address', None)
         if self.address == None:
-            addr = await w.query('getnewaddress', [])
+            addr = self.loop.run_until_complete(w.query('getnewaddress', []))
             if not isinstance(addr, str):
                 raise Exception('Client down')
             self.address = addr
