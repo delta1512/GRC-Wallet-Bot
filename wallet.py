@@ -25,7 +25,7 @@ async def query(cmd, params):
     if response['error'] != None:
         return 1
     else:
-        return response['result']
+        return response['result'].replace('\n', '')
 
 async def tx(addr, amount):
     if isinstance(addr, str) and len(addr) > 1:
