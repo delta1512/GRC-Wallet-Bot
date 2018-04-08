@@ -13,8 +13,7 @@ async def check_uid(uid):
 
 async def check_db():
     try:
-        if len(asyncio.ensure_future(await check_uid('FAUCET')).result()) == 0:
-            raise Exception('Faucet does not exist!')
+        asyncio.ensure_future(await check_uid('FAUCET')).result():
     except:
         return 1
     return 0

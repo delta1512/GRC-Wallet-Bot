@@ -64,7 +64,7 @@ async def pluggable_loop():
         await blk_searcher()
         if sleepcount % g.SLP == 0:
             await db.save_db(UDB)
-            with open(g.LST_BLK_COLD, 'w') as last_block:
+            with open(g.LST_BLK, 'w') as last_block:
                 last_block.write(str(LAST_BLK))
             with open(g.FEE_POOL, 'r') as fees:
                 owed = float(fees.read())
@@ -80,7 +80,6 @@ async def pluggable_loop():
 
 @client.event
 async def on_ready():
-    global g
     if await w.query('getblockcount', []) > 5: # 5 is largest error return value
         print('[DEBUG] Gridcoin client is online')
     else:
@@ -91,38 +90,23 @@ async def on_ready():
         print('[ERROR] Root data directory doesn\'t exist')
         exit(1)
 
-    if path.exists(g.MEM_DB):
-        db.read_db(g.MEM_DB)
-    elif path.exists(g.COLD_DB):
-        db.read_db(g.COLD_DB)
-    else:
-        db.create_db(g.MEM_DB)
-        print('[DEBUG] Created template table')
+    if db.check_db() != 0:
+        print('[ERROR] Could not connect to SQL database')
+        exit(1)
 
-    if not FCT in UDB:
-        UDB[FCT] = usr(FCT)
+    UDB = db.read_db()
 
-    if path.exists(g.LST_BLK_MEM):
-        with open(g.LST_BLK_MEM, 'r') as last_block:
-            LAST_BLK = int(last_block.read())
-    elif path.exists(g.LST_BLK_COLD):
-        with open(g.LST_BLK_COLD, 'r') as last_block:
+    if path.exists(g.LST_BLK):
+        with open(g.LST_BLK, 'r') as last_block:
             LAST_BLK = int(last_block.read())
     else:
-        with open(g.LST_BLK_COLD, 'w') as last_block:
+        with open(g.LST_BLK, 'w') as last_block:
             last_block.write(str(await w.query('getblockcount', [])))
         print('[DEBUG] No start block specified. Setting block to client latest')
 
     if not path.exists(g.FEE_POOL):
         with open(g.FEE_POOL, 'w') as fees:
             fees.write('0')
-
-    try:
-        import grcconf as g
-        print('[DEBUG] Successfully loaded the configuration file')
-    except:
-        print('[ERROR] Failed to load config file')
-        exit(1)
 
     await pluggable_loop()
 
