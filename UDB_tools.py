@@ -13,7 +13,7 @@ async def check_uid(uid):
 
 async def check_db():
     try:
-        asyncio.ensure_future(await check_uid('FAUCET')).result():
+        asyncio.ensure_future(await check_uid('FAUCET')).result()
     except:
         return 1
     return 0

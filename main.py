@@ -37,24 +37,31 @@ async def blk_searcher():
         for blockheight in range(LAST_BLK+1, newblock+1):
             try:
                 blockhash = await w.query('getblockhash', [blockheight])
+                await asyncio.sleep(0.05) # Protections to guard against reusing the bind address
                 blockdata = await w.query('getblock', [blockhash])
-                for txid in blockdata['tx']:
-                    addrs, vals = await check_tx(txid)
-                    if len(addrs) > 0:
-                        for uid in UDB:
-                            found = False
-                            usr_obj = UDB[uid]
-                            for i, addr in enumerate(addrs):
-                                if usr_obj.address == addr:
-                                    found = True
-                                    index = i
-                                    break
-                            if found:
-                                UDB[uid].balance += vals[index]
-                                addrs.pop(index)
-                                vals.pop(index)
+                if isinstance(blockdata, dict): # Protections to guard against reusing the bind address
+                    for txid in blockdata['tx']:
+                        addrs, vals = await check_tx(txid)
+                        if len(addrs) > 0:
+                            for uid in UDB:
+                                found = False
+                                usr_obj = UDB[uid]
+                                for i, addr in enumerate(addrs):
+                                    if usr_obj.address == addr:
+                                        found = True
+                                        index = i
+                                        break
+                                if found:
+                                    UDB[uid].balance += vals[index]
+                                    addrs.pop(index)
+                                    vals.pop(index)
+                elif blockdata == 3:
+                    pass
+                else:
+                    raise Exception('Received erronous signal in GRC client interface.')
             except Exception as E:
                 print('[ERROR] Block searcher ran into an error: {}'.format(E))
+                exit(0)
         LAST_BLK = newblock
 
 async def pluggable_loop():
@@ -80,21 +87,18 @@ async def pluggable_loop():
 
 @client.event
 async def on_ready():
+    global UDB
     if await w.query('getblockcount', []) > 5: # 5 is largest error return value
         print('[DEBUG] Gridcoin client is online')
     else:
         print('[ERROR] GRC client is not online')
         exit(1)
 
-    if not (path.exists(g.MEMORY_ROOT) or path.exists(g.COLD_DB)):
-        print('[ERROR] Root data directory doesn\'t exist')
-        exit(1)
-
-    if db.check_db() != 0:
+    if await db.check_db() != 0:
         print('[ERROR] Could not connect to SQL database')
         exit(1)
-
-    UDB = db.read_db()
+    else:
+        print('[DEBUG] SQL DB online and accessible')
 
     if path.exists(g.LST_BLK):
         with open(g.LST_BLK, 'r') as last_block:
@@ -105,9 +109,12 @@ async def on_ready():
         print('[DEBUG] No start block specified. Setting block to client latest')
 
     if not path.exists(g.FEE_POOL):
+        print('[DEBUG] Fees owed file not found. Setting fees owed to 0')
         with open(g.FEE_POOL, 'w') as fees:
             fees.write('0')
 
+    UDB = await db.read_db()
+    print('[DEBUG] Initialisation complete')
     await pluggable_loop()
 
 @client.event
@@ -125,11 +132,11 @@ async def on_message(msg):
     elif iscommand and (len(cmd) > 1):
         cmd = cmd[1:]
         if cmd.startswith('status'):
-            await client.send_message(chan, bot.dump_cfg(price_fetcher))
+            await client.send_message(chan, await bot.dump_cfg(price_fetcher))
         elif cmd.startswith('new'):
             if not INDB:
                 await client.send_message(chan, '{}Creating your account now...'.format(e.SETTING))
-                status, reply, userobj = bot.new_user(user)
+                status, reply, userobj = await bot.new_user(user)
                 if status == 0:
                     UDB[user] = userobj
                 await client.send_message(chan, reply)
@@ -142,29 +149,29 @@ async def on_message(msg):
         elif INDB:
             USROBJ = UDB[user]
             if cmd in ['bal', 'balance']:
-                await client.send_message(chan, bot.fetch_balance(USROBJ, price_fetcher))
+                await client.send_message(chan, await bot.fetch_balance(USROBJ, price_fetcher))
             elif cmd.startswith('addr'):
                 await client.send_message(chan, USROBJ.address)
             elif cmd.split()[0] in ['wdr', 'withdraw', 'send']:
                 args = cmd.split()[1:]
                 if len(args) == 2:
-                    reply = bot.withdraw(bot.amt_filter(args[1], USROBJ), args[0], USROBJ)
+                    reply = await bot.withdraw(args[1], args[0], USROBJ)
                 else:
-                    reply = '{}To withdraw from your account type: `%wdr [address to send to] [amount-GRC]`\nA service fee of {} is subtracted from what you send. If you wish to send GRC to someone in the server, use `%give`'.format(e.INFO, str(g.tx_fee))
+                    reply = '{}To withdraw from your account type: `%wdr [address to send to] [amount-GRC]`\nA service fee of {} GRC is subtracted from what you send. If you wish to send GRC to someone in the server, use `%give`'.format(e.INFO, str(g.tx_fee))
                 await client.send_message(chan, reply)
             elif cmd.startswith('donate'):
                 args = cmd.split()[1:]
                 if len(args) == 2:
-                    reply = bot.donate(args[0], args[1], USROBJ)
+                    reply = await bot.donate(args[0], args[1], USROBJ)
                 else:
                     reply = bot.fetch_donation_addrs()
                 await client.send_message(chan, reply)
             elif cmd.startswith('rdonate'):
                 args = cmd.split()[1:]
                 if len(args) == 1:
-                    reply = bot.rdonate(args[0], USROBJ)
+                    reply = await bot.rdonate(args[0], USROBJ)
                 else:
-                    reply = '{}To donate to a random contributor type: `%rdonate [amount-GRC]`'
+                    reply = '{}To donate to a random contributor type: `%rdonate [amount-GRC]`'.format(e.GIVE)
                 await client.send_message(chan, reply)
             elif cmd.startswith('give'):
                 args = cmd.split()[1:]

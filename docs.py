@@ -2,6 +2,7 @@ import grcconf as g
 import emotes as e
 
 hlp = '''```
+Type %help [topic] for more detailed information about the following:
 - new
 - balance
 - withdraw
@@ -77,6 +78,8 @@ info = '''
 **This bot is the original work of Delta and various contributors.**
 
 The source code for the bot can be found here: https://github.com/delta1512/GRC-Wallet-Bot
+
+If there are any problems, glitches or crashes, please notify me or the contributors below as soon as possible. Any queries can be sent to `boincosdelta@gmail.com`.
 
 Notable mentions:
 - Jorkermc https://github.com/jorkermc

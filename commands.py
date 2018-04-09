@@ -34,11 +34,15 @@ Block height: {}
 Latest hash: {}
 Price (USD): {}```'''.format(e.ONLINE, g.tx_fee, g.MIN_TX, g.tx_timeout, block_height, block_hash, round(await price_fetcher.price(), 4))
 
-def new_user(uid):
+async def new_user(uid):
     try:
-        userobj = usr(uid)
+        addr = await w.query('getnewaddress', [])
+        if not isinstance(addr, str):
+            raise Exception('Error in communicating with client')
+        userobj = usr(uid, address=addr)
         return 0, '{}User account created successfully. Your address is `{}`'.format(e.GOOD, userobj.address), userobj
-    except:
+    except Exception as E:
+        print(E)
         return 1, '{}Error: Something went wrong when attempting to make your user account.'.format(e.ERROR), None
 
 async def fetch_balance(userobj, price_fetcher):
@@ -46,7 +50,7 @@ async def fetch_balance(userobj, price_fetcher):
     return '''{}Your balance for: `{}`
 ```{} GRC (${} USD)```'''.format(e.BAL, userobj.address, round(usrbal, 8), await price_fetcher.conv(usrbal))
 
-def donate(selection, amount, userobj):
+async def donate(selection, amount, userobj):
     amount = amt_filter(amount, userobj)
     try:
         selection = int(selection)-1
@@ -55,17 +59,17 @@ def donate(selection, amount, userobj):
     if amount == None:
         return '{}Amount provided is invalid.'.format(e.ERROR)
     if round(userobj.balance, 8) < amount:
-        return '{}Insufficient funds to donate. You have `{} GRC`'.format(e.ERROR, round(userobj.balance, 8))
+        return '{}Insufficient funds to donate. You have `{} GRC`'.format(e.ERROR, round(userobj.balance, 2))
     if 0 <= selection < len(g.donation_accts):
         acct_dict = g.donation_accts[selection]
         address = acct_dict[list(acct_dict.keys())[0]]
-        return userobj.donate(address, amount)
+        return await userobj.donate(address, amount)
     else:
         return '{}Invalid selection.'.format(e.ERROR)
 
-def rdonate(amount, userobj):
-    selection = r.randint(0, len(g.donation_accts))
-    reply = donate(selection, amount, userobj)
+async def rdonate(amount, userobj):
+    selection = r.randint(0, len(g.donation_accts)-1)
+    reply = await donate(selection, amount, userobj)
     if reply.startswith(e.GOOD):
         acct_dict = g.donation_accts[selection]
         return reply + '\n\nYou donated to: {}'.format(list(acct_dict.keys())[0])
@@ -79,14 +83,15 @@ def fetch_donation_addrs():
         acc += '\n{}. {}'.format(str(count+1), name)
     return big_string.format(e.GIVE, acc[1:])
 
-def withdraw(amount, addr, userobj):
+async def withdraw(amount, addr, userobj):
+    amount = amt_filter(amount, userobj)
     if amount is None or amount <= 0:
         return '{}Amount provided is invalid.'.format(e.ERROR)
     if amount-g.tx_fee-g.MIN_TX <= 0:
         return '{}Invalid amount, withdraw an amount higher than the fee and minimum. (`{} GRC`)'.format(e.ERROR, g.tx_fee+g.MIN_TX)
     if round(userobj.balance, 8) < amount:
-        return '{}Insufficient funds to withdraw. You have `{} GRC`'.format(e.ERROR, round(userobj.balance, 8))
-    return userobj.withdraw(amount, addr)
+        return '{}Insufficient funds to withdraw. You have `{} GRC`'.format(e.ERROR, round(userobj.balance, 2))
+    return await userobj.withdraw(amount, addr)
 
 def give(amount, current_usrobj, rec_usrobj, add_success_msg='', donation=False):
     amount = amt_filter(amount, current_usrobj)

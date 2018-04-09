@@ -23,12 +23,13 @@ async def query(cmd, params):
         print('[WARN] Exception triggered in communication with GRC client\n', E)
         return 3
     if response['error'] != None:
+        print(response['error'])
         return 1
     else:
-        return response['result'].replace('\n', '')
+        return response['result']
 
 async def tx(addr, amount):
     if isinstance(addr, str) and len(addr) > 1:
-        return await query('sendtoaddress', [addr, float(amount)])
+        return await query('sendtoaddress', [addr, amount])
     else:
         return 4
