@@ -199,7 +199,7 @@ async def on_message(msg):
                 if len(args) < 1:
                     await client.send_message(chan, '{}Please specify an amount to give.'.format(e.ERROR))
                 else:
-                    await client.send_message(chan, bot.give(args[0], USROBJ, UDB[FCT], add_success_msg='\n\nThankyou for donating to the faucet!', donation=True))
+                    await client.send_message(chan, bot.give(args[0], USROBJ, UDB[FCT], add_success_msg='\n\nThank you for donating to the faucet!', donation=True))
             elif cmd in ['faucet', 'fct', 'get']:
                 fctobj = UDB[FCT]
                 await client.send_message(chan, docs.faucetmsg.format(round(fctobj.balance, 8), g.FCT_REQ_LIM, fctobj.address))
@@ -257,7 +257,7 @@ try:
     import grcconf as g
     print('[DEBUG] Successfully loaded the configuration file')
 except:
-    print('[ERROR] Failed to load config file')
+    print('[ERROR] Failed to load configuration file')
     exit(1)
 
 client.run(APIkey)
