@@ -52,11 +52,11 @@ async def blk_searcher():
                                         index = i
                                         break
                                 if found:
-                                    UDB[uid].balance += vals[index]
+                                    usr_obj.balance += vals[index]
                                     addrs.pop(index)
                                     vals.pop(index)
                 elif blockdata == 3:
-                    pass
+                    pass # Don't render the reuse address error as an exception, otherwise it may flood the terminal
                 else:
                     raise Exception('Received erronous signal in GRC client interface.')
             except Exception as E:
@@ -87,7 +87,7 @@ async def pluggable_loop():
 
 @client.event
 async def on_ready():
-    global UDB
+    global UDB, LAST_BLK
     if await w.query('getblockcount', []) > 5: # 5 is largest error return value
         print('[DEBUG] Gridcoin client is online')
     else:
