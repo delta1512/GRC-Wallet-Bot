@@ -40,6 +40,7 @@ async def blk_searcher():
                 await asyncio.sleep(0.05) # Protections to guard against reusing the bind address
                 blockdata = await w.query('getblock', [blockhash])
                 if isinstance(blockdata, dict): # Protections to guard against reusing the bind address
+                    LAST_BLK = blockheight
                     for txid in blockdata['tx']:
                         addrs, vals = await check_tx(txid)
                         if len(addrs) > 0:
@@ -52,6 +53,7 @@ async def blk_searcher():
                                         index = i
                                         break
                                 if found:
+                                    print('[DEBUG] Processed deposit.')
                                     usr_obj.balance += vals[index]
                                     addrs.pop(index)
                                     vals.pop(index)
@@ -62,7 +64,6 @@ async def blk_searcher():
             except Exception as E:
                 print('[ERROR] Block searcher ran into an error: {}'.format(E))
                 exit(0)
-        LAST_BLK = newblock
 
 async def pluggable_loop():
     sleepcount = 0
@@ -196,13 +197,13 @@ async def on_message(msg):
                 if len(args) == 1:
                     await client.send_file(chan, bot.get_qr(args[0], user))
                 elif len(args) > 1:
-                    await client.send_message(chan, '{}Too many arguments provided')
+                    await client.send_message(chan, '{}Too many arguments provided'.format(e.CANNOT))
                 else:
                     await client.send_file(chan, bot.get_qr(USROBJ.address, user))
             else:
-                await client.send_message(chan, '{}Invalid command.'.format(e.INFO))
+                await client.send_message(chan, '{}Invalid command. Type `%help` for help.'.format(e.INFO))
         else:
-            await client.send_message(chan, '{}Either incorrect command or not in user database (try `%new`)'.format(e.ERROR))
+            await client.send_message(chan, '{}Either incorrect command or not in user database (try `%new` or type `%help` for help)'.format(e.ERROR))
 
 try:
     with open('API.key', 'r') as APIkeyfile:

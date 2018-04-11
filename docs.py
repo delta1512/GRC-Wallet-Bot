@@ -10,6 +10,7 @@ Type %help [topic] for more detailed information about the following:
 - rdonate
 - give
 - faucet
+- qr
 - status
 - info
 ```'''
@@ -66,6 +67,14 @@ Get some free GRC: %faucet
     To help fund the faucet, you can type `%fgive [amount-GRC]`.
 ```'''.format(g.FCT_REQ_LIM)
 
+qr = '''```
+Generate a QR code: %qr
+    Format: %qr [optional data]
+
+    Generates a qr code. If no data is given, it will send a QR code of your
+    wallet address. Any data given must contain no spaces.
+```'''
+
 status = '''```
 Bot and network status: %status
 ```'''
@@ -92,8 +101,10 @@ help_dict = {
     'balance'   :   bal,
     'withdraw'  :   wdr,
     'donate'    :   donate,
+    'rdonate'   :   rdonate,
     'give'      :   give,
     'faucet'    :   faucet,
+    'qr'        :   qr,
     'status'    :   status,
     'info'      :   info_help
 }
