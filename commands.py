@@ -68,7 +68,7 @@ async def donate(selection, amount, userobj):
         return '{}Invalid selection.'.format(e.ERROR)
 
 async def rdonate(amount, userobj):
-    selection = r.randint(0, len(g.donation_accts)-1)
+    selection = r.randint(1, len(g.donation_accts))
     reply = await donate(selection, amount, userobj)
     if reply.startswith(e.GOOD):
         acct_dict = g.donation_accts[selection]
@@ -113,7 +113,7 @@ def faucet(faucet_usr, current_usr):
     if faucet_usr.balance <= g.FCT_MAX:
         return '{}Unfortunately the faucet balance is too low. Try again soon.'.format(e.DOWN)
     elif round(time()) < current_usr.last_faucet+3600*g.FCT_REQ_LIM:
-        return '{}Request too recent. Faucet timeout is {} hours. Try again in {} minutes.'.format(e.CANNOT, g.FCT_REQ_LIM, round((current_usr.last_active+3600*g.FCT_REQ_LIM-round(time()))/60, 1))
+        return '{}Request too recent. Faucet timeout is {} hours. Try again in {} minutes.'.format(e.CANNOT, g.FCT_REQ_LIM, round((current_usr.last_faucet+3600*g.FCT_REQ_LIM-round(time()))/60, 1))
     else:
         current_usr.last_faucet = round(time())
         return give(round(r.uniform(g.FCT_MIN, g.FCT_MAX), 8), faucet_usr, current_usr)
