@@ -23,7 +23,9 @@ async def query(cmd, params):
         print('[WARN] Exception triggered in communication with GRC client\n', E)
         return 3
     if response['error'] != None:
-        print(response['error'])
+        if response['error']['code'] == -17:
+            return None
+        print('[WARN] Error response collected by GRC client: ', response['error'])
         return 1
     else:
         return response['result']
@@ -33,3 +35,6 @@ async def tx(addr, amount):
         return await query('sendtoaddress', [addr, amount])
     else:
         return 4
+
+async def unlock():
+    return await query('walletpassphrase', [g.grc_pass, 999999999, False])

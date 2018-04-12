@@ -114,6 +114,12 @@ async def on_ready():
         with open(g.FEE_POOL, 'w') as fees:
             fees.write('0')
 
+    if await w.unlock() == None:
+        print('[DEBUG] Wallet successfully unlocked')
+    else:
+        print('[ERROR] There was a problem trying to unlock the gridcoin wallet')
+        exit(1)
+
     UDB = await db.read_db()
     print('[DEBUG] Initialisation complete')
     await pluggable_loop()
@@ -128,8 +134,6 @@ async def on_message(msg):
     iscommand = cmd.startswith(g.pre)
     if iscommand and chan.is_private:
         await client.send_message(chan, docs.PM_msg)
-    elif iscommand and chan.server.id in g.LCK_SRVS:
-        await client.send_message(chan, docs.server_lock_msg)
     elif iscommand and (len(cmd) > 1):
         cmd = cmd[1:]
         if cmd.startswith('status'):
