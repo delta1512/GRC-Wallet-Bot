@@ -71,7 +71,7 @@ async def rdonate(amount, userobj):
     selection = r.randint(1, len(g.donation_accts))
     reply = await donate(selection, amount, userobj)
     if reply.startswith(e.GOOD):
-        acct_dict = g.donation_accts[selection]
+        acct_dict = g.donation_accts[selection-1]
         return reply + '\n\nYou donated to: {}'.format(list(acct_dict.keys())[0])
     return reply
 

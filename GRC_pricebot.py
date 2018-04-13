@@ -14,9 +14,8 @@ class price_bot:
         if round(time()) > self.last_updated+self.timeout_sec:
             try:
                 async with aiohttp.ClientSession() as session:
-                    async with async_timeout.timeout(3):
-                        async with session.get(self.price_url) as response:
-                            self.last_price = float(json.loads(await response.text())[0]['price_usd'])
+                    async with session.get(self.price_url) as response:
+                        self.last_price = float(json.loads(await response.text())[0]['price_usd'])
             except Exception as E:
                 print('[WARN] Error when trying to fetch USD price: ', E)
             self.last_updated = round(time())
