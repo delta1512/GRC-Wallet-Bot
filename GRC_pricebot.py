@@ -1,5 +1,7 @@
-from urllib.request import urlopen
 from time import time
+import async_timeout
+import aiohttp
+import asyncio
 import json
 
 class price_bot:
@@ -8,14 +10,16 @@ class price_bot:
     timeout_sec = 380
     price_url = 'https://api.coinmarketcap.com/v1/ticker/gridcoin/'
 
-    def price(self):
+    async def price(self):
         if round(time()) > self.last_updated+self.timeout_sec:
             try:
-                self.last_price = float(json.loads(urlopen(self.price_url).read().decode())[0]['price_usd'])
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(self.price_url) as response:
+                        self.last_price = float(json.loads(await response.text())[0]['price_usd'])
             except Exception as E:
                 print('[WARN] Error when trying to fetch USD price: ', E)
             self.last_updated = round(time())
         return self.last_price
 
-    def conv(self, amt):
-        return round(amt*self.price(), 2)
+    async def conv(self, amt):
+        return round(amt*(await self.price()), 2)

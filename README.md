@@ -16,7 +16,7 @@ These are just ideas, not all of them may be implemented in the future. Any sugg
 
 - [ ] Interactive donation presentation
 
-- [ ] Site to view donation ranks
+- [ ] Site or command to view donation ranks
 
 - [x] Faucet
 
@@ -33,3 +33,5 @@ These are just ideas, not all of them may be implemented in the future. Any sugg
 - [ ] BOINC stats
 
 - [ ] Links to featured sites
+
+- [ ] Private messaging support

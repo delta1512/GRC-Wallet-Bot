@@ -1,5 +1,5 @@
 from GRC_pricebot import price_bot
-import subprocess as sp
+import UDB_tools as db
 import commands as bot
 from user import usr
 from sys import exit
@@ -7,7 +7,6 @@ import grcconf as g
 from os import path
 import emotes as e
 import wallet as w
-import sqlite3
 import discord
 import asyncio
 import docs
@@ -18,8 +17,8 @@ FCT = 'FAUCET'
 price_fetcher = price_bot()
 UDB = {}
 
-def check_tx(txid):
-    tx = w.query('gettransaction', [txid])
+async def check_tx(txid):
+    tx = await w.query('gettransaction', [txid])
     final_addrs = []
     final_vals = []
     try:
@@ -31,102 +30,98 @@ def check_tx(txid):
         pass
     return final_addrs, final_vals
 
-def create_db(dbdir):
-    db = sqlite3.connect(dbdir)
-    c = db.cursor()
-    c.execute('''CREATE TABLE udb (
-    userID text,
-    address text,
-    last_active int,
-    balance float,
-    donations float,
-    lastTX_amt float,
-    lastTX_time int,
-    lastTX_txid text
-    )''')
-    db.commit()
-    db.close()
-
-def read_db(dbdir):
-    global UDB
-    db = sqlite3.connect(dbdir)
-    c = db.cursor()
-    c.execute('SELECT * FROM udb')
-    for record in c.fetchall():
-        UDB[record[0]] = usr(record[0],
-        address=record[1],
-        last_faucet=record[2],
-        balance=record[3],
-        donations=record[4],
-        lastTX=[record[5], record[6], record[7]])
-    db.close()
-
-def save_db(dbdir):
-    create_db(g.TMP_DIR)
-    db = sqlite3.connect(g.TMP_DIR)
-    c = db.cursor()
-    for u in UDB:
-        c.execute('INSERT INTO udb VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (
-        UDB[u].usrID, UDB[u].address, UDB[u].last_faucet, UDB[u].balance, UDB[u].donations,
-        UDB[u].active_tx[0], UDB[u].active_tx[1], UDB[u].active_tx[2]))
-    db.commit()
-    db.close()
-    sp.call('mv {} {}'.format(g.TMP_DIR, dbdir), shell=True)
-
-def blk_searcher():
+async def blk_searcher():
     global UDB, LAST_BLK
-    newblock = w.query('getblockcount', [])
+    newblock = await w.query('getblockcount', [])
     if newblock > LAST_BLK:
         for blockheight in range(LAST_BLK+1, newblock+1):
             try:
-                blockhash = w.query('getblockhash', [blockheight])
-                blockdata = w.query('getblock', [blockhash])
-                for txid in blockdata['tx']:
-                    addrs, vals = check_tx(txid)
-                    if len(addrs) > 0:
-                        for uid in UDB:
-                            found = False
-                            usr_obj = UDB[uid]
-                            for i, addr in enumerate(addrs):
-                                if usr_obj.address == addr:
-                                    found = True
-                                    index = i
-                                    break
-                            if found:
-                                UDB[uid].balance += vals[index]
-                                addrs.pop(index)
-                                vals.pop(index)
+                blockhash = await w.query('getblockhash', [blockheight])
+                await asyncio.sleep(0.05) # Protections to guard against reusing the bind address
+                blockdata = await w.query('getblock', [blockhash])
+                if isinstance(blockdata, dict): # Protections to guard against reusing the bind address
+                    LAST_BLK = blockheight
+                    for txid in blockdata['tx']:
+                        addrs, vals = await check_tx(txid)
+                        if len(addrs) > 0:
+                            for uid in UDB:
+                                found = False
+                                usr_obj = UDB[uid]
+                                for i, addr in enumerate(addrs):
+                                    if usr_obj.address == addr:
+                                        found = True
+                                        index = i
+                                        break
+                                if found:
+                                    print('[DEBUG] Processed deposit.')
+                                    usr_obj.balance += vals[index]
+                                    addrs.pop(index)
+                                    vals.pop(index)
+                elif blockdata == 3:
+                    pass # Don't render the reuse address error as an exception, otherwise it may flood the terminal
+                else:
+                    raise Exception('Received erronous signal in GRC client interface.')
             except Exception as E:
                 print('[ERROR] Block searcher ran into an error: {}'.format(E))
-        LAST_BLK = newblock
+                exit(0)
 
 async def pluggable_loop():
     sleepcount = 0
     while True:
         await asyncio.sleep(5)
-        if sleepcount % g.SLP_SML == 0:
-            save_db(g.MEM_DB)
-            with open(g.LST_BLK_MEM, 'w') as last_block:
+        await blk_searcher()
+        if sleepcount % g.SLP == 0:
+            await db.save_db(UDB)
+            with open(g.LST_BLK, 'w') as last_block:
                 last_block.write(str(LAST_BLK))
-        if sleepcount % g.SLP_BIG == 0:
-            save_db(g.COLD_DB)
-            with open(g.LST_BLK_COLD, 'w') as last_block:
-                last_block.write(str(LAST_BLK))
-        blk_searcher()
-        with open(g.FEE_POOL, 'r') as fees:
-            owed = float(fees.read())
-        if owed >= g.FEE_WDR_THRESH:
-            txid = w.tx(g.admin_wallet, owed)
-            if not isinstance(txid, str):
-                print('[ERROR] Admin fees could not be sent')
-            else:
-                print('[DEBUG] Admin fees sent')
-                with open(g.FEE_POOL, 'w') as fees:
-                    fees.write('0')
+            with open(g.FEE_POOL, 'r') as fees:
+                owed = float(fees.read())
+            if owed >= g.FEE_WDR_THRESH:
+                txid = await w.tx(g.admin_wallet, owed)
+                if not isinstance(txid, str):
+                    print('[ERROR] Admin fees could not be sent')
+                else:
+                    print('[DEBUG] Admin fees sent')
+                    with open(g.FEE_POOL, 'w') as fees:
+                        fees.write('0')
         sleepcount += 5
 
 @client.event
 async def on_ready():
+    global UDB, LAST_BLK
+    if await w.query('getblockcount', []) > 5: # 5 is largest error return value
+        print('[DEBUG] Gridcoin client is online')
+    else:
+        print('[ERROR] GRC client is not online')
+        exit(1)
+
+    if await db.check_db() != 0:
+        print('[ERROR] Could not connect to SQL database')
+        exit(1)
+    else:
+        print('[DEBUG] SQL DB online and accessible')
+
+    if path.exists(g.LST_BLK):
+        with open(g.LST_BLK, 'r') as last_block:
+            LAST_BLK = int(last_block.read())
+    else:
+        with open(g.LST_BLK, 'w') as last_block:
+            last_block.write(str(await w.query('getblockcount', [])))
+        print('[DEBUG] No start block specified. Setting block to client latest')
+
+    if not path.exists(g.FEE_POOL):
+        print('[DEBUG] Fees owed file not found. Setting fees owed to 0')
+        with open(g.FEE_POOL, 'w') as fees:
+            fees.write('0')
+
+    if await w.unlock() == None:
+        print('[DEBUG] Wallet successfully unlocked')
+    else:
+        print('[ERROR] There was a problem trying to unlock the gridcoin wallet')
+        exit(1)
+
+    UDB = await db.read_db()
+    print('[DEBUG] Initialisation complete')
     await pluggable_loop()
 
 @client.event
@@ -139,17 +134,14 @@ async def on_message(msg):
     iscommand = cmd.startswith(g.pre)
     if iscommand and chan.is_private:
         await client.send_message(chan, docs.PM_msg)
-    elif iscommand and chan.server.id in g.LCK_SRVS:
-        await client.send_message(chan, docs.server_lock_msg)
     elif iscommand and (len(cmd) > 1):
-        #await client.send_message(chan, '{} **DISCLAIMER**: The bot currently uses the testnet. **DO NOT SEND REAL GRIDCOIN TO THE BOT** {}'.format(e.INFO, e.INFO[:-2]))
         cmd = cmd[1:]
         if cmd.startswith('status'):
-            await client.send_message(chan, bot.dump_cfg(price_fetcher))
+            await client.send_message(chan, await bot.dump_cfg(price_fetcher))
         elif cmd.startswith('new'):
             if not INDB:
                 await client.send_message(chan, '{}Creating your account now...'.format(e.SETTING))
-                status, reply, userobj = bot.new_user(user)
+                status, reply, userobj = await bot.new_user(user)
                 if status == 0:
                     UDB[user] = userobj
                 await client.send_message(chan, reply)
@@ -162,29 +154,29 @@ async def on_message(msg):
         elif INDB:
             USROBJ = UDB[user]
             if cmd in ['bal', 'balance']:
-                await client.send_message(chan, bot.fetch_balance(USROBJ, price_fetcher))
+                await client.send_message(chan, await bot.fetch_balance(USROBJ, price_fetcher))
             elif cmd.startswith('addr'):
                 await client.send_message(chan, USROBJ.address)
             elif cmd.split()[0] in ['wdr', 'withdraw', 'send']:
                 args = cmd.split()[1:]
                 if len(args) == 2:
-                    reply = bot.withdraw(bot.amt_filter(args[1], USROBJ), args[0], USROBJ)
+                    reply = await bot.withdraw(args[1], args[0], USROBJ)
                 else:
-                    reply = '{}To withdraw from your account type: `%wdr [address to send to] [amount-GRC]`\nA service fee of {} is subtracted from what you send. If you wish to send GRC to someone in the server, use `%give`'.format(e.INFO, str(g.tx_fee))
+                    reply = '{}To withdraw from your account type: `%wdr [address to send to] [amount-GRC]`\nA service fee of {} GRC is subtracted from what you send. If you wish to send GRC to someone in the server, use `%give`'.format(e.INFO, str(g.tx_fee))
                 await client.send_message(chan, reply)
             elif cmd.startswith('donate'):
                 args = cmd.split()[1:]
                 if len(args) == 2:
-                    reply = bot.donate(args[0], args[1], USROBJ)
+                    reply = await bot.donate(args[0], args[1], USROBJ)
                 else:
                     reply = bot.fetch_donation_addrs()
                 await client.send_message(chan, reply)
             elif cmd.startswith('rdonate'):
                 args = cmd.split()[1:]
                 if len(args) == 1:
-                    reply = bot.rdonate(args[0], USROBJ)
+                    reply = await bot.rdonate(args[0], USROBJ)
                 else:
-                    reply = '{}To donate to a random contributor type: `%rdonate [amount-GRC]`'
+                    reply = '{}To donate to a random contributor type: `%rdonate [amount-GRC]`'.format(e.GIVE)
                 await client.send_message(chan, reply)
             elif cmd.startswith('give'):
                 args = cmd.split()[1:]
@@ -204,46 +196,18 @@ async def on_message(msg):
                 fctobj = UDB[FCT]
                 await client.send_message(chan, docs.faucetmsg.format(round(fctobj.balance, 8), g.FCT_REQ_LIM, fctobj.address))
                 await client.send_message(chan, bot.faucet(fctobj, USROBJ))
+            elif cmd.startswith('qr'):
+                args = cmd.split()[1:]
+                if len(args) == 1:
+                    await client.send_file(chan, bot.get_qr(args[0], user))
+                elif len(args) > 1:
+                    await client.send_message(chan, '{}Too many arguments provided'.format(e.CANNOT))
+                else:
+                    await client.send_file(chan, bot.get_qr(USROBJ.address, user))
             else:
-                await client.send_message(chan, '{}Invalid command.'.format(e.INFO))
+                await client.send_message(chan, '{}Invalid command. Type `%help` for help.'.format(e.INFO))
         else:
-            await client.send_message(chan, '{}Either incorrect command or not in user database (try `%new`)'.format(e.ERROR))
-
-if w.query('getblockcount', []) > 5: # 5 is largest error return value
-    print('[DEBUG] Gridcoin client is online')
-else:
-    print('[ERROR] GRC client is not online')
-    exit(1)
-
-if not (path.exists(g.MEMORY_ROOT) or path.exists(g.COLD_DB)):
-    print('[ERROR] Root data directory doesn\'t exist')
-    exit(1)
-
-if path.exists(g.MEM_DB):
-    read_db(g.MEM_DB)
-elif path.exists(g.COLD_DB):
-    read_db(g.COLD_DB)
-else:
-    create_db(g.MEM_DB)
-    print('[DEBUG] Created template table')
-
-if not FCT in UDB:
-    UDB[FCT] = usr(FCT)
-
-if path.exists(g.LST_BLK_MEM):
-    with open(g.LST_BLK_MEM, 'r') as last_block:
-        LAST_BLK = int(last_block.read())
-elif path.exists(g.LST_BLK_COLD):
-    with open(g.LST_BLK_COLD, 'r') as last_block:
-        LAST_BLK = int(last_block.read())
-else:
-    with open(g.LST_BLK_COLD, 'w') as last_block:
-        last_block.write(str(w.query('getblockcount', [])))
-    print('[DEBUG] No start block specified. Setting block to client latest')
-
-if not path.exists(g.FEE_POOL):
-    with open(g.FEE_POOL, 'w') as fees:
-        fees.write('0')
+            await client.send_message(chan, '{}Either incorrect command or not in user database (try `%new` or type `%help` for help)'.format(e.ERROR))
 
 try:
     with open('API.key', 'r') as APIkeyfile:
@@ -253,15 +217,4 @@ except:
     print('[ERROR] Failed to load API key')
     exit(1)
 
-try:
-    import grcconf as g
-    print('[DEBUG] Successfully loaded the configuration file')
-except:
-    print('[ERROR] Failed to load config file')
-    exit(1)
-
 client.run(APIkey)
-
-'''
-- https://github.com/Rapptz/discord.py/blob/master/examples
-'''

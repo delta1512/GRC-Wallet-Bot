@@ -2,6 +2,7 @@ import grcconf as g
 import emotes as e
 
 hlp = '''```
+Type %help [topic] for more detailed information about the following:
 - new
 - balance
 - withdraw
@@ -9,6 +10,7 @@ hlp = '''```
 - rdonate
 - give
 - faucet
+- qr
 - status
 - info
 ```'''
@@ -65,6 +67,14 @@ Get some free GRC: %faucet
     To help fund the faucet, you can type `%fgive [amount-GRC]`.
 ```'''.format(g.FCT_REQ_LIM)
 
+qr = '''```
+Generate a QR code: %qr
+    Format: %qr [optional data]
+
+    Generates a qr code. If no data is given, it will send a QR code of your
+    wallet address. Any data given must contain no spaces.
+```'''
+
 status = '''```
 Bot and network status: %status
 ```'''
@@ -78,6 +88,8 @@ info = '''
 
 The source code for the bot can be found here: https://github.com/delta1512/GRC-Wallet-Bot
 
+If there are any problems, glitches or crashes, please notify me or the contributors below as soon as possible. Any queries can be sent to `boincosdelta@gmail.com`.
+
 Notable mentions:
 - Jorkermc https://github.com/jorkermc
 - Foxifi
@@ -89,8 +101,10 @@ help_dict = {
     'balance'   :   bal,
     'withdraw'  :   wdr,
     'donate'    :   donate,
+    'rdonate'   :   rdonate,
     'give'      :   give,
     'faucet'    :   faucet,
+    'qr'        :   qr,
     'status'    :   status,
     'info'      :   info_help
 }
@@ -101,7 +115,5 @@ The faucet currently contains `{} GRC` and has a timeout of {} hours.
 Donate GRC to this address `{}`
 or type `%fgive [amount-GRC]` to help refill the faucet
 '''
-
-server_lock_msg = '{} This server is currently not taking commands. The bot is under maintenance.'.format(e.SETTING)
 
 PM_msg = '{} The bot does not take commands through private messages.'.format(e.CANNOT)
