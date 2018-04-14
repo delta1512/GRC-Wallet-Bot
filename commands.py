@@ -1,5 +1,5 @@
 import UDB_tools as db
-from time import time
+from math import ceil
 from user import usr
 import grcconf as g
 import emotes as e
@@ -7,6 +7,7 @@ import wallet as w
 import random as r
 import qrcode
 import docs
+import time
 
 def amt_filter(inp, userobj):
     #if inp == 'all':
@@ -110,13 +111,15 @@ def give(amount, current_usrobj, rec_usrobj, add_success_msg='', donation=False)
         return '{}Amount provided was invalid.'.format(e.ERROR)
 
 def faucet(faucet_usr, current_usr):
+    nxtfct = current_usr.last_faucet+3600*g.FCT_REQ_LIM
+    ctime = round(time.time())
     if faucet_usr.balance <= g.FCT_MAX:
         return '{}Unfortunately the faucet balance is too low. Try again soon.'.format(e.DOWN)
-    elif round(time()) < current_usr.last_faucet+3600*g.FCT_REQ_LIM:
-        return '{}Request too recent. Faucet timeout is {} hours. Try again in {} minutes.'.format(e.CANNOT, g.FCT_REQ_LIM, round((current_usr.last_faucet+3600*g.FCT_REQ_LIM-round(time()))/60, 1))
-    else:
-        current_usr.last_faucet = round(time())
-        return give(round(r.uniform(g.FCT_MIN, g.FCT_MAX), 8), faucet_usr, current_usr)
+    elif ctime < nxtfct:
+        return '{}Request too recent. Faucet timeout is {} hours. Try again in: {}'.format(e.CANNOT, g.FCT_REQ_LIM,
+                time.strftime("%H Hours %M Minutes %S Seconds" , time.gmtime(ceil(nxtfct-ctime))))
+    current_usr.last_faucet = ctime
+    return give(round(r.uniform(g.FCT_MIN, g.FCT_MAX), 8), faucet_usr, current_usr)
 
 def get_qr(string, uid):
     qr = qrcode.QRCode(
