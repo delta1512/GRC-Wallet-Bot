@@ -203,11 +203,11 @@ async def on_message(msg):
                 if chan.is_private:
                     await client.send_message(chan, docs.PM_msg)
                 elif len(args) == 1:
-                    await client.send_file(chan, bot.get_qr(args[0], user))
+                    await client.send_file(chan, bot.get_qr(args[0], filename=user + '.png'))
                 elif len(args) > 1:
                     await client.send_message(chan, '{}Too many arguments provided'.format(e.CANNOT))
                 else:
-                    await client.send_file(chan, bot.get_qr(USROBJ.address, user))
+                    await client.send_file(chan, bot.get_qr(USROBJ.address), filename=user + '.png')
             else:
                 await client.send_message(chan, '{}Invalid command. Type `%help` for help.'.format(e.INFO))
         else:
