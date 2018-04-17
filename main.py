@@ -197,7 +197,10 @@ async def on_message(msg):
             elif cmd in ['faucet', 'fct', 'get']:
                 fctobj = UDB[FCT]
                 await client.send_message(chan, docs.faucetmsg.format(round(fctobj.balance, 8), g.FCT_REQ_LIM, fctobj.address))
-                await client.send_message(chan, bot.faucet(fctobj, USROBJ))
+                if chan.is_private:
+                    await client.send_message(chan, docs.PM_msg)
+                else:
+                    await client.send_message(chan, bot.faucet(fctobj, USROBJ))
             elif cmd.startswith('qr'):
                 args = cmd.split()[1:]
                 if chan.is_private:
