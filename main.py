@@ -132,9 +132,9 @@ async def on_message(msg):
     user = msg.author.id
     INDB = user in UDB
     iscommand = cmd.startswith(g.pre)
-    if iscommand and chan.is_private:
-        await client.send_message(chan, docs.PM_msg)
-    elif iscommand and (len(cmd) > 1):
+    #if iscommand and chan.is_private:
+        #await client.send_message(chan, docs.PM_msg)
+    if iscommand and (len(cmd) > 1):
         cmd = cmd[1:]
         if cmd.startswith('status'):
             await client.send_message(chan, await bot.dump_cfg(price_fetcher))
@@ -180,7 +180,9 @@ async def on_message(msg):
                 await client.send_message(chan, reply)
             elif cmd.startswith('give'):
                 args = cmd.split()[1:]
-                if (len(args) != 2) or (len(msg.mentions) != 1):
+                if chan.is_private:
+                    await client.send_message(chan, docs.PM_msg)
+                elif (len(args) != 2) or (len(msg.mentions) != 1):
                     await client.send_message(chan, '{}To give funds to a member in the server, type `%give [discord mention of user] [amount to give]`.\nThe person must also have an account with the bot.'.format(e.INFO))
                 elif not msg.mentions[0].id in UDB:
                     await client.send_message(chan, '{}Invalid user specified.'.format(e.ERROR))
@@ -198,7 +200,9 @@ async def on_message(msg):
                 await client.send_message(chan, bot.faucet(fctobj, USROBJ))
             elif cmd.startswith('qr'):
                 args = cmd.split()[1:]
-                if len(args) == 1:
+                if chan.is_private:
+                    await client.send_message(chan, docs.PM_msg)
+                elif len(args) == 1:
                     await client.send_file(chan, bot.get_qr(args[0], user))
                 elif len(args) > 1:
                     await client.send_message(chan, '{}Too many arguments provided'.format(e.CANNOT))
