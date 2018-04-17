@@ -39,15 +39,15 @@ async def save_db(udb):
     for u in udb:
         if len(asyncio.ensure_future(await check_uid(u)).result()) > 0:
             await c.execute('''UPDATE {} SET
-                            last_faucet=%s,
-                            balance=%s,
-                            donations=%s,
-                            lastTX_amt=%s,
-                            lastTX_time=%s,
-                            lastTX_txid="%s"
-                            WHERE uid=%s;'''.format(g.udb_name), (udb[u].last_faucet,
-                            udb[u].balance, udb[u].donations, udb[u].active_tx[0],
-                            udb[u].active_tx[1], udb[u].active_tx[2], u))
+                last_faucet=%s,
+                balance=%s,
+                donations=%s,
+                lastTX_amt=%s,
+                lastTX_time=%s,
+                lastTX_txid="%s"
+                WHERE uid=%s;'''.format(g.udb_name), (udb[u].last_faucet,
+                udb[u].balance, udb[u].donations, udb[u].active_tx[0],
+                udb[u].active_tx[1], udb[u].active_tx[2], u))
         else:
             await c.execute('INSERT INTO {} VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'.format(g.udb_name), (
             u, udb[u].address, udb[u].last_faucet, udb[u].balance, udb[u].donations,

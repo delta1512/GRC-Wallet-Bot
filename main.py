@@ -1,14 +1,14 @@
+from os import path
+
+import asyncio
+import discord
+
 from GRC_pricebot import price_bot
 import UDB_tools as db
 import commands as bot
-from user import usr
-from sys import exit
 import grcconf as g
-from os import path
 import emotes as e
 import wallet as w
-import discord
-import asyncio
 import docs
 
 client = discord.Client()
@@ -26,7 +26,7 @@ async def check_tx(txid):
             if details['category'] == 'receive':
                 final_addrs.append(details['address'])
                 final_vals.append(details['amount'])
-    except:
+    except KeyError:
         pass
     return final_addrs, final_vals
 
@@ -114,7 +114,7 @@ async def on_ready():
         with open(g.FEE_POOL, 'w') as fees:
             fees.write('0')
 
-    if await w.unlock() == None:
+    if await w.unlock() is None:
         print('[DEBUG] Wallet successfully unlocked')
     else:
         print('[ERROR] There was a problem trying to unlock the gridcoin wallet')
@@ -210,11 +210,11 @@ async def on_message(msg):
             await client.send_message(chan, '{}Either incorrect command or not in user database (try `%new` or type `%help` for help)'.format(e.ERROR))
 
 try:
-    with open('API.key', 'r') as APIkeyfile:
-        APIkey = str(APIkeyfile.read().replace('\n', ''))
+    with open('API.key', 'r') as key_file:
+        API_KEY = str(key_file.read().replace('\n', ''))
     print('[DEBUG] API Key loaded')
 except:
     print('[ERROR] Failed to load API key')
     exit(1)
 
-client.run(APIkey)
+client.run(API_KEY)

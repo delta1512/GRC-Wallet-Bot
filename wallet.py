@@ -1,7 +1,7 @@
-import grcconf as g
 import aiohttp
-import asyncio
 import json
+
+import grcconf as g
 
 '''
 1 - protocol/client error
@@ -33,8 +33,7 @@ async def query(cmd, params):
 async def tx(addr, amount):
     if isinstance(addr, str) and len(addr) > 1:
         return await query('sendtoaddress', [addr, amount])
-    else:
-        return 4
+    return 4
 
 async def unlock():
     return await query('walletpassphrase', [g.grc_pass, 999999999, False])

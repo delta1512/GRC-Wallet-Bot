@@ -1,13 +1,15 @@
-import UDB_tools as db
 from math import ceil
+import random as r
+import time
+
+import qrcode
+
 from user import usr
 import grcconf as g
 import emotes as e
 import wallet as w
-import random as r
-import qrcode
 import docs
-import time
+
 
 def amt_filter(inp, userobj):
     #if inp == 'all':
@@ -39,10 +41,10 @@ async def new_user(uid):
     try:
         addr = await w.query('getnewaddress', [])
         if not isinstance(addr, str):
-            raise Exception('Error in communicating with client')
+            raise RuntimeError('Error in communicating with client')
         userobj = usr(uid, address=addr)
         return 0, '{}User account created successfully. Your address is `{}`'.format(e.GOOD, userobj.address), userobj
-    except Exception as E:
+    except (RuntimeError, ValueError) as E:
         print(E)
         return 1, '{}Error: Something went wrong when attempting to make your user account.'.format(e.ERROR), None
 
@@ -55,9 +57,9 @@ async def donate(selection, amount, userobj):
     amount = amt_filter(amount, userobj)
     try:
         selection = int(selection)-1
-    except:
+    except ValueError:
         return '{}Invalid selection.'.format(e.ERROR)
-    if amount == None:
+    if amount is None:
         return '{}Amount provided is invalid.'.format(e.ERROR)
     if round(userobj.balance, 8) < amount:
         return '{}Insufficient funds to donate. You have `{} GRC`'.format(e.ERROR, round(userobj.balance, 2))
@@ -65,8 +67,7 @@ async def donate(selection, amount, userobj):
         acct_dict = g.donation_accts[selection]
         address = acct_dict[list(acct_dict.keys())[0]]
         return await userobj.donate(address, amount)
-    else:
-        return '{}Invalid selection.'.format(e.ERROR)
+    return '{}Invalid selection.'.format(e.ERROR)
 
 async def rdonate(amount, userobj):
     selection = r.randint(1, len(g.donation_accts))
@@ -117,7 +118,7 @@ def faucet(faucet_usr, current_usr):
         return '{}Unfortunately the faucet balance is too low. Try again soon.'.format(e.DOWN)
     elif ctime < nxtfct:
         return '{}Request too recent. Faucet timeout is {} hours. Try again in: {}'.format(e.CANNOT, g.FCT_REQ_LIM,
-                time.strftime("%H Hours %M Minutes %S Seconds" , time.gmtime(ceil(nxtfct-ctime))))
+                time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(nxtfct-ctime))))
     current_usr.last_faucet = ctime
     return give(round(r.uniform(g.FCT_MIN, g.FCT_MAX), 8), faucet_usr, current_usr)
 

@@ -1,8 +1,8 @@
 from time import time
+
 import grcconf as g
 import emotes as e
 import wallet as w
-import asyncio
 
 class usr:
     def __init__(self, uid, **k):
@@ -12,8 +12,8 @@ class usr:
         self.donations = k.get('donations', 0.0)
         self.last_faucet = k.get('last_faucet', 0)
         self.address = k.get('address', None)
-        if self.address == None:
-            raise Exception('[ERROR] Null value passed to user instantiation')
+        if self.address is None:
+            raise ValueError('[ERROR] Null value passed to user instantiation')
 
     async def withdraw(self, amount, addr):
         if round(time()) > self.active_tx[1]+1.5*60*g.tx_timeout:
@@ -26,11 +26,8 @@ class usr:
                 self.active_tx = [amount, round(time()), txid.replace('\n', '')]
                 self.balance -= amount
                 return '{}Transaction of `{} GRC` (inc. {} GRC fee) was successful, ID: `{}`{}'.format(e.GOOD, round(amount, 8), g.tx_fee, txid, '\n\nYour new balance is {} GRC.'.format(round(self.balance, 2)))
-            else:
-                print(txid)
-                return '{}Error: The withdraw operation failed.'.format(e.ERROR)
-        else:
-            return '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
+            return '{}Error: The withdraw operation failed.'.format(e.ERROR)
+        return '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
 
     async def donate(self, addr, amount):
         if round(time()) > self.active_tx[1]+1.5*60:
@@ -40,7 +37,5 @@ class usr:
                 self.donations += amount
                 self.balance -= amount
                 return '{}Donation of `{} GRC` was successful, ID: `{}`{}'.format(e.GOOD, round(amount, 8), txid, '\n\nThankyou for donating! Your new balance is {} GRC.'.format(round(self.balance, 2)))
-            else:
-                return '{}Error: Transaction was unsuccessful.'.format(e.ERROR)
-        else:
-            return '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
+            return '{}Error: Transaction was unsuccessful.'.format(e.ERROR)
+        return '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
