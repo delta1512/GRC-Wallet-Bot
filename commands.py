@@ -1,6 +1,7 @@
 from math import ceil
 import random as r
 import time
+import io
 
 import qrcode
 
@@ -122,16 +123,18 @@ def faucet(faucet_usr, current_usr):
     current_usr.last_faucet = ctime
     return give(round(r.uniform(g.FCT_MIN, g.FCT_MAX), 8), faucet_usr, current_usr)
 
-def get_qr(string, uid):
+def get_qr(string):
     qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=2,)
+         version=1,
+         error_correction=qrcode.constants.ERROR_CORRECT_L,
+         box_size=10,
+         border=2)
     qr.add_data(string)
     qr.make(fit=True)
-    savedir = '/tmp/{}.png'.format(uid)
-    qr.make_image(fill_color='#5c00b3', back_color='white').save(savedir)
+    savedir = io.BytesIO()
+    img = qr.make_image(fill_color='#5c00b3', back_color='white')
+    img.save(savedir, format="PNG")
+    savedir.seek(0)
     return savedir
 
 def help_interface(query):
