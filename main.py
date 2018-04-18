@@ -1,7 +1,8 @@
 from os import path
-
 import asyncio
 import discord
+import logging
+from logging.handlers import RotatingFileHandler
 
 from GRC_pricebot import price_bot
 import UDB_tools as db
@@ -10,6 +11,13 @@ import grcconf as g
 import emotes as e
 import wallet as w
 import docs
+
+# Set up logging functionality
+handler = [RotatingFileHandler(g.log_dir, maxBytes=10**7, backupCount=3)]
+logging.basicConfig(format='[%(asctime)s] %(levelname)s: %(message)s',
+                    datefmt='%d/%m %T',
+                    level=logging.INFO,
+                    handlers=handler)
 
 client = discord.Client()
 LAST_BLK = 0
@@ -53,17 +61,16 @@ async def blk_searcher():
                                         index = i
                                         break
                                 if found:
-                                    print('[DEBUG] Processed deposit.')
+                                    logging.info('Processed deposit.')
                                     usr_obj.balance += vals[index]
                                     addrs.pop(index)
                                     vals.pop(index)
                 elif blockdata == 3:
                     pass # Don't render the reuse address error as an exception, otherwise it may flood the terminal
                 else:
-                    raise Exception('Received erronous signal in GRC client interface.')
+                    raise RuntimeError('Received erroneous signal in GRC client interface.')
             except Exception as E:
-                print('[ERROR] Block searcher ran into an error: {}'.format(E))
-                exit(0)
+                logging.exception('Block searcher ran into an error: {}'.format(E))
 
 async def pluggable_loop():
     sleepcount = 0
@@ -79,9 +86,9 @@ async def pluggable_loop():
             if owed >= g.FEE_WDR_THRESH:
                 txid = await w.tx(g.admin_wallet, owed)
                 if not isinstance(txid, str):
-                    print('[ERROR] Admin fees could not be sent')
+                    logging.error('Admin fees could not be sent, exit_code: %s', txid)
                 else:
-                    print('[DEBUG] Admin fees sent')
+                    logging.info('Admin fees sent')
                     with open(g.FEE_POOL, 'w') as fees:
                         fees.write('0')
         sleepcount += 5
@@ -90,16 +97,16 @@ async def pluggable_loop():
 async def on_ready():
     global UDB, LAST_BLK
     if await w.query('getblockcount', []) > 5: # 5 is largest error return value
-        print('[DEBUG] Gridcoin client is online')
+        logging.info('Gridcoin client is online')
     else:
-        print('[ERROR] GRC client is not online')
+        logging.error('GRC client is not online')
         exit(1)
 
     if await db.check_db() != 0:
-        print('[ERROR] Could not connect to SQL database')
+        logging.error('Could not connect to SQL database')
         exit(1)
     else:
-        print('[DEBUG] SQL DB online and accessible')
+        logging.info('SQL DB online and accessible')
 
     if path.exists(g.LST_BLK):
         with open(g.LST_BLK, 'r') as last_block:
@@ -107,21 +114,21 @@ async def on_ready():
     else:
         with open(g.LST_BLK, 'w') as last_block:
             last_block.write(str(await w.query('getblockcount', [])))
-        print('[DEBUG] No start block specified. Setting block to client latest')
+        logging.info('No start block specified. Setting block to client latest')
 
     if not path.exists(g.FEE_POOL):
-        print('[DEBUG] Fees owed file not found. Setting fees owed to 0')
+        logging.info('Fees owed file not found. Setting fees owed to 0')
         with open(g.FEE_POOL, 'w') as fees:
             fees.write('0')
 
     if await w.unlock() is None:
-        print('[DEBUG] Wallet successfully unlocked')
+        logging.info('Wallet successfully unlocked')
     else:
-        print('[ERROR] There was a problem trying to unlock the gridcoin wallet')
+        logging.error('There was a problem trying to unlock the gridcoin wallet')
         exit(1)
 
     UDB = await db.read_db()
-    print('[DEBUG] Initialisation complete')
+    logging.info('Initialisation complete')
     await pluggable_loop()
 
 @client.event
@@ -129,13 +136,18 @@ async def on_message(msg):
     global UDB
     cmd = msg.content
     chan = msg.channel
+    uname = msg.author.name
     user = msg.author.id
     INDB = user in UDB
     iscommand = cmd.startswith(g.pre)
-    #if iscommand and chan.is_private:
-        #await client.send_message(chan, docs.PM_msg)
     if iscommand and (len(cmd) > 1):
         cmd = cmd[1:]
+        if chan.is_private:
+            logging.info('COMMAND "%s" executed by %s (%s) in private channel',
+            cmd.split()[0], user, uname)
+        else:
+            logging.info('COMMAND "%s" executed by %s (%s)',
+            cmd.split()[0], user, uname)
         if cmd.startswith('status'):
             await client.send_message(chan, await bot.dump_cfg(price_fetcher))
         elif cmd.startswith('new'):
@@ -219,9 +231,9 @@ async def on_message(msg):
 try:
     with open('API.key', 'r') as key_file:
         API_KEY = str(key_file.read().replace('\n', ''))
-    print('[DEBUG] API Key loaded')
+    logging.info('API Key loaded')
 except:
-    print('[ERROR] Failed to load API key')
+    logging.error('Failed to load API key')
     exit(1)
 
 client.run(API_KEY)

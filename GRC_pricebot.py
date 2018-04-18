@@ -1,5 +1,6 @@
 from time import time
 import async_timeout
+import logging
 import aiohttp
 import asyncio
 import json
@@ -17,7 +18,7 @@ class price_bot:
                     async with session.get(self.price_url) as response:
                         self.last_price = float(json.loads(await response.text())[0]['price_usd'])
             except Exception as E:
-                print('[WARN] Error when trying to fetch USD price: ', E)
+                logging.warning('[WARN] Error when trying to fetch USD price: '.format(E))
             self.last_updated = round(time())
         return self.last_price
 

@@ -1,4 +1,5 @@
 import aiohttp
+import logging
 import json
 
 import grcconf as g
@@ -12,7 +13,7 @@ import grcconf as g
 
 async def query(cmd, params):
     if not all([isinstance(cmd, str), isinstance(params, list)]):
-        print('[WARN] Invalid data sent to wallet query')
+        logging.warning('Invalid data sent to wallet query')
         return 2
     command = json.dumps({'method' : cmd, 'params' : params})
     try:
@@ -20,12 +21,12 @@ async def query(cmd, params):
             async with session.post(g.rpc_url, data=command, headers={'content-type': "application/json", 'cache-control': "no-cache"}, auth=aiohttp.BasicAuth(g.rpc_usr, password=g.rpc_pass)) as resp:
                 response = await resp.json()
     except Exception as E:
-        print('[WARN] Exception triggered in communication with GRC client\n', E)
+        logging.warning('Exception triggered in communication with GRC client: %s', E)
         return 3
     if response['error'] != None:
         if response['error']['code'] == -17:
             return None
-        print('[WARN] Error response collected by GRC client: ', response['error'])
+        logging.warning('Error response sent by GRC client: %s', response['error'])
         return 1
     else:
         return response['result']

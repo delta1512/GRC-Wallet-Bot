@@ -10,6 +10,7 @@ sql_db_host = '[host]'
 sql_db_usr = '[username]'
 sql_db_pass = '[password]'
 udb_name = '[name of database and table]'
+log_dir = '[where to save the log file]'
 donation_accts = [
     {'[name]' : '[addr]'},
     ]

@@ -1,4 +1,5 @@
 from time import time
+import logging
 
 import grcconf as g
 import emotes as e
@@ -25,7 +26,9 @@ class usr:
                     fees.write(str(owed+g.tx_fee))
                 self.active_tx = [amount, round(time()), txid.replace('\n', '')]
                 self.balance -= amount
+                logging.info('Transaction successfully made with txid: %s', txid)
                 return '{}Transaction of `{} GRC` (inc. {} GRC fee) was successful, ID: `{}`{}'.format(e.GOOD, round(amount, 8), g.tx_fee, txid, '\n\nYour new balance is {} GRC.'.format(round(self.balance, 2)))
+            logging.error('Failed transaction. Addr: %s, Amt: %s, exit_code: %s', addr, amount, txid)
             return '{}Error: The withdraw operation failed.'.format(e.ERROR)
         return '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
 
@@ -36,6 +39,8 @@ class usr:
                 self.active_tx = [amount, round(time()), txid.replace('\n', '')]
                 self.donations += amount
                 self.balance -= amount
+                logging.info('Donation successfully made with txid: %s', txid)
                 return '{}Donation of `{} GRC` was successful, ID: `{}`{}'.format(e.GOOD, round(amount, 8), txid, '\n\nThankyou for donating! Your new balance is {} GRC.'.format(round(self.balance, 2)))
+            logging.error('Failed transaction. Addr: %s, Amt: %s, exit_code: %s', addr, amount, txid)
             return '{}Error: Transaction was unsuccessful.'.format(e.ERROR)
         return '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)

@@ -1,5 +1,6 @@
 from math import ceil
 import random as r
+import logging
 import time
 import io
 
@@ -42,11 +43,13 @@ async def new_user(uid):
     try:
         addr = await w.query('getnewaddress', [])
         if not isinstance(addr, str):
+            logging.error('Failed to get address from GRC client')
             raise RuntimeError('Error in communicating with client')
         userobj = usr(uid, address=addr)
+        logging.info('New user registered successfully, UID: %s', uid)
         return 0, '{}User account created successfully. Your address is `{}`'.format(e.GOOD, userobj.address), userobj
     except (RuntimeError, ValueError) as E:
-        print(E)
+        logging.error('New user registration failed with error: %s', E)
         return 1, '{}Error: Something went wrong when attempting to make your user account.'.format(e.ERROR), None
 
 async def fetch_balance(userobj, price_fetcher):

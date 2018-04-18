@@ -2,3 +2,4 @@ __pycache__/
 API.key
 grcconf.py
 grcconf.py.bak
+*.log
