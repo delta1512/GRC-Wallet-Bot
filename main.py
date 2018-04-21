@@ -52,8 +52,6 @@ async def blk_searcher():
     global UDB, LAST_BLK
     newblock = await w.query('getblockcount', [])
     if newblock > LAST_BLK:
-        logging.info('lastblock newblock: {} {}'.format(LAST_BLK, newblock))
-        logging.info('range list: {}'.format(list(range(LAST_BLK+1, newblock+1))))
         try:
             for blockheight in range(LAST_BLK+1, newblock+1):
                 blockhash = await w.query('getblockhash', [blockheight])
