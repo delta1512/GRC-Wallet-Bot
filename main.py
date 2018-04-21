@@ -27,50 +27,68 @@ UDB = {}
 
 async def check_tx(txid):
     tx = await w.query('gettransaction', [txid])
-    final_addrs = []
-    final_vals = []
+    recv_addrs = []
+    send_addrs = []
+    recv_vals = []
     try:
-        for details in tx['details']:
-            if details['category'] == 'receive':
-                final_addrs.append(details['address'])
-                final_vals.append(details['amount'])
+        if not isinstance(tx, int):
+            for details in tx['details']:
+                if details['category'] == 'receive':
+                    recv_addrs.append(details['address'])
+                    recv_vals.append(details['amount'])
+                elif details['category'] == 'send':
+                    send_addrs.append(details['address'])
+        elif tx == 1:
+            pass
+        else:
+            raise RuntimeError('Bad signal in GRC client: {}'.format(tx))
+    except RuntimeError as E:
+        logging.error(E)
     except KeyError:
         pass
-    return final_addrs, final_vals
+    return recv_addrs, send_addrs, recv_vals
 
 async def blk_searcher():
     global UDB, LAST_BLK
     newblock = await w.query('getblockcount', [])
     if newblock > LAST_BLK:
-        for blockheight in range(LAST_BLK+1, newblock+1):
-            try:
+        logging.info('lastblock newblock: {} {}'.format(LAST_BLK, newblock))
+        logging.info('range list: {}'.format(list(range(LAST_BLK+1, newblock+1))))
+        try:
+            for blockheight in range(LAST_BLK+1, newblock+1):
                 blockhash = await w.query('getblockhash', [blockheight])
                 await asyncio.sleep(0.05) # Protections to guard against reusing the bind address
                 blockdata = await w.query('getblock', [blockhash])
                 if isinstance(blockdata, dict): # Protections to guard against reusing the bind address
                     LAST_BLK = blockheight
                     for txid in blockdata['tx']:
-                        addrs, vals = await check_tx(txid)
-                        if len(addrs) > 0:
+                        recv_addrs, send_addrs, vals = await check_tx(txid)
+                        if len(recv_addrs) > 0:
                             for uid in UDB:
                                 found = False
                                 usr_obj = UDB[uid]
-                                for i, addr in enumerate(addrs):
+                                for i, addr in enumerate(recv_addrs):
                                     if usr_obj.address == addr:
-                                        found = True
+                                        # Check whether change address
+                                        found = not addr in send_addrs
                                         index = i
-                                        break
+                                        if found:
+                                            break
                                 if found:
-                                    logging.info('Processed deposit.')
+                                    logging.info('Processed deposit for {}'.format(usr_obj.usrID))
                                     usr_obj.balance += vals[index]
-                                    addrs.pop(index)
+                                    tmp = recv_addrs.pop(index)
+                                    try: # In event of change address
+                                        send_addrs.pop(send_addrs.index(tmp))
+                                    except ValueError:
+                                        pass
                                     vals.pop(index)
                 elif blockdata == 3:
                     pass # Don't render the reuse address error as an exception, otherwise it may flood the terminal
                 else:
                     raise RuntimeError('Received erroneous signal in GRC client interface.')
-            except Exception as E:
-                logging.exception('Block searcher ran into an error: {}'.format(E))
+        except Exception as E:
+            logging.exception('Block searcher ran into an error: {}'.format(E))
 
 async def pluggable_loop():
     sleepcount = 0
@@ -113,7 +131,8 @@ async def on_ready():
             LAST_BLK = int(last_block.read())
     else:
         with open(g.LST_BLK, 'w') as last_block:
-            last_block.write(str(await w.query('getblockcount', [])))
+            LAST_BLK = await w.query('getblockcount', [])
+            last_block.write(str(LAST_BLK))
         logging.info('No start block specified. Setting block to client latest')
 
     if not path.exists(g.FEE_POOL):
@@ -223,6 +242,12 @@ async def on_message(msg):
                     await client.send_message(chan, '{}Too many arguments provided'.format(e.CANNOT))
                 else:
                     await client.send_file(chan, bot.get_qr(USROBJ.address), filename=user + '.png')
+            elif cmd.startswith('bin {}'.format(user)):
+                args = cmd.split()[2:]
+                if len(args) > 0 and chan.is_private:
+                    amt = 0 if (bot.amt_filter(args[0], USROBJ) == None) else bot.amt_filter(args[0], USROBJ)
+                    USROBJ.balance -= amt
+                    await client.send_message(chan, 'Burned `{} GRC`'.format(amt))
             else:
                 await client.send_message(chan, '{}Invalid command. Type `%help` for help.'.format(e.INFO))
         else:

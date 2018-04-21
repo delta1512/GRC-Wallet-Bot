@@ -34,4 +34,4 @@ These are just ideas, not all of them may be implemented in the future. Any sugg
 
 - [ ] Links to featured sites
 
-- [ ] Private messaging support
+- [X] Private messaging support
