@@ -35,3 +35,11 @@ These are just ideas, not all of them may be implemented in the future. Any sugg
 - [ ] Links to featured sites
 
 - [X] Private messaging support
+
+- [ ] Remember the users withdrawal address
+
+- [ ] News and random interesting facts upon commands 
+
+- [ ] time untill next withdrawal period 
+
+
