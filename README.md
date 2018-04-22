@@ -35,3 +35,11 @@ These are just ideas, not all of them may be implemented in the future. Any sugg
 - [ ] Links to featured sites
 
 - [X] Private messaging support
+
+- [ ] FAQ interface
+
+- [ ] Static withdraw address option
+
+- [ ] %time function to show eligibility of %faucet, %withdraw and %donate
+
+- [ ] Random facts/FAQ article
