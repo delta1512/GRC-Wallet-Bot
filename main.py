@@ -227,7 +227,7 @@ async def on_message(msg):
                 else:
                     reply = '{}To donate to a random contributor type: `%rdonate [amount-GRC]`'.format(e.GIVE)
                 await client.send_message(chan, reply)
-            elif cmd.startswith('give'):
+            elif cmd.split()[0] in ['give', 'tip']:
                 args = cmd.split()[1:]
                 if chan.is_private:
                     await client.send_message(chan, docs.PM_msg)

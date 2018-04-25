@@ -12,6 +12,7 @@ Type %help [topic] for more detailed information about the following:
 - give
 - faucet
 - qr
+- faq
 - status
 - info
 ```'''
@@ -54,7 +55,7 @@ Donate to a random contributor: %rdonate
 ```'''
 
 give = '''```
-Give funds to another user: %give
+Give funds to another user: %give %tip
     Format: %give [discord mention of user] [amount-GRC]
 
     Give some GRC to another person within the server. (no fees apply)
@@ -74,6 +75,14 @@ Generate a QR code: %qr
 
     Generates a qr code. If no data is given, it will send a QR code of your
     wallet address. Any data given must contain no spaces.
+```'''
+
+faq = '''```
+Read answers to frequently asked questions: %faq
+    Format: %faq [selection no.]
+
+    All answers are formulated by Delta, Foxifi and LavRadis, and checked by
+    community members and developers.
 ```'''
 
 status = '''```
@@ -106,6 +115,7 @@ help_dict = {
     'give'      :   give,
     'faucet'    :   faucet,
     'qr'        :   qr,
+    'faq'       :   faq,
     'status'    :   status,
     'info'      :   info_help
 }
