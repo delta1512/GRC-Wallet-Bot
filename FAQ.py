@@ -33,6 +33,9 @@ links = [
 'https://www.facebook.com/gridcoins/', #29
 'https://twitter.com/GridcoinNetwork', #30
 'https://steemit.com/trending/gridcoin', #31
+'https://www.grcpool.com/account', #32
+'https://youtu.be/jm2E6pQ-Ifw', #33
+'https://github.com/gridcoin/Gridcoin-Research/issues' #34
 ]
 
 # What is Gridcoin?
@@ -57,14 +60,14 @@ Stakers are people that hold Gridcoin and earn 1.5% annual interest (stake) on t
 Crunchers (AKA Miners) are individuals that participate in [BOINC]({}) computing and earn rewards from Gridcoin through Proof Of Research (POR). To be eligible for GRC rewards, miners must have a minimum of 100 Recent Average Credit (RAC) from BOINC for any [whitelisted project]({}) and an existing GRC balance.
 '''.format(links[0], links[2]))
 
-# How much GRC is Enough to Start Staking?
-how_much_grc = discord.Embed(title='How much GRC is Enough to Start Staking?', colour=discord.Colour.purple(),
+# How much GRC is enough to start staking?
+how_much_grc = discord.Embed(title='How much GRC is enough to start staking?', colour=discord.Colour.purple(),
 description='''
 A good amount of GRC to hold in your wallet is at least 2000 GRC and will allow you to stake on a regular basis. Time to get rewards depends on network difficulty (the collective amount of coins online and trying to stake) and whether you have reached the minimum threshold to retrieve your rewards.
 ''')
 
-# Where can I Report Issues and Where can I get Help?
-additional_help = discord.Embed(title='Where can I Report Issues and Where can I get Help?', colour=discord.Colour.purple(),
+# Where can I report issues and where can I get help?
+additional_help = discord.Embed(title='Where can I report issues and where can I get help?', colour=discord.Colour.purple(),
 description='''
 The following links are various Gridcoin community locations and you will surely find someone that can help:
 - [Telegram]({})
@@ -73,7 +76,7 @@ The following links are various Gridcoin community locations and you will surely
 - [Cryptocurrency Talk]({})
 - [Github]({})
 - [Discord]({})
-'''.format(links[6], links[7], links[8], links[9], links[10], links[11]))
+'''.format(links[6], links[7], links[8], links[9], links[34], links[11]))
 
 # How do I get started with pool mining?
 pool_mining = discord.Embed(title='How do I get started with pool mining?', colour=discord.Colour.purple(),
@@ -98,7 +101,7 @@ description='''
 
 10. Repeat step 7 in your BOINC manager and then move to the projects tab to see the new project
 
-The official pool guide can be found [here]({})'''.format(links[4], links[5], links[4], links[4]))
+The official pool guide can be found [here]({})'''.format(links[4], links[5], links[32], links[33]))
 
 # How do I get started with solo mining?
 solo_mining = discord.Embed(title='How do I get started with solo mining?', colour=discord.Colour.purple(),
@@ -117,7 +120,7 @@ description='''
 
 7. Delete everything in this folder apart from the wallet.dat, gridcoinresearch.conf and the walletbackups folder.
 
-8. Download the [snapshot]({}) and extract it directly into the configuration folder (official instructions [here]({}))
+8. Download the [snapshot]({}) (warning, file over 1.5GB) and extract it directly into the configuration folder (official instructions [here]({}))
 
 9. Re-open the GRC client and wait for it to synchronise with the rest of the chain.
 
@@ -125,11 +128,11 @@ description='''
 
 11. Once you have some coins and your client is fully synchronised, in the GRC client go to Help > Debug Window > Console and type “execute advertisebeacon”.
 
-12. If the return message says “SUCCESS”, then you must wait about a day for your client to be recognised for your crunching. If it says “FAIL” Then contact a Gridcoin community member to help you troubleshoot issues.
+12. If the return message says “SUCCESS”, then you must wait about a day for your client to be recognised for your crunching. If it says “FAIL” Then make sure you have over 100 RAC and a small GRC balance before contacting a Gridcoin community member to help you troubleshoot issues.
 '''.format(links[5], links[2], links[3], links[10], links[12], links[13], links[14]))
 
-# Useful Links
-useful_links = discord.Embed(title='Useful Links', colour=discord.Colour.purple(),
+# Useful links
+useful_links = discord.Embed(title='Useful links', colour=discord.Colour.purple(),
 description='''
 Information:
 - [Gridcoin Official Site]({})
@@ -150,7 +153,7 @@ Block Explorers:
 BOINC Related:
 - [Boinc.Berkeley]({})
 - [BoincOS]({})
-- [Boinc Italy]({})
+- [Boinc Italy Linux Distro]({})
 - [Boinc Wiki Manual]({})
 - [Overclockers Boinc FAQ]({})
 
@@ -170,10 +173,10 @@ Media and community:
 # Do I need to put the GRC client on all computers running BOINC?
 client_on_many_pc = discord.Embed(title='Do I need to put the GRC client on all computers running BOINC?', colour=discord.Colour.purple(),
 description='''
-No, you simply need to ensure that all your BOINC computers use the same email and are crunching for the Gridcoin team.
+No, you simply need to ensure that all your BOINC computers use the same email and are crunching for the Gridcoin team. Doing so may get you temporarily banned by the network and could have implications on the integrity of your wallet.
 ''')
 
-# Example GRC Config Windows
+# Example GRC config windows
 example_windows = discord.Embed(description='''```
 email=YOUREMAIL@example.com
 boincdatadir=C:\ProgramData\BOINC\
@@ -192,7 +195,7 @@ addnode=nl.gridcoin.pl # Netherlands
 addnode=de.gridcoin.pl # Germany
 ```''')
 
-# Example GRC Config Linux
+# Example GRC config linux
 example_linux = discord.Embed(description='''```
 email=YOUREMAIL@example.com
 boincdatadir=/var/lib/boinc/
@@ -213,11 +216,11 @@ addnode=de.gridcoin.pl # Germany
 index = [{'What is Gridcoin?': what_is_grc},
         {'What is BOINC?' : what_is_boinc},
         {'How is GRC staked/mined?' : how_to_stake},
-        {'How much GRC is Enough to Start Staking?' : how_much_grc},
+        {'How much GRC is enough to start staking?' : how_much_grc},
         {'How do I get started with pool mining?' : pool_mining},
         {'How do I get started with solo mining?' : solo_mining},
         {'Do I need to put the GRC client on all computers running BOINC?' : client_on_many_pc},
-        {'Example GRC Config Windows' : example_windows},
-        {'Example GRC Config Linux' : example_linux},
-        {'Where can I Report Issues and Where can I get Help?' : additional_help},
-        {'Useful Links' : useful_links}]
+        {'Example GRC config windows' : example_windows},
+        {'Example GRC config linux' : example_linux},
+        {'Where can I report issues and where can I get help?' : additional_help},
+        {'Useful links' : useful_links}]

@@ -200,6 +200,12 @@ async def on_message(msg):
             await client.send_message(chan, bot.help_interface(cmd.split().pop()))
         elif cmd.startswith('info'):
             await client.send_message(chan, embed=docs.info)
+        elif cmd.startswith('faq'):
+            reply = bot.faq(cmd.split()[1:])
+            if type(reply) is str:
+                await client.send_message(chan, reply)
+            else:
+                await client.send_message(await client.start_private_message(msg.author), embed=reply)
         elif INDB:
             USROBJ = UDB[user]
             if cmd in ['bal', 'balance']:
@@ -266,12 +272,6 @@ async def on_message(msg):
                     amt = 0 if (bot.amt_filter(args[0], USROBJ) == None) else bot.amt_filter(args[0], USROBJ)
                     USROBJ.balance -= amt
                     await client.send_message(chan, 'Burned `{} GRC`'.format(amt))
-            elif cmd.startswith('faq'):
-                reply = bot.faq(cmd.split()[1:])
-                if type(reply) is str:
-                    await client.send_message(chan, reply)
-                else:
-                    await client.send_message(await client.start_private_message(msg.author), embed=reply)
             else:
                 await client.send_message(chan, '{}Invalid command. Type `%help` for help.'.format(e.INFO))
         else:
