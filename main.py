@@ -2,6 +2,7 @@ from os import path
 import asyncio
 import discord
 import logging
+from time import time
 from logging.handlers import RotatingFileHandler
 
 from GRC_pricebot import price_bot
@@ -24,6 +25,20 @@ LAST_BLK = 0
 FCT = 'FAUCET'
 price_fetcher = price_bot()
 UDB = {}
+latest_users = {}
+
+def checkbanned(user):
+    global latest_users
+    if user in latest_users:
+        if time()-latest_users[user] > 1:
+            latest_users[user] = time()
+            return False
+        else:
+            latest_users[user] = time()
+            return True
+    else:
+        latest_users[user] = time()
+        return False
 
 async def check_tx(txid):
     tx = await w.query('gettransaction', [txid])
@@ -157,7 +172,11 @@ async def on_message(msg):
     user = msg.author.id
     INDB = user in UDB
     iscommand = cmd.startswith(g.pre)
-    if iscommand and (len(cmd) > 1):
+    if ((chan.is_private and str(user) in g.banned_priv) or
+    (str(user) in g.banned) or
+    checkbanned(user)):
+        pass
+    elif iscommand and (len(cmd) > 1):
         cmd = cmd[1:]
         if chan.is_private:
             logging.info('COMMAND "%s" executed by %s (%s) in private channel',
@@ -235,7 +254,7 @@ async def on_message(msg):
                 if chan.is_private:
                     await client.send_message(chan, docs.PM_msg)
                 elif len(args) == 1:
-                    await client.send_file(chan, bot.get_qr(args[0], filename=user + '.png'))
+                    await client.send_file(chan, bot.get_qr(args[0]), filename=user + '.png')
                 elif len(args) > 1:
                     await client.send_message(chan, '{}Too many arguments provided'.format(e.CANNOT))
                 else:
