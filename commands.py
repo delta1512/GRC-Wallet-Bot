@@ -11,7 +11,7 @@ import grcconf as g
 import emotes as e
 import wallet as w
 import docs
-
+import FAQ
 
 def amt_filter(inp, userobj):
     #if inp == 'all':
@@ -81,13 +81,13 @@ async def rdonate(amount, userobj):
         return reply + '\n\nYou donated to: {}'.format(list(acct_dict.keys())[0])
     return reply
 
-def fetch_donation_addrs():
-    big_string = '{}Be generous! Below are possible donation options.```{}```\nTo donate, type `%donate [selection no.] [amount-GRC]`'
+def index_displayer(header, index):
+    big_string = '{}```{}```'
     acc = ''
-    for count, acct in enumerate(g.donation_accts):
+    for count, acct in enumerate(index):
         name = list(acct.keys())[0]
         acc += '\n{}. {}'.format(str(count+1), name)
-    return big_string.format(e.GIVE, acc[1:])
+    return big_string.format(header, acc[1:])
 
 async def withdraw(amount, addr, userobj):
     amount = amt_filter(amount, userobj)
@@ -145,3 +145,15 @@ def help_interface(query):
         return docs.help_dict[query]
     except:
         return docs.help_dict['default']
+
+def faq(args):
+    if len(args) < 1:
+        return index_displayer('{}The following are currently documented FAQ articles. To read, type `%faq [selection no.]` '.format(e.BOOK), FAQ.index) + '\n*Thanks to LavRadis and Foxifi for making these resources.*'
+    try:
+        selection = int(args[0])-1
+    except ValueError:
+        return '{}Invalid selection.'.format(e.ERROR)
+    if 0 <= selection < len(FAQ.index):
+        article = FAQ.index[selection]
+        return article[list(article.keys())[0]]
+    return '{}Invalid selection.'.format(e.ERROR)

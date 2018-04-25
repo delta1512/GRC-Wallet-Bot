@@ -1,5 +1,6 @@
 import grcconf as g
 import emotes as e
+import discord
 
 hlp = '''```
 Type %help [topic] for more detailed information about the following:
@@ -83,17 +84,17 @@ info_help = '''```
 Info about author and this bot: %info
 ```'''
 
-info = '''
-**This bot is the original work of Delta and various contributors.**
-
-The source code for the bot can be found here: https://github.com/delta1512/GRC-Wallet-Bot
+info = discord.Embed(title='This bot is the original work of Delta and various contributors.', colour=discord.Colour.purple(),
+description='''
+The source code for the bot can be found [here](https://github.com/delta1512/GRC-Wallet-Bot).
 
 If there are any problems, glitches or crashes, please notify me or the contributors below as soon as possible. Any queries can be sent to `boincosdelta@gmail.com`.
 
 Notable mentions:
-- Jorkermc https://github.com/jorkermc
+- [Jorkermc](https://github.com/jorkermc)
 - Foxifi
-'''
+- [LavRadis](https://steemit.com/@lavradis)
+''')
 
 help_dict = {
     'default'   :   hlp,
