@@ -170,7 +170,7 @@ Media and community:
 # Do I need to put the GRC client on all computers running BOINC?
 client_on_many_pc = discord.Embed(title='Do I need to put the GRC client on all computers running BOINC?', colour=discord.Colour.purple(),
 description='''
-No, you simply need to ensure that all your BOINC computers use the same email and are crunching for the Gridcoin team.
+No, you simply need to ensure that all your BOINC computers use the same email and are crunching for the Gridcoin team. Also doing that is an easy way to get you banned by other grc wallets.
 ''')
 
 # Example GRC Config Windows
