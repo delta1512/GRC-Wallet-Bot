@@ -14,6 +14,7 @@ Type %help [topic] for more detailed information about the following:
 - qr
 - faq
 - status
+- time
 - info
 ```'''
 
@@ -89,6 +90,12 @@ status = '''```
 Bot and network status: %status
 ```'''
 
+time = '''```
+Shows what functionality is available given recent activity: %time
+    Specifically shows faucet, withdrawal and donation availability.
+    Requested by LavRadis.
+```'''
+
 info_help = '''```
 Info about author and this bot: %info
 ```'''
@@ -117,6 +124,7 @@ help_dict = {
     'qr'        :   qr,
     'faq'       :   faq,
     'status'    :   status,
+    'time'      :   time,
     'info'      :   info_help
 }
 

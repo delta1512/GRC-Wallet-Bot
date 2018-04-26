@@ -224,7 +224,7 @@ async def on_message(msg):
                 if len(args) == 2:
                     reply = await bot.donate(args[0], args[1], USROBJ)
                 else:
-                    reply = bot.index_displayer('{}Be generous! Below are possible donation options.\nTo donate, type `%donate [selection no.] [amount-GRC]`'.format(e.GIVE), g.donation_accts)
+                    reply = bot.index_displayer('{}Be generous! Below are possible donation options.\nTo donate, type `%donate [selection no.] [amount-GRC]`\n'.format(e.GIVE), g.donation_accts)
                 await client.send_message(chan, reply)
             elif cmd.startswith('rdonate'):
                 args = cmd.split()[1:]
@@ -266,6 +266,8 @@ async def on_message(msg):
                     await client.send_message(chan, '{}Too many arguments provided'.format(e.CANNOT))
                 else:
                     await client.send_file(chan, bot.get_qr(USROBJ.address), filename=user + '.png')
+            elif cmd.startswith('time'):
+                await client.send_message(chan, bot.check_times(USROBJ))
             elif cmd.startswith('bin {}'.format(user)):
                 args = cmd.split()[2:]
                 if len(args) > 0 and chan.is_private:
