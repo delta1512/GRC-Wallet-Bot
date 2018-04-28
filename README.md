@@ -14,6 +14,8 @@ This bot aims to be a third part wallet service for the Gridcoin cryptocurrency 
 
 * Filled out configuration file
 
+* Two files in the same directory as main.py called **blist** and **priv_blist** (these are your total and private message blacklists)
+
 * A record in the DB with the userID `'FAUCET'` and a preset GRC address
 
 ## Database Setup

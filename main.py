@@ -6,6 +6,7 @@ import time
 from logging.handlers import RotatingFileHandler
 
 from GRC_pricebot import price_bot
+from blacklist import blist
 import UDB_tools as db
 import commands as bot
 import grcconf as g
@@ -26,8 +27,9 @@ FCT = 'FAUCET'
 price_fetcher = price_bot()
 UDB = {}
 latest_users = {}
+blacklister = None
 
-def checkbanned(user):
+def checkspam(user):
     global latest_users
     if user in latest_users:
         if time.time()-latest_users[user] > 1:
@@ -131,7 +133,7 @@ async def pluggable_loop():
 
 @client.event
 async def on_ready():
-    global UDB, LAST_BLK
+    global UDB, LAST_BLK, blacklister
     if await w.query('getblockcount', []) > 5: # 5 is largest error return value
         logging.info('Gridcoin client is online')
     else:
@@ -143,6 +145,13 @@ async def on_ready():
         exit(1)
     else:
         logging.info('SQL DB online and accessible')
+
+    try:
+        blacklister = blist()
+        logging.info('Blacklisting service loaded correctly')
+    except:
+        logging.error('Blacklisting service failed to load')
+        exit(1)
 
     if path.exists(g.LST_BLK):
         with open(g.LST_BLK, 'r') as last_block:
@@ -178,10 +187,7 @@ async def on_message(msg):
     user = a.id
     INDB = user in UDB
     iscommand = cmd.startswith(g.pre)
-    if ((chan.is_private and str(user) in g.banned_priv) or
-    (str(user) in g.banned) or
-    a.bot or
-    checkbanned(user)):
+    if a.bot or checkspam(user) or blacklister.is_banned(user, chan.is_private):
         pass
     elif iscommand and user_is_new(a.created_at):
         await client.send_message(chan, docs.new_usr_msg)
@@ -276,9 +282,16 @@ async def on_message(msg):
                     await client.send_file(chan, bot.get_qr(USROBJ.address), filename=user + '.png')
             elif cmd.startswith('time'):
                 await client.send_message(chan, bot.check_times(USROBJ))
-            elif cmd.startswith('bin {}'.format(user)):
+            # ADMINISTRATION COMMANDS
+            elif cmd.startswith('blist') and user == g.owner_id and chan.is_private:
+                args = cmd.split()[1:]
+                if len(args) > 0:
+                    await client.send_message(chan, bot.blist_iface(args, blacklister))
+                else:
+                    await client.send_message(chan, blacklister.get_blisted())
+            elif cmd.startswith('bin {}'.format(user)) and chan.is_private: # 'Burns' GRC from your account
                 args = cmd.split()[2:]
-                if len(args) > 0 and chan.is_private:
+                if len(args) > 0:
                     amt = 0 if (bot.amt_filter(args[0], USROBJ) == None) else bot.amt_filter(args[0], USROBJ)
                     USROBJ.balance -= amt
                     await client.send_message(chan, 'Burned `{} GRC`'.format(amt))

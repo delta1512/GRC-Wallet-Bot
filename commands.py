@@ -158,6 +158,28 @@ def faq(args):
         return article[list(article.keys())[0]]
     return '{}Invalid selection.'.format(e.ERROR)
 
+#check [usr] [chan]
+#ban [user] [chan]
+#unban [user]
+def blist_iface(args, blist_obj):
+    if args[0] == 'check':
+        if len(args) == 3:
+            return str(blist_obj.is_banned(args[1], True if args[2] == 'priv' else False))
+        return '{}Invalid args'.format(e.ERROR)
+    elif args[0] == 'ban':
+        if len(args) == 3:
+            blist_obj.new_blist(args[1], True if args[2] == 'priv' else False)
+            return e.GOOD[:-3]
+        return '{}Invalid args'.format(e.ERROR)
+    elif args[0] == 'unban':
+        if len(args) == 2:
+            blist_obj.remove_blist(args[1])
+            return e.GOOD[:-3]
+        return '{}Invalid args'.format(e.ERROR)
+    else:
+        return '{}Invalid command'.format(e.ERROR)
+
+
 def check_times(userobj):
     nxtfct = userobj.last_faucet+3600*g.FCT_REQ_LIM
     nxtwdr = userobj.active_tx[1]+1.5*60*g.tx_timeout

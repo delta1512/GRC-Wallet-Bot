@@ -3,3 +3,5 @@ API.key
 grcconf.py
 grcconf.py.bak
 *.log
+blist
+priv_blist
