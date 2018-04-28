@@ -1,7 +1,7 @@
 ### ADMINISTRATION
 admin_wallet = ''
 tx_fee = 0.5
-tx_timeout = 1 # Confirmations
+tx_timeout = 1            # Confirmations
 rpc_usr = ''
 rpc_pass = ''
 rpc_url = 'http://[host]:[port]/'
@@ -23,8 +23,9 @@ pre = '%'
 FEE_POOL = '[location of amount of fees owed file]'
 LST_BLK = '[location of last block height file (temporary)]'
 MIN_TX = 0.001
-FEE_WDR_THRESH = 10 # When to send out the collected fees to admin
-SLP = 30 # Save interval
-FCT_REQ_LIM = 24 # Hours
+FEE_WDR_THRESH = 10       # (GRC) When to send out the collected fees to admin
+SLP = 30                  # Save interval
+FCT_REQ_LIM = 24          # Hours
 FCT_MAX = 1
 FCT_MIN = 0.1
+NEW_USR_TIME = 3          # Days

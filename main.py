@@ -2,7 +2,7 @@ from os import path
 import asyncio
 import discord
 import logging
-from time import time
+import time
 from logging.handlers import RotatingFileHandler
 
 from GRC_pricebot import price_bot
@@ -30,15 +30,20 @@ latest_users = {}
 def checkbanned(user):
     global latest_users
     if user in latest_users:
-        if time()-latest_users[user] > 1:
-            latest_users[user] = time()
+        if time.time()-latest_users[user] > 1:
+            latest_users[user] = time.time()
             return False
         else:
-            latest_users[user] = time()
+            latest_users[user] = time.time()
             return True
     else:
-        latest_users[user] = time()
+        latest_users[user] = time.time()
         return False
+
+def user_is_new(crtime):
+    crtime = str(crtime)
+    ut = time.mktime(time.strptime(crtime[:crtime.index('.')], '%Y-%m-%d %H:%M:%S'))
+    return time.time() < ut+24*60*60*g.NEW_USR_TIME
 
 async def check_tx(txid):
     tx = await w.query('gettransaction', [txid])
@@ -168,15 +173,18 @@ async def on_message(msg):
     global UDB
     cmd = msg.content
     chan = msg.channel
-    uname = msg.author.name
-    user = msg.author.id
+    a = msg.author
+    uname = a.name
+    user = a.id
     INDB = user in UDB
     iscommand = cmd.startswith(g.pre)
     if ((chan.is_private and str(user) in g.banned_priv) or
     (str(user) in g.banned) or
-    msg.author.bot or
+    a.bot or
     checkbanned(user)):
         pass
+    elif iscommand and user_is_new(a.created_at):
+        await client.send_message(chan, docs.new_usr_msg)
     elif iscommand and (len(cmd) > 1):
         cmd = cmd[1:]
         if chan.is_private:
@@ -205,7 +213,7 @@ async def on_message(msg):
             if type(reply) is str:
                 await client.send_message(chan, reply)
             else:
-                await client.send_message(await client.start_private_message(msg.author), embed=reply)
+                await client.send_message(await client.start_private_message(a), embed=reply)
         elif INDB:
             USROBJ = UDB[user]
             if cmd in ['bal', 'balance']:

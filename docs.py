@@ -135,4 +135,6 @@ Donate GRC to this address `{}`
 or type `%fgive [amount-GRC]` to help refill the faucet
 '''
 
-PM_msg = '{} The bot cannot process this command through private messages.'.format(e.CANNOT)
+PM_msg = '{}The bot cannot process this command through private messages.'.format(e.CANNOT)
+
+new_usr_msg = '{}Your account is too new to be using the bot, please ensure your account is at least {} days old.'.format(e.CANNOT, g.NEW_USR_TIME)
