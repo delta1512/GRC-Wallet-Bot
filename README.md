@@ -62,9 +62,9 @@ These are just ideas, not all of them may be implemented in the future. Any sugg
 
 - [ ] Static withdraw address option
 
-- [ ] %time function to show eligibility of %faucet, %withdraw and %donate
+- [X] %time function to show eligibility of %faucet, %withdraw and %donate
 
-- [ ] Random facts/FAQ article
+- [ ] Random facts
 
 ### FAQ Ideas:
 
