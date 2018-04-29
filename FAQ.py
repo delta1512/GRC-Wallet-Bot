@@ -35,7 +35,9 @@ links = [
 'https://steemit.com/trending/gridcoin', #31
 'https://www.grcpool.com/account', #32
 'https://youtu.be/jm2E6pQ-Ifw', #33
-'https://github.com/gridcoin/Gridcoin-Research/issues' #34
+'https://github.com/gridcoin/Gridcoin-Research/issues', #34
+'http://gridcoinl.ch/faucet.php', #35
+'https://gridcoinstats.eu/faucet.php' #36
 ]
 
 # What is Gridcoin?
