@@ -72,7 +72,7 @@ description='''
 The following links are various Gridcoin community locations and you will surely find someone that can help:
 - [Telegram]({})
 - [Slack]({})
-- [reddit]({})
+- [Reddit]({})
 - [Cryptocurrency Talk]({})
 - [Github]({})
 - [Discord]({})
@@ -163,7 +163,7 @@ Media and community:
 - [Twitter]({})
 - [Slack]({})
 - [Reddit]({})
-- [Steemit]({})
+- [Steem]({})
 - [Cryptocurrencytalk]({})
 '''.format(links[3], links[15], links[16], links[17], links[18], links[19],
             links[10], links[20], links[21], links[22], links[23], links[24],
