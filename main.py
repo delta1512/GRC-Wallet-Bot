@@ -2,8 +2,8 @@ from os import path
 import asyncio
 import discord
 import logging
-import time
 from logging.handlers import RotatingFileHandler
+import time
 
 from GRC_pricebot import price_bot
 from blacklist import blist
@@ -44,7 +44,11 @@ def checkspam(user):
 
 def user_is_new(crtime):
     crtime = str(crtime)
-    ut = time.mktime(time.strptime(crtime[:crtime.index('.')], '%Y-%m-%d %H:%M:%S'))
+    try:
+        crtime = crtime[:crtime.index('.')]
+    except ValueError:
+        pass
+    ut = time.mktime(time.strptime(crtime, '%Y-%m-%d %H:%M:%S'))
     return time.time() < ut+24*60*60*g.NEW_USR_TIME
 
 async def check_tx(txid):
@@ -95,7 +99,7 @@ async def blk_searcher():
                                         if found:
                                             break
                                 if found:
-                                    logging.info('Processed deposit for {}'.format(usr_obj.usrID))
+                                    logging.info('Processed deposit for %s', usr_obj.usrID)
                                     usr_obj.balance += vals[index]
                                     tmp = recv_addrs.pop(index)
                                     try: # In event of change address
@@ -108,7 +112,7 @@ async def blk_searcher():
                 else:
                     raise RuntimeError('Received erroneous signal in GRC client interface.')
         except Exception as E:
-            logging.exception('Block searcher ran into an error: {}'.format(E))
+            logging.exception('Block searcher ran into an error: %s', E)
 
 async def pluggable_loop():
     sleepcount = 0

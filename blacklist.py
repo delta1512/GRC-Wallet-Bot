@@ -1,4 +1,4 @@
-import grcconf as g
+import logging
 
 class blist:
     blacklist = {}
@@ -17,6 +17,7 @@ class blist:
         return '```UID | Private ban\n{}```'.format(''.join(['{} | {}\n'.format(u, self.blacklist[u]) for u in self.blacklist]))
 
     def new_blist(self, user, priv_ban):
+        logging.info('New ban made for UID: %s', user)
         self.blacklist[user] = priv_ban
         if priv_ban:
             f = 'priv_blist'
@@ -26,6 +27,7 @@ class blist:
             b.write(user + '\n')
 
     def remove_blist(self, user):
+        logging.info('Attempted ban removal for UID: %s', user)
         if user in self.blacklist:
             if self.blacklist.pop(user):
                 with open('priv_blist', 'w') as b:
