@@ -207,7 +207,7 @@ async def on_message(msg):
             await client.send_message(chan, await bot.dump_cfg(price_fetcher))
         elif cmd.startswith('new'):
             if not INDB:
-                await client.send_message(chan, '{}Creating your account now...'.format(e.SETTING))
+                await client.send_message(chan, '{}Welcome to the GRC Wallet Bot! Type `%help` for more commands and `%faq` if you have any questions about Gridcoin.'.format(e.INFO))
                 status, reply, userobj = await bot.new_user(user)
                 if status == 0:
                     UDB[user] = userobj
@@ -224,6 +224,7 @@ async def on_message(msg):
                 await client.send_message(chan, reply)
             else:
                 await client.send_message(await client.start_private_message(a), embed=reply)
+                await client.add_reaction(msg, '✅')
         elif INDB:
             USROBJ = UDB[user]
             if cmd in ['bal', 'balance']:

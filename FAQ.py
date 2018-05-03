@@ -60,10 +60,26 @@ Stakers are people that hold Gridcoin and earn 1.5% annual interest (stake) on t
 Crunchers (AKA Miners) are individuals that participate in [BOINC]({}) computing and earn rewards from Gridcoin through Proof Of Research (POR). To be eligible for GRC rewards, miners must have a minimum of 100 Recent Average Credit (RAC) from BOINC for any [whitelisted project]({}) and an existing GRC balance.
 '''.format(links[0], links[2]))
 
-# How much GRC is enough to start staking?
-how_much_grc = discord.Embed(title='How much GRC is enough to start staking?', colour=discord.Colour.purple(),
+# Do I need GRC to earn mining rewards?
+initial_grc = discord.Embed(title='Do I need GRC to earn mining rewards?', colour=discord.Colour.purple(),
 description='''
-A good amount of GRC to hold in your wallet is at least 2000 GRC and will allow you to stake on a regular basis. Time to get rewards depends on network difficulty (the collective amount of coins online and trying to stake) and whether you have reached the minimum threshold to retrieve your rewards.
+Yes. Solo mining rewards are based off of stake which means an existing balance of GRC. However when mining for the pool, you do not need any GRC.
+''')
+
+# Should I join the pool or do solo mining?
+pool_or_solo = discord.Embed(title='I\'m new to Gridcoin, should I join the pool or do solo mining?', colour=discord.Colour.purple(),
+description='''
+If you do not want to invest a small amount of money to perform staking and earn research rewards, you should join the [GRC Pool]({}).
+The pool allows you to crunch projects and earn rewards without having any existing GRC to stake with. To learn how to join the pool, see `%faq 7`.
+
+If you have an existing amount of GRC (see `%faq 6`) that you believe is satisfactory to start staking, you may want to start solo mining.
+Solo mining is where you crunch your own work and earn rewards through interest on the Gridcoin blockchain. To learn how to do solo mining, see `%faq 8`.
+'''.format(links[4]))
+
+# How much GRC is enough to start staking?
+how_much_grc = discord.Embed(title='How much GRC is enough to start mining/staking?', colour=discord.Colour.purple(),
+description='''
+A good amount of GRC to hold in your wallet is about 1000-2000 GRC and will allow you to stake on a regular basis. Time to get rewards depends on network difficulty (the collective amount of GRC online and trying to stake) and the amount of GRC you own.
 ''')
 
 # Where can I report issues and where can I get help?
@@ -116,7 +132,7 @@ description='''
 
 5. Configure the client according to the prompts or follow the [guide]({})
 
-6. After configuration, close the client completely and then open your configuration folder (Windows: C:\[User]\Appdata\Roaming\Gridcoinresearch) (Linux: ~/.GridcoinResearch/)
+6. After configuration, close the client completely and then open your configuration folder (Windows: C:\[User]\Appdata\Roaming\Gridcoinresearch\) (Linux: ~/.GridcoinResearch/)
 
 7. Delete everything in this folder apart from the wallet.dat, gridcoinresearch.conf and the walletbackups folder.
 
@@ -130,6 +146,28 @@ description='''
 
 12. If the return message says “SUCCESS”, then you must wait about a day for your client to be recognised for your crunching. If it says “FAIL” Then make sure you have over 100 RAC and a small GRC balance before contacting a Gridcoin community member to help you troubleshoot issues.
 '''.format(links[5], links[2], links[3], links[10], links[12], links[13], links[14]))
+
+# Terminology
+terms = discord.Embed(title='Terminology', colour=discord.Colour.purple(),
+description='''
+- POS: Proof Of Stake. A consensus protocol used in cryptocurrencies that allows the fabrication of blocks through the balance owned by individuals and the integration of annual interest.
+
+- CPID: Cross Project IDentifier. Is a unique ID used by your BOINC projects to identify your hosts across any project. This is also used in the GRC client to identify your BOINC account so that you can get research rewards.
+
+- Beacon: This is a form of contract made on the Gridcoin blockchain that advertises your CPID and allows you to be eligible for research rewards.
+
+- Superblock: (Yet to be written)
+
+- RAC: Recent Average Credit. This is a value calculated by BOINC and represents your average credit computed over a period of time. This is what Gridcoin looks at in order to calculate magnitude.
+
+- MAG: Magnitude. Is the value used by Gridcoin in order to calculate your entitled rewards. It is proportional to your RAC.
+
+- Whitelist: The set of projects that the Gridcoin network considers eligible for rewards. In order to receive GRC, you must be crunching as apart of one of these projects. The chosen projects are determined by network voting.
+
+- Voting: The mechanism built into the Gridcoin protocol that allows for the creation of polls and the collection of votes in order to make a truly secure and transparent voting system.
+
+- Neural Network: (Yet to be written)
+''')
 
 # Useful links
 useful_links = discord.Embed(title='Useful links', colour=discord.Colour.purple(),
@@ -173,7 +211,9 @@ Media and community:
 # Do I need to put the GRC client on all computers running BOINC?
 client_on_many_pc = discord.Embed(title='Do I need to put the GRC client on all computers running BOINC?', colour=discord.Colour.purple(),
 description='''
-No, you simply need to ensure that all your BOINC computers use the same email and are crunching for the Gridcoin team. Doing so may get you temporarily banned by the network and could have implications on the integrity of your wallet.
+No, you simply need to ensure that all your BOINC computers use the same email and are crunching for the Gridcoin team.
+
+Running the GRC client on multiple machines with the same CPID may get you temporarily banned by the network, will not increase your chance of research rewards and could have implications on the integrity of your wallet.
 ''')
 
 # Example GRC config windows
@@ -215,6 +255,8 @@ addnode=de.gridcoin.pl # Germany
 
 index = [{'What is Gridcoin?': what_is_grc},
         {'What is BOINC?' : what_is_boinc},
+        {'Do I need GRC to earn mining rewards?' : initial_grc},
+        {'Should I join the pool or do solo mining?' : pool_or_solo},
         {'How is GRC staked/mined?' : how_to_stake},
         {'How much GRC is enough to start staking?' : how_much_grc},
         {'How do I get started with pool mining?' : pool_mining},
@@ -223,4 +265,5 @@ index = [{'What is Gridcoin?': what_is_grc},
         {'Example GRC config windows' : example_windows},
         {'Example GRC config linux' : example_linux},
         {'Where can I report issues and where can I get help?' : additional_help},
+        {'Terminology' : terms},
         {'Useful links' : useful_links}]
