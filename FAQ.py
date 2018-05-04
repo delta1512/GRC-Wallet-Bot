@@ -41,10 +41,10 @@ links = [
 # What is Gridcoin?
 what_is_grc = discord.Embed(title='What is Gridcoin?', colour=discord.Colour.purple(),
 description='''
-[Gridcoin]({}) is an open source cryptocurrency (Ticker: GRC) which securely rewards volunteer computing performed upon the [BOINC]({}) platform in a decentralized manner on top of Proof Of Stake (POS) and a new protocol known as Proof Of Research (POR).
+[Gridcoin]({}) is an open source cryptocurrency (Ticker: [GRC]({})) which securely rewards volunteer computing performed upon the [BOINC]({}) platform in a decentralized manner on top of Proof Of Stake (POS) and a new protocol known as Proof Of Research (POR).
 
 Unlike typical currencies that compute (arguably) useless mathematics to produce hashes and secure their own chain, the Gridcoin ecosystem uses the environmentally friendly POS protocol in addition to incentivising the computing of real-world problems that help solve humanity’s greatest struggles such as cancer, protein fabrication, prime factoring and even searching for alien life.
-'''.format(links[3], links[0]))
+'''.format(links[3], links[18], links[0]))
 
 # What is BOINC?
 what_is_boinc = discord.Embed(title='What is BOINC?', colour=discord.Colour.purple(),
@@ -150,23 +150,23 @@ description='''
 # Terminology
 terms = discord.Embed(title='Terminology', colour=discord.Colour.purple(),
 description='''
-- POS: Proof Of Stake. A consensus protocol used in cryptocurrencies that allows the fabrication of blocks through the balance owned by individuals and the integration of annual interest.
+- **POS**: Proof Of Stake. A consensus protocol used in cryptocurrencies that allows the fabrication of blocks through the balance owned by individuals and the integration of annual interest.
 
-- CPID: Cross Project IDentifier. Is a unique ID used by your BOINC projects to identify your hosts across any project. This is also used in the GRC client to identify your BOINC account so that you can get research rewards.
+- **CPID**: Cross Project IDentifier. Is a unique ID used by your BOINC projects to identify your hosts across any project. This is also used in the GRC client to identify your BOINC account so that you can get research rewards.
 
-- Beacon: This is a form of contract made on the Gridcoin blockchain that advertises your CPID and allows you to be eligible for research rewards.
+- **Beacon**: This is a form of contract made on the Gridcoin blockchain that advertises your CPID and allows you to be eligible for research rewards.
 
-- Superblock: (Yet to be written)
+- **Superblock**: (Yet to be written)
 
-- RAC: Recent Average Credit. This is a value calculated by BOINC and represents your average credit computed over a period of time. This is what Gridcoin looks at in order to calculate magnitude.
+- **RAC**: Recent Average Credit. This is a value calculated by BOINC and represents your average credit computed over a period of time. This is what Gridcoin looks at in order to calculate magnitude.
 
-- MAG: Magnitude. Is the value used by Gridcoin in order to calculate your entitled rewards. It is proportional to your RAC.
+- **MAG**: Magnitude. Is the value used by Gridcoin in order to calculate your entitled rewards. It is proportional to your RAC.
 
-- Whitelist: The set of projects that the Gridcoin network considers eligible for rewards. In order to receive GRC, you must be crunching as apart of one of these projects. The chosen projects are determined by network voting.
+- **Whitelist**: The set of projects that the Gridcoin network considers eligible for rewards. In order to receive GRC, you must be crunching as apart of one of these projects. The chosen projects are determined by network voting.
 
-- Voting: The mechanism built into the Gridcoin protocol that allows for the creation of polls and the collection of votes in order to make a truly secure and transparent voting system.
+- **Voting**: The mechanism built into the Gridcoin protocol that allows for the creation of polls and the collection of votes in order to make a truly secure and transparent voting system.
 
-- Neural Network: (Yet to be written)
+- **Neural Network**: (Yet to be written)
 ''')
 
 # Useful links
