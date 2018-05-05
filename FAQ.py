@@ -35,7 +35,27 @@ links = [
 'https://steemit.com/trending/gridcoin', #31
 'https://www.grcpool.com/account', #32
 'https://youtu.be/jm2E6pQ-Ifw', #33
-'https://github.com/gridcoin/Gridcoin-Research/issues' #34
+'https://github.com/gridcoin/Gridcoin-Research/issues', #34
+'https://coinomi.com', #35
+'https://holytransaction.com', #36
+'https://www.coinvault.io', #37
+'https://walletgenerator.net/?currency=GridcoinResearch', #38
+'https://play.google.com/store/apps/details?id=com.bitshares.bitshareswallet', #39
+'http://gridcoin.ch/faucet.php', #40
+'https://gridcoinstats.eu/faucet.php', #41
+'https://www.eobot.com/faucet', #42
+'http://uscore.net/', #43
+'https://bittrex.com/Market/', #44
+'https://poloniex.com/', #45
+'https://c-cex.com/', #46
+'https://flyp.me/', #47
+'https://tradebytrade.com/', #48
+'https://bisq.network/', #49
+'https://door.one/', #50
+'https://bitshares.org/', #51
+'https://bit.btsabc.org/', #52
+'https://openledger.io/', #53
+'https://market.rudex.org/' #54
 ]
 
 # What is Gridcoin?
@@ -169,6 +189,44 @@ description='''
 - **Neural Network**: (Yet to be written)
 ''')
 
+# Third-party wallets
+other_wallets = discord.Embed(title='Third-party wallets', colour=discord.Colour.purple(),
+description='''
+- [Coinomi wallet]({})
+- [Holy Transaction]({})
+- [Coinvault]({})
+- [Paper wallet]({})
+- [Bitshares wallet]({})
+- [Delta's GRC Discord bot]({})
+'''.format(links[35], links[36], links[37], links[38], links[39], links[11]))
+
+# Faucets
+faucet_list = discord.Embed(title='Faucets', colour=discord.Colour.purple(),
+description='''
+- [GRC Switzerland]({})
+- [Gridcoin Stats]({})
+- [Eobot]({})
+- [Uscore]({})
+- [Delta's GRC Discord bot]({})
+'''.format(links[40], links[41], links[42], links[43], links[11]))
+
+# Supported exchanges
+exchanges = discord.Embed(title='Supported exchanges', colour=discord.Colour.purple(),
+description='''
+- [Bittrex]({})
+- [Poloniex]({})
+- [C-CEX]({})
+- [flyp.me]({})
+- [Trade by Trade]({})
+- [Bisq]({})
+- [Door One]({})
+- [Bitshares]({})
+- [BTSABC]({})
+- [Openledger]({})
+- [Rudex]({})
+'''.format(links[44], links[45], links[46], links[47], links[48], links[49],
+            links[50], links[51], links[52], links[53], links[54]))
+
 # Useful links
 useful_links = discord.Embed(title='Useful links', colour=discord.Colour.purple(),
 description='''
@@ -266,4 +324,7 @@ index = [{'What is Gridcoin?': what_is_grc},
         {'Example GRC config linux' : example_linux},
         {'Where can I report issues and where can I get help?' : additional_help},
         {'Terminology' : terms},
+        {'Third-party wallets' : other_wallets},
+        {'Supported exchanges' : exchanges},
+        {'Faucets' : faucet_list},
         {'Useful links' : useful_links}]
