@@ -48,14 +48,13 @@ links = [
 'https://bittrex.com/Market/', #44
 'https://poloniex.com/', #45
 'https://c-cex.com/', #46
-'https://flyp.me/', #47
-'https://tradebytrade.com/', #48
-'https://bisq.network/', #49
-'https://door.one/', #50
-'https://bitshares.org/', #51
-'https://bit.btsabc.org/', #52
-'https://openledger.io/', #53
-'https://market.rudex.org/' #54
+'https://tradebytrade.com/', #47
+'https://bisq.network/', #48
+'https://door.one/', #49
+'https://bitshares.org/', #50
+'https://bit.btsabc.org/', #51
+'https://openledger.io/', #52
+'https://market.rudex.org/' #53
 ]
 
 # What is Gridcoin?
@@ -224,7 +223,6 @@ description='''
 - [Bittrex]({})
 - [Poloniex]({})
 - [C-CEX]({})
-- [flyp.me]({})
 - [Trade by Trade]({})
 - [Bisq]({})
 - [Door One]({})
@@ -232,8 +230,8 @@ description='''
 - [BTSABC]({})
 - [Openledger]({})
 - [Rudex]({})
-'''.format(links[44], links[45], links[46], links[47], links[48], links[49],
-            links[50], links[51], links[52], links[53], links[54]))
+'''.format(links[44], links[45], links[46], links[47], links[48],
+            links[49], links[50], links[51], links[52], links[53]))
 
 # Useful links
 useful_links = discord.Embed(title='Useful links', colour=discord.Colour.purple(),
