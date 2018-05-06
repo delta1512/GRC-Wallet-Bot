@@ -44,7 +44,7 @@ async def save_db(udb):
                 donations=%s,
                 lastTX_amt=%s,
                 lastTX_time=%s,
-                lastTX_txid="%s"
+                lastTX_txid=%s
                 WHERE uid=%s;'''.format(g.udb_name), (udb[u].last_faucet,
                 udb[u].balance, udb[u].donations, udb[u].active_tx[0],
                 udb[u].active_tx[1], udb[u].active_tx[2], u))
