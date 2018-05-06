@@ -50,7 +50,7 @@ links = [
 'https://c-cex.com/', #46
 'https://tradebytrade.com/', #47
 'https://bisq.network/', #48
-'https://door.one/', #49
+'https://doorone.cloud/en/', #49
 'https://bitshares.org/', #50
 'https://bit.btsabc.org/', #51
 'https://openledger.io/', #52
@@ -82,7 +82,7 @@ Crunchers (AKA Miners) are individuals that participate in [BOINC]({}) computing
 # Do I need GRC to earn mining rewards?
 initial_grc = discord.Embed(title='Do I need GRC to earn mining rewards?', colour=discord.Colour.purple(),
 description='''
-Yes. Solo mining rewards are received by staking, which requires an existing balance of GRC. However when mining for the pool, you do not need any existing GRC.
+Yes. Solo mining rewards are received by staking, which requires an existing balance of GRC. However, when mining for the pool, you do not need any existing GRC.
 ''')
 
 # Should I join the pool or do solo mining?
@@ -91,7 +91,7 @@ description='''
 If you do not want to invest a small amount of money to perform staking and earn research rewards, you should join the [GRC Pool]({}).
 The pool allows you to crunch projects and earn rewards without having any existing GRC to stake with. To learn how to join the pool, see `%faq 7`.
 
-If you have an existing amount of GRC (see `%faq 6`) that you believe is satisfactory to start staking, you may want to start solo mining.
+If you have an existing amount of GRC (see `%faq 6`), you may want to start solo mining.
 Solo mining is where you crunch your own work and earn rewards through interest on the Gridcoin blockchain. To learn how to do solo mining, see `%faq 8`.
 '''.format(links[4]))
 
@@ -185,7 +185,7 @@ description='''
 
 **Net Weight**: The stake weight of all users on the Gridcoin network who are actively trying to earn interest/research rewards.
 
-**Difficulty**: A measurement of how hard it is to make a block and earn your interest/research rewards so that the network makes a block approximately every 1.5 minutes. This is based off of net weight.
+**Difficulty**: A measurement of how hard it is to make a block and earn your interest/research rewards so that the network makes a block approximately every 1.5 minutes. This is based on net weight.
 
 **Whitelist**: The set of projects that the Gridcoin network considers eligible for rewards. To earn GRC, you must be crunching for one of these projects. The chosen projects are determined by network voting.
 
