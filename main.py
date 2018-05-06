@@ -7,6 +7,7 @@ import time
 
 from GRC_pricebot import price_bot
 from blacklist import blist
+from rain import rainbot
 import UDB_tools as db
 import commands as bot
 import grcconf as g
@@ -24,10 +25,12 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s: %(message)s',
 client = discord.Client()
 LAST_BLK = 0
 FCT = 'FAUCET'
-price_fetcher = price_bot()
+RN = 'RAIN'
 UDB = {}
 latest_users = {}
+price_fetcher = price_bot()
 blacklister = None
+rbot = None
 
 def checkspam(user):
     global latest_users
@@ -119,6 +122,8 @@ async def pluggable_loop():
     while True:
         await asyncio.sleep(5)
         await blk_searcher()
+        if rbot.check_rain():
+            await rbot.do_rain(UDB, client)
         if sleepcount % g.SLP == 0:
             await db.save_db(UDB)
             with open(g.LST_BLK, 'w') as last_block:
@@ -137,7 +142,7 @@ async def pluggable_loop():
 
 @client.event
 async def on_ready():
-    global UDB, LAST_BLK, blacklister
+    global UDB, LAST_BLK, blacklister, rbot
     if await w.query('getblockcount', []) > 5: # 5 is largest error return value
         logging.info('Gridcoin client is online')
     else:
@@ -178,6 +183,14 @@ async def on_ready():
         exit(1)
 
     UDB = await db.read_db()
+
+    try:
+        rbot = rainbot(UDB[RN])
+        logging.info('Rainbot service loaded correctly')
+    except:
+        logging.error('Rainbot service failed to load')
+        exit(1)
+
     logging.info('Initialisation complete')
     await pluggable_loop()
 
@@ -275,6 +288,8 @@ async def on_message(msg):
                     await client.send_message(chan, docs.PM_msg)
                 else:
                     await client.send_message(chan, bot.faucet(fctobj, USROBJ))
+            elif cmd.startswith('rain'):
+                await client.send_message(chan, rbot.process_message(cmd.split()[1:], USROBJ))
             elif cmd.startswith('qr'):
                 args = cmd.split()[1:]
                 if chan.is_private:

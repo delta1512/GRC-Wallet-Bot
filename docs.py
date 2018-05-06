@@ -132,7 +132,14 @@ faucetmsg = '''
 The faucet currently contains `{} GRC` and has a timeout of {} hours.
 
 Donate GRC to this address `{}`
-or type `%fgive [amount-GRC]` to help refill the faucet
+or type `%fgive [amount-GRC]` to help refill the faucet.
+'''
+
+rain_msg = '''
+The rainbot currently contains `{} GRC` and will rain at `{} GRC`.
+
+Donate GRC to this address `{}`
+or type `%rain [amount-GRC]` to build up rain.
 '''
 
 PM_msg = '{}The bot cannot process this command through private messages.'.format(e.CANNOT)

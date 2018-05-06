@@ -30,3 +30,5 @@ FCT_REQ_LIM = 24          # Hours
 FCT_MAX = 1
 FCT_MIN = 0.1
 NEW_USR_TIME = 3          # Days
+MAX_RAIN = 30             # (GRC) Must be greater than 10
+RAIN_CHAN = ''            # Discord channel to announce rain
