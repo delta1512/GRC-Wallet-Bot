@@ -63,6 +63,14 @@ Give funds to another user: %give %tip
     Requires the mentioned user to also have an account with the bot through %new.
 ```'''
 
+rain = '''```
+Rain on active users: %rain
+    Typing %rain on its own will display the current rain balance and threshold.
+    Once the balance of the rainbot exceeds the threshold, it will rain on all online users.
+
+    To contribute GRC to the rain pool, type: %rain [amount-GRC]
+```'''
+
 faucet = '''```
 Get some free GRC: %faucet
     Type this command to get some free Gridcoins.
@@ -127,6 +135,8 @@ help_dict = {
     'time'      :   time,
     'info'      :   info_help
 }
+
+welcome = '{}Welcome to the GRC Wallet Bot! Type `%help` for more commands and `%faq` if you have any questions about Gridcoin.'.format(e.CELEBRATE)
 
 faucetmsg = '''
 The faucet currently contains `{} GRC` and has a timeout of {} hours.
