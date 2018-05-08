@@ -102,7 +102,7 @@ async def blk_searcher():
                                         if found:
                                             break
                                 if found:
-                                    logging.info('Processed deposit for %s', usr_obj.usrID)
+                                    logging.info('Processed deposit with TXID: %s for %s', txid, usr_obj.usrID)
                                     usr_obj.balance += vals[index]
                                     tmp = recv_addrs.pop(index)
                                     try: # In event of change address
