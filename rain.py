@@ -17,16 +17,18 @@ class rainbot:
     async def do_rain(self, UDB, client):
         ulist = [uid for uid in UDB]
         online = []
+        bias = uniform(0.001, 0.01)
+        rain_amt = round(self.RBOT.balance - bias, 8)
         for member in client.get_all_members():
             if member.status == discord.Status.online and member.id in ulist:
                 online.append(member.id)
-        for i, val in enumerate(self.get_rain_vals(len(online))):
+        for i, val in enumerate(self.get_rain_vals(len(online), bias)):
             give(val, self.RBOT, UDB[online[i]])
-        big_string = '{}Rained `{} GRC`\n'.format(e.RAIN, self.thresh)
+        big_string = '{}Rained `{} GRC`\n'.format(e.RAIN, rain_amt)
         for user in online:
             big_string += '<@{}>\n'.format(user)
         if len(big_string) >= 2000:
-            big_string = '{}Rainbot has rained `{} GRC` on {} users. See if you are lucky!'.format(e.RAIN, self.thresh, len(online))
+            big_string = '{}Rainbot has rained `{} GRC` on {} users. See if you are lucky!'.format(e.RAIN, rain_amt, len(online))
         await client.send_message(client.get_channel(g.RAIN_CHAN), big_string)
         self.get_next_thresh()
 
@@ -46,7 +48,7 @@ class rainbot:
                         add_success_msg='\n\nThank you for raining on the users!', donation=True)
         return '{}Too many arguments provided'.format(e.CANNOT)
 
-    def get_rain_vals(self, n):
+    def get_rain_vals(self, n, bias):
         rand_set = [uniform(0.1, 0.8) for i in range(n)]
         set_sum = sum(rand_set)
-        return list(map(lambda x: (x/set_sum)*self.thresh, rand_set))
+        return list(map(lambda x: (x/set_sum)*self.RBOT.balance-bias, rand_set))
