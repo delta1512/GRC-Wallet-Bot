@@ -122,7 +122,7 @@ Notable mentions:
 ''')
 
 help_dict = {
-    'default'   :   hlp,
+    ''   :   hlp,
     'new'       :   new,
     'balance'   :   bal,
     'withdraw'  :   wdr,
