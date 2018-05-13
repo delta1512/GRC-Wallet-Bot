@@ -22,11 +22,13 @@ async def query(cmd, params):
                 response = await resp.json()
     except Exception as E:
         logging.warning('Exception triggered in communication with GRC client: %s', E)
+        logging.warning('CMD: %s ARGS: %s', cmd, params)
         return 3
     if response['error'] != None:
         if response['error']['code'] == -17:
             return None
         logging.warning('Error response sent by GRC client: %s', response['error'])
+        logging.warning('CMD: %s ARGS: %s', cmd, params)
         return 1
     else:
         return response['result']
