@@ -10,8 +10,9 @@ from user import usr
 import grcconf as g
 import emotes as e
 import wallet as w
-import docs
 import FAQ
+
+import json
 
 def amt_filter(inp, userobj):
     #if inp == 'all':
@@ -141,10 +142,11 @@ def get_qr(string):
     return savedir
 
 def help_interface(query):
-    try:
-        return docs.help_dict[query]
-    except:
-        return docs.help_dict['default']
+    with open("docs.json","r") as file:
+        try:
+            return json.load(file.read())[query]
+        except:
+            return json.load(file.read())[""]
 
 def faq(args):
     if len(args) < 1:

@@ -1,6 +1,7 @@
 import grcconf as g
 import emotes as e
 import discord
+import json
 
 hlp = '''```
 Type %help [topic] for more detailed information about the following:
@@ -121,7 +122,7 @@ Notable mentions:
 ''')
 
 help_dict = {
-    'default'   :   hlp,
+    ''   :   hlp,
     'new'       :   new,
     'balance'   :   bal,
     'withdraw'  :   wdr,
@@ -135,6 +136,9 @@ help_dict = {
     'time'      :   time,
     'info'      :   info_help
 }
+
+with open("docs.json","w") as file:
+    file.write(json.dumps(help_dict))
 
 welcome = '{}Welcome to the GRC Wallet Bot! Type `%help` for more commands and `%faq` if you have any questions about Gridcoin.'.format(e.CELEBRATE)
 
