@@ -18,6 +18,8 @@ This bot aims to be a third part wallet service for the Gridcoin cryptocurrency 
 
 * A record in the DB with the userID `'FAUCET'` and a preset GRC address
 
+* A record in the DB with the userID `'RAIN'` and a preset GRC address
+
 ## Database Setup
 
 The following is an example SQL script for creating a table that is compatible with the bot:
@@ -48,9 +50,9 @@ These are just ideas, not all of them may be implemented in the future. Any sugg
 
 - [ ] Dice and other assorted features
 
-- [ ] Rain/soak
+- [X] Rain/soak
 
-- [ ] Help topics such as getting started with GRC
+- [X] Help topics such as getting started with GRC
 
 - [ ] Block exploring features
 
@@ -70,10 +72,10 @@ These are just ideas, not all of them may be implemented in the future. Any sugg
 
 - [ ] Linux compilation guide
 
-- [ ] Third-party walets
+- [X] Third-party walets
 
-- [ ] Exchanges
+- [X] Exchanges
 
-- [ ] Faucets
+- [X] Faucets
 
 - [ ] History of Gridcoin
