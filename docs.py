@@ -10,6 +10,7 @@ Type %help [topic] for more detailed information about the following:
 - donate
 - rdonate
 - give
+- rain
 - faucet
 - qr
 - faq
@@ -128,6 +129,7 @@ help_dict = {
     'donate'    :   donate,
     'rdonate'   :   rdonate,
     'give'      :   give,
+    'rain'      :   rain,
     'faucet'    :   faucet,
     'qr'        :   qr,
     'faq'       :   faq,

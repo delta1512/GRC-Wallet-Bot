@@ -179,16 +179,12 @@ def blist_iface(args, blist_obj):
     else:
         return '{}Invalid command'.format(e.ERROR)
 
-
 def check_times(userobj):
-    nxtfct = userobj.last_faucet+3600*g.FCT_REQ_LIM
-    nxtwdr = userobj.active_tx[1]+1.5*60*g.tx_timeout
-    nxtdonate = userobj.active_tx[1]+1.5*60
     ctime = time.time()
     return '''
 Faucet: {}
 Withdrawals: {}
 Donations: {}
-'''.format(e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(nxtfct-ctime)))) if ctime < nxtfct else e.GOOD[:-3],
-            e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(nxtwdr-ctime)))) if ctime < nxtwdr else e.GOOD[:-3],
-            e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(nxtdonate-ctime)))) if ctime < nxtdonate else e.GOOD[:-3])
+'''.format(e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(userobj.next_fct()-ctime)))) if not userobj.can_faucet() else e.GOOD[:-3],
+            e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(userobj.next_wdr()-ctime)))) if not userobj.can_withdraw() else e.GOOD[:-3],
+            e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(userobj.next_dnt()-ctime)))) if not userobj.can_donate() else e.GOOD[:-3])

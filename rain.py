@@ -33,7 +33,7 @@ class rainbot:
         self.get_next_thresh()
 
     def get_next_thresh(self):
-        self.thresh = round(uniform(10, g.MAX_RAIN), 8)
+        self.thresh = round(uniform(g.MIN_RAIN, g.MAX_RAIN), 8)
 
     def check_rain(self):
         return self.RBOT.balance > self.thresh

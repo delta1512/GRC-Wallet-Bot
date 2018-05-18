@@ -68,6 +68,8 @@ These are just ideas, not all of them may be implemented in the future. Any sugg
 
 - [ ] Random facts
 
+- [ ] %give and %rain in all chats
+
 ### FAQ Ideas:
 
 - [ ] Linux compilation guide

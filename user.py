@@ -17,7 +17,7 @@ class usr:
             raise ValueError('[ERROR] Null value passed to user instantiation')
 
     async def withdraw(self, amount, addr):
-        if round(time()) > self.active_tx[1]+1.5*60*g.tx_timeout:
+        if self.can_withdraw():
             txid = await w.tx(addr, amount-g.tx_fee)
             if isinstance(txid, str):
                 with open(g.FEE_POOL, 'r') as fees:
@@ -33,7 +33,7 @@ class usr:
         return '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
 
     async def donate(self, addr, amount):
-        if round(time()) > self.active_tx[1]+1.5*60:
+        if self.can_donate():
             txid = await w.tx(addr, amount-0.0001)
             if isinstance(txid, str):
                 self.active_tx = [amount, round(time()), txid.replace('\n', '')]
@@ -44,3 +44,21 @@ class usr:
             logging.error('Failed transaction. Addr: %s, Amt: %s, exit_code: %s', addr, amount, txid)
             return '{}Error: Transaction was unsuccessful.'.format(e.ERROR)
         return '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
+
+    def next_wdr(self):
+        return self.active_tx[1]+1.5*60*g.tx_timeout
+
+    def next_dnt(self):
+        return self.active_tx[1]+1.5*60*(g.tx_timeout/2)
+
+    def next_fct(self):
+        return self.last_faucet+3600*g.FCT_REQ_LIM
+
+    def can_withdraw(self):
+        return time() > self.next_wdr()
+
+    def can_donate(self):
+        return time() > self.next_dnt()
+
+    def can_faucet(self):
+        return time() > self.next_fct()
