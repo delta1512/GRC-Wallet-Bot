@@ -225,6 +225,8 @@ async def on_message(msg):
                 if status == 0:
                     UDB[user] = userobj
                 await client.send_message(chan, reply)
+                await client.send_message(await client.start_private_message(a), embed=docs.rules)
+                await client.send_message(await client.start_private_message(a), embed=docs.terms)
             else:
                 await client.send_message(chan, '{}Cannot create new account, you already have one.'.format(e.CANNOT))
         elif cmd.startswith('help'):
@@ -238,6 +240,12 @@ async def on_message(msg):
             else:
                 await client.send_message(await client.start_private_message(a), embed=reply)
                 await client.add_reaction(msg, '✅')
+        elif cmd.startswith('rule'):
+            await client.send_message(await client.start_private_message(a), embed=docs.rules)
+            await client.add_reaction(msg, '✅')
+        elif cmd.startswith('term'):
+            await client.send_message(await client.start_private_message(a), embed=docs.terms)
+            await client.add_reaction(msg, '✅')
         elif INDB:
             USROBJ = UDB[user]
             if cmd in ['bal', 'balance']:
