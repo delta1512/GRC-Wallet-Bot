@@ -16,12 +16,13 @@ class rainbot:
 
     async def do_rain(self, UDB, client):
         ulist = [uid for uid in UDB]
-        online = []
+        online = set()
         bias = uniform(0.001, 0.01)
         rain_amt = round(self.RBOT.balance - bias, 8)
         for member in client.get_all_members():
             if member.status == discord.Status.online and member.id in ulist:
-                online.append(member.id)
+                online.add(member.id)
+        online = list(online)
         for i, val in enumerate(self.get_rain_vals(len(online), bias)):
             give(val, self.RBOT, UDB[online[i]])
         big_string = '{}Rained `{} GRC`\n'.format(e.RAIN, rain_amt)
