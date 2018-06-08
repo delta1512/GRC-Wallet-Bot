@@ -74,7 +74,7 @@ These are just ideas, not all of them may be implemented in the future. Any sugg
 
 - [ ] Linux compilation guide
 
-- [X] Third-party walets
+- [X] Third-party wallets
 
 - [X] Exchanges
 

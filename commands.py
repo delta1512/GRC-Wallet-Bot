@@ -14,8 +14,6 @@ import docs
 import FAQ
 
 def amt_filter(inp, userobj):
-    #if inp == 'all':
-        #return round(userobj.balance, 8)
     try:
         inp = float(inp)
         if (inp < 0) or (inp <= g.MIN_TX) or (inp == float('inf')):
@@ -158,10 +156,8 @@ def faq(args):
     return '{}Invalid selection.'.format(e.ERROR)
 
 async def get_block(args):
-    #if len(args) < 1:
-    #    return '{}To check a block type: `%block [block no.]`'.format(e.INFO)
     try:
-        height = 0
+        height = await w.query('getblockcount', [])
         if len(args) >= 1:
             height = int(args[0])
     except:
