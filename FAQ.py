@@ -54,7 +54,8 @@ links = [
 'https://bitshares.org/', #50
 'https://bit.btsabc.org/', #51
 'https://openledger.io/', #52
-'https://market.rudex.org/' #53
+'https://market.rudex.org/', #53
+'https://gridcoin.ml/' #54
 ]
 
 # What is Gridcoin?
@@ -215,7 +216,8 @@ description='''
 - [Eobot]({})
 - [Uscore]({})
 - [Delta's GRC Discord bot]({})
-'''.format(links[40], links[41], links[42], links[43], links[11]))
+- [Gridcoin Faucet Android App]({})
+'''.format(links[40], links[41], links[42], links[43], links[11], links[54]))
 
 # Supported exchanges
 exchanges = discord.Embed(title='Supported exchanges', colour=discord.Colour.purple(),
