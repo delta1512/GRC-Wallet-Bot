@@ -40,18 +40,18 @@ async def tx(addr, amount):
 
 async def get_block(height):
     current_block = await query('getblockcount', [])
-    if height <= 0 or height > current_block:
+    if height < 0 or height > current_block:
         return None
     else:
         data = {}
-        hash = await query('getblockhash', [height])
-        block_data = await query('getblock', [hash])
+        block_hash = await query('getblockhash', [height])
+        block_data = await query('getblock', [block_hash])
         if type(block_data) is int:
             return None
         data['Height: '] = height
-        data['Hash: '] = hash
+        data['Hash: '] = block_hash
         data['Timestamp: '] = block_data['time']
-        data['Difficulty: '] = block_data['difficulty']
+        data['Difficulty: '] = "{:4f}".format(block_data['difficulty'])
         data['No. of TXs: '] = len(block_data['tx'])
         data['Mint Type: '] = 'POR' if ('proof-of-research' in block_data['flags']) else 'POS'
         data['Amount Minted: '] = block_data['mint']
