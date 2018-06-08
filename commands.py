@@ -82,12 +82,11 @@ async def rdonate(amount, userobj):
     return reply
 
 def index_displayer(header, index):
-    big_string = '{}```{}```'
     acc = ''
     for count, acct in enumerate(index):
         name = list(acct.keys())[0]
         acc += '\n{}. {}'.format(str(count+1), name)
-    return big_string.format(header, acc[1:])
+    return '{}```{}```'.format(header, acc[1:])
 
 async def withdraw(amount, addr, userobj):
     amount = amt_filter(amount, userobj)
@@ -157,6 +156,21 @@ def faq(args):
         article = FAQ.index[selection]
         return article[list(article.keys())[0]]
     return '{}Invalid selection.'.format(e.ERROR)
+
+async def get_block(args):
+    if len(args) < 1:
+        return '{}To check a block type: `%block [block no.]`'.format(e.INFO)
+    try:
+        height = int(args[0])
+    except:
+        return '{}Invalid number provided.'.format(e.ERROR)
+    data = await w.get_block(height)
+    if data is None:
+        return '{}Could not fetch block data.'.format(e.ERROR)
+    acc = ''
+    for key in data:
+        acc += key + str(data[key]) + '\n'
+    return '```{}```'.format(acc)
 
 #check [usr] [chan]
 #ban [user] [chan]

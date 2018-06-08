@@ -240,6 +240,8 @@ async def on_message(msg):
             else:
                 await client.send_message(await client.start_private_message(a), embed=reply)
                 await client.add_reaction(msg, '✅')
+        elif cmd.startswith('block'):
+            await client.send_message(chan, await bot.get_block(cmd.split()[1:]))
         elif cmd.startswith('rule'):
             await client.send_message(await client.start_private_message(a), embed=docs.rules)
             await client.add_reaction(msg, '✅')

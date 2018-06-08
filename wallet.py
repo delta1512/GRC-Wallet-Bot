@@ -38,5 +38,25 @@ async def tx(addr, amount):
         return await query('sendtoaddress', [addr, amount])
     return 4
 
+async def get_block(height):
+    current_block = await query('getblockcount', [])
+    if height <= 0 or height > current_block:
+        return None
+    else:
+        data = {}
+        hash = await query('getblockhash', [height])
+        block_data = await query('getblock', [hash])
+        if type(block_data) is int:
+            return None
+        data['Height: '] = height
+        data['Hash: '] = hash
+        data['Timestamp: '] = block_data['time']
+        data['Difficulty: '] = block_data['difficulty']
+        data['No. of TXs: '] = len(block_data['tx'])
+        data['Mint Type: '] = 'POR' if ('proof-of-research' in block_data['flags']) else 'POS'
+        data['Amount Minted: '] = block_data['mint']
+        data['Superblock: '] = 'No' if (block_data['IsSuperBlock'] == 0) else 'Yes'
+        return data
+
 async def unlock():
     return await query('walletpassphrase', [g.grc_pass, 999999999, False])
