@@ -158,10 +158,12 @@ def faq(args):
     return '{}Invalid selection.'.format(e.ERROR)
 
 async def get_block(args):
-    if len(args) < 1:
-        return '{}To check a block type: `%block [block no.]`'.format(e.INFO)
+    #if len(args) < 1:
+    #    return '{}To check a block type: `%block [block no.]`'.format(e.INFO)
     try:
-        height = int(args[0])
+        height = 0
+        if len(args) >= 1:
+            height = int(args[0])
     except:
         return '{}Invalid number provided.'.format(e.ERROR)
     data = await w.get_block(height)
