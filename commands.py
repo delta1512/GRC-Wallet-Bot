@@ -121,7 +121,7 @@ def faucet(faucet_usr, current_usr):
         return '{}Request too recent. Faucet timeout is {} hours. Try again in: {}'.format(e.CANNOT, g.FCT_REQ_LIM,
                 time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(nxtfct-ctime))))
     current_usr.last_faucet = ctime
-    return give(round(r.uniform(g.FCT_MIN, g.FCT_MAX), 8), faucet_usr, current_usr)
+    return give(round(r.uniform(g.FCT_MIN, g.FCT_MAX), 8), faucet_usr, current_usr) + ' Your new balance is `{} GRC`'.format(round(current_usr.balance, 8))
 
 def get_qr(string):
     qr = qrcode.QRCode(
