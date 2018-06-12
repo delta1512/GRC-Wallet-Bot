@@ -191,13 +191,14 @@ def blist_iface(args, blist_obj):
     else:
         return '{}Invalid command'.format(e.ERROR)
 
-def user_stats(uid, userobj, crtime, client):
+def user_stats(uid, userobj, crtime_f, client):
     final = 'User ID: {}\n'.format(uid)
     user = None
     members = client.get_all_members() if g.main_server == '' else [server.members for server in client.servers if server.id == g.main_server][0]
     for member in members:
         if member.id == uid:
             user = member
+            crtime = round(crtime_f(member.created_at))
             break
     if user is None:
         return '```{}```'.format(final)
@@ -207,9 +208,9 @@ Balance: {}
 Last TX time: {}
 Last TXID: {}
 '''.format(userobj.address, userobj.balance, userobj.active_tx[1], userobj.active_tx[2])
-    final += 'Created at: {} {}\n'.format(round(crtime), time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(ceil(time.time()-crtime))))
+    final += 'Created at: {} {}\n'.format(crtime, time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(time.time()-crtime)))
     jtime = round(time.mktime(member.joined_at.timetuple()))
-    final += 'Joined at: {} {}'.format(jtime, time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(ceil(time.time()-jtime))))
+    final += 'Joined at: {} {}'.format(jtime, time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(time.time()-jtime)))
     return '```{}```'.format(final)
 
 def check_times(userobj):

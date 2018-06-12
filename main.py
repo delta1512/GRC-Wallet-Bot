@@ -328,7 +328,7 @@ async def on_message(msg):
                 elif cmd.startswith('stat'):
                     args = cmd.split()[1:]
                     if len(args) > 0:
-                        await client.send_message(chan, bot.user_stats(args[0], UDB.get(args[0], None), user_time(a.created_at), client))
+                        await client.send_message(chan, bot.user_stats(args[0], UDB.get(args[0], None), user_time, client))
             else:
                 await client.send_message(chan, '{}Invalid command. Type `%help` for help.'.format(e.INFO))
         else:
