@@ -201,15 +201,15 @@ def user_stats(uid, userobj, crtime, client):
             break
     if user is None:
         return '```{}```'.format(final)
-    final += 'Name: {}\n'.format(user.nick)
     if not userobj is None:
         final += '''Address: {}
 Balance: {}
 Last TX time: {}
 Last TXID: {}
 '''.format(userobj.address, userobj.balance, userobj.active_tx[1], userobj.active_tx[2])
-    final += 'Created at: {}\n'.format(round(crtime))
-    final += 'Joined at: {}'.format(round(time.mktime(member.joined_at.timetuple())))
+    final += 'Created at: {} {}\n'.format(round(crtime), time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(ceil(time.time()-crtime))))
+    jtime = round(time.mktime(member.joined_at.timetuple()))
+    final += 'Joined at: {} {}'.format(jtime, time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(ceil(time.time()-jtime))))
     return '```{}```'.format(final)
 
 def check_times(userobj):
