@@ -1,6 +1,7 @@
 ### ADMINISTRATION
 admin_wallet = ''
 owner_id = ''             # Discord ID of owner
+main_server = ''          # Optional main server ID
 tx_fee = 0.5
 tx_timeout = 1            # Confirmations
 rpc_usr = ''

@@ -45,14 +45,13 @@ def checkspam(user):
         latest_users[user] = time.time()
         return False
 
-def user_is_new(crtime):
+def user_time(crtime):
     crtime = str(crtime)
     try:
         crtime = crtime[:crtime.index('.')]
     except ValueError:
         pass
-    ut = time.mktime(time.strptime(crtime, '%Y-%m-%d %H:%M:%S'))
-    return time.time() < ut+24*60*60*g.NEW_USR_TIME
+    return time.mktime(time.strptime(crtime, '%Y-%m-%d %H:%M:%S'))
 
 async def check_tx(txid):
     tx = await w.query('gettransaction', [txid])
@@ -206,7 +205,7 @@ async def on_message(msg):
     iscommand = cmd.startswith(g.pre)
     if a.bot or checkspam(user) or blacklister.is_banned(user, chan.is_private):
         pass
-    elif iscommand and user_is_new(a.created_at):
+    elif iscommand and time.time() < user_time(a.created_at)+24*60*60*g.NEW_USR_TIME:
         await client.send_message(chan, docs.new_usr_msg)
     elif iscommand and (len(cmd) > 1):
         cmd = cmd[1:]
@@ -313,18 +312,23 @@ async def on_message(msg):
             elif cmd.startswith('time'):
                 await client.send_message(chan, bot.check_times(USROBJ))
             # ADMINISTRATION COMMANDS
-            elif cmd.startswith('blist') and user == g.owner_id and chan.is_private:
-                args = cmd.split()[1:]
-                if len(args) > 0:
-                    await client.send_message(chan, bot.blist_iface(args, blacklister))
-                else:
-                    await client.send_message(chan, blacklister.get_blisted())
-            elif cmd.startswith('bin {}'.format(user)) and chan.is_private: # 'Burns' GRC from your account
-                args = cmd.split()[2:]
-                if len(args) > 0:
-                    amt = 0 if (bot.amt_filter(args[0], USROBJ) == None) else bot.amt_filter(args[0], USROBJ)
-                    USROBJ.balance -= amt
-                    await client.send_message(chan, 'Burned `{} GRC`'.format(amt))
+            elif user == g.owner_id and chan.is_private:
+                if cmd.startswith('blist'):
+                    args = cmd.split()[1:]
+                    if len(args) > 0:
+                        await client.send_message(chan, bot.blist_iface(args, blacklister))
+                    else:
+                        await client.send_message(chan, blacklister.get_blisted())
+                elif cmd.startswith('bin {}'.format(user)): # 'Burns' GRC from your account
+                    args = cmd.split()[2:]
+                    if len(args) > 0:
+                        amt = 0 if (bot.amt_filter(args[0], USROBJ) == None) else bot.amt_filter(args[0], USROBJ)
+                        USROBJ.balance -= amt
+                        await client.send_message(chan, 'Burned `{} GRC`'.format(amt))
+                elif cmd.startswith('stat'):
+                    args = cmd.split()[1:]
+                    if len(args) > 0:
+                        await client.send_message(chan, bot.user_stats(args[0], UDB.get(args[0], None), user_time(a.created_at), client))
             else:
                 await client.send_message(chan, '{}Invalid command. Type `%help` for help.'.format(e.INFO))
         else:

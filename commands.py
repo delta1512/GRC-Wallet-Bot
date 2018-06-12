@@ -191,6 +191,27 @@ def blist_iface(args, blist_obj):
     else:
         return '{}Invalid command'.format(e.ERROR)
 
+def user_stats(uid, userobj, crtime, client):
+    final = 'User ID: {}\n'.format(uid)
+    user = None
+    members = client.get_all_members() if g.main_server == '' else [server.members for server in client.servers if server.id == g.main_server][0]
+    for member in members:
+        if member.id == uid:
+            user = member
+            break
+    if user is None:
+        return '```{}```'.format(final)
+    final += 'Name: {}\n'.format(user.nick)
+    if not userobj is None:
+        final += '''Address: {}
+Balance: {}
+Last TX time: {}
+Last TXID: {}
+'''.format(userobj.address, userobj.balance, userobj.active_tx[1], userobj.active_tx[2])
+    final += 'Created at: {}\n'.format(round(crtime))
+    final += 'Joined at: {}'.format(round(time.mktime(member.joined_at.timetuple())))
+    return '```{}```'.format(final)
+
 def check_times(userobj):
     ctime = time.time()
     return '''
