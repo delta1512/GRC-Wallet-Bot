@@ -54,7 +54,7 @@ These are just ideas, not all of them may be implemented in the future. Any sugg
 
 - [X] Help topics such as getting started with GRC
 
-- [ ] Block exploring features
+- [ ] Block exploring features (under construction)
 
 - [ ] BOINC stats
 
