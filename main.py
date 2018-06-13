@@ -216,7 +216,7 @@ async def on_message(msg):
             logging.info('COMMAND "%s" executed by %s (%s)',
             cmd.split()[0], user, uname)
         if cmd.startswith('status'):
-            await client.send_message(chan, await bot.dump_cfg(price_fetcher))
+            await client.send_message(chan, await bot.dump_cfg(price_fetcher, len(UDB)))
         elif cmd.startswith('new'):
             if not INDB:
                 await client.send_message(chan, docs.welcome)

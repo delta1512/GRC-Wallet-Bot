@@ -23,19 +23,23 @@ def amt_filter(inp, userobj):
     except:
         return None
 
-async def dump_cfg(price_fetcher):
+async def dump_cfg(price_fetcher, udb_len):
     block_height = await w.query('getblockcount', [])
     block_hash = await w.query('getblockhash', [block_height])
     if block_height < 5 or not isinstance(block_hash, str): # 5 is largest error return value
         return '{}Could not access the Gridcoin client.'.format(e.ERROR)
 
     return '''{}Bot is up. Configuration:```
-Withdraw fee: {}
-Transfer limit: {}
+Withdraw fee: {} GRC
+Min. transfer limit: {} GRC
 Required confirmations per withdraw: {}
+Faucet timeout: {} Hours
+Users: {}
 Block height: {}
 Latest hash: {}
-Price (USD): {}```'''.format(e.ONLINE, g.tx_fee, g.MIN_TX, g.tx_timeout, block_height, block_hash, round(await price_fetcher.price(), 4))
+Price (USD): ${}```'''.format(e.ONLINE, g.tx_fee, g.MIN_TX, g.tx_timeout,
+                            g.FCT_REQ_LIM, udb_len, block_height, block_hash,
+                            round(await price_fetcher.price(), 4))
 
 async def new_user(uid):
     try:
