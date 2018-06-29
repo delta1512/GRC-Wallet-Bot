@@ -88,6 +88,7 @@ async def blk_searcher():
                 if isinstance(blockdata, dict): # Protections to guard against reusing the bind address
                     LAST_BLK = blockheight
                     for txid in blockdata['tx']:
+                        if db.check_deposit(txid) > 0: continue;
                         recv_addrs, send_addrs, vals = await check_tx(txid)
                         if len(recv_addrs) > 0:
                             for uid in UDB:
@@ -101,9 +102,10 @@ async def blk_searcher():
                                         if found:
                                             break
                                 if found:
-                                    logging.info('Processed deposit with TXID: %s for %s', txid, usr_obj.usrID)
                                     usr_obj.balance += vals[index]
                                     tmp = recv_addrs.pop(index)
+                                    db.register_deposit(txid, vals[index], usr_obj.usrID)
+                                    logging.info('Processed deposit with TXID: %s for %s', txid, usr_obj.usrID)
                                     try: # In event of change address
                                         send_addrs.pop(send_addrs.index(tmp))
                                     except ValueError:

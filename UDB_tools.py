@@ -6,7 +6,7 @@ import asyncio
 async def check_uid(uid):
     conn = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await conn.cursor()
-    await c.execute('SELECT uid FROM {} WHERE uid=%s'.format(g.udb_name), (uid))
+    await c.execute('SELECT uid FROM {}.udb WHERE uid=%s'.format(g.udb_name), (uid))
     response = c.fetchall()
     conn.close()
     return response
@@ -22,7 +22,7 @@ async def read_db():
     tmpdb = {}
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
-    await c.execute('SELECT * FROM {}'.format(g.udb_name))
+    await c.execute('SELECT * FROM {}.udb'.format(g.udb_name))
     for record in await c.fetchall():
         tmpdb[record[0]] = usr(record[0],
         address=record[1],
@@ -33,12 +33,28 @@ async def read_db():
     db.close()
     return tmpdb
 
+async def check_deposit(txidq):
+    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
+    c = await db.cursor()
+    await c.execute('SELECT count(txid) FROM {}.deposits WHERE txid=%s'.format(g.udb_name), txidq)
+    result = c.fetchone()
+    db.close()
+    return result
+
+async def register_deposit(txid, amount, uid):
+    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
+    c = await db.cursor()
+    await c.execute('INSERT INTO {}.deposits VALUES (%s, %s, %s)'.format(g.udb_name),
+                    txid, amount, uid)
+    await db.commit()
+    db.close()
+
 async def save_db(udb):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
     for u in udb:
         if len(asyncio.ensure_future(await check_uid(u)).result()) > 0:
-            await c.execute('''UPDATE {} SET
+            await c.execute('''UPDATE {}.udb SET
                 last_faucet=%s,
                 balance=%s,
                 donations=%s,
@@ -49,7 +65,7 @@ async def save_db(udb):
                 udb[u].balance, udb[u].donations, udb[u].active_tx[0],
                 udb[u].active_tx[1], udb[u].active_tx[2], u))
         else:
-            await c.execute('INSERT INTO {} VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'.format(g.udb_name), (
+            await c.execute('INSERT INTO {}.udb VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'.format(g.udb_name), (
             u, udb[u].address, udb[u].last_faucet, udb[u].balance, udb[u].donations,
             udb[u].active_tx[0], udb[u].active_tx[1], udb[u].active_tx[2]))
     await db.commit()
