@@ -37,15 +37,15 @@ async def check_deposit(txidq):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
     await c.execute('SELECT count(txid) FROM {}.deposits WHERE txid=%s'.format(g.udb_name), txidq)
-    result = c.fetchone()
+    result = await c.fetchone()
     db.close()
-    return result
+    return result[0]
 
 async def register_deposit(txid, amount, uid):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
     await c.execute('INSERT INTO {}.deposits VALUES (%s, %s, %s)'.format(g.udb_name),
-                    txid, amount, uid)
+                    (txid, amount, uid))
     await db.commit()
     db.close()
 
