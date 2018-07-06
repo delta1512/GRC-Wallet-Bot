@@ -50,12 +50,14 @@ links = [
 'https://c-cex.com/', #46
 'https://tradebytrade.com/', #47
 'https://bisq.network/', #48
-'https://doorone.cloud/en/', #49
+'https://flyp.me/', #49
 'https://bitshares.org/', #50
 'https://bit.btsabc.org/', #51
 'https://openledger.io/', #52
 'https://market.rudex.org/', #53
 'https://gridcoin.ml/' #54
+'https://gridcoin.io/' #55
+'https://gridcoin.tumblr.com/' #56
 ]
 
 # What is Gridcoin?
@@ -211,13 +213,16 @@ description='''
 # Faucets
 faucet_list = discord.Embed(title='Faucets', colour=discord.Colour.purple(),
 description='''
+- [Official Wallet]({})
+- [Core Source Code]({})
 - [GRC Switzerland]({})
 - [Gridcoin Stats]({})
 - [Eobot]({})
 - [Uscore]({})
 - [Delta's GRC Discord bot]({})
 - [Gridcoin Faucet Android App]({})
-'''.format(links[40], links[41], links[42], links[43], links[11], links[54]))
+'''.format(links[3], links[10], links[40], links[41], links[42], links[43],
+            links[11], links[54]))
 
 # Supported exchanges
 exchanges = discord.Embed(title='Supported exchanges', colour=discord.Colour.purple(),
@@ -227,7 +232,7 @@ description='''
 - [C-CEX]({})
 - [Trade by Trade]({})
 - [Bisq]({})
-- [Door One]({})
+- [flyp.me]({})
 - [Bitshares]({})
 - [BTSABC]({})
 - [Openledger]({})
@@ -242,6 +247,7 @@ Information:
 - [Gridcoin Official Site]({})
 - [Gridcoin Swizerland]({})
 - [Gridcoin.Science]({})
+- [Gridcoin.io]({})
 - [What Is Gridcoin]({})
 - [Coinmarketcap]({})
 - [Wiki]({})
@@ -269,10 +275,12 @@ Media and community:
 - [Reddit]({})
 - [Steem]({})
 - [Cryptocurrencytalk]({})
-'''.format(links[3], links[15], links[16], links[17], links[18], links[19],
-            links[10], links[20], links[21], links[22], links[23], links[24],
-            links[0], links[25], links[26], links[27], links[28], links[11],
-            links[29], links[30], links[7], links[8], links[31], links[9]))
+- [Tumblr]({})
+'''.format(links[3], links[15], links[16], link[55], links[17], links[18],
+            links[19], links[10], links[20], links[21], links[22], links[23],
+            links[24], links[0], links[25], links[26], links[27], links[28],
+            links[11], links[29], links[30], links[7], links[8], links[31],
+            links[9], links[56]))
 
 # Do I need to put the GRC client on all computers running BOINC?
 client_on_many_pc = discord.Embed(title='Do I need to put the GRC client on all computers running BOINC?', colour=discord.Colour.purple(),
