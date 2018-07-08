@@ -55,8 +55,8 @@ links = [
 'https://bit.btsabc.org/', #51
 'https://openledger.io/', #52
 'https://market.rudex.org/', #53
-'https://gridcoin.ml/' #54
-'https://gridcoin.io/' #55
+'https://gridcoin.ml/', #54
+'https://gridcoin.io/', #55
 'https://gridcoin.tumblr.com/' #56
 ]
 
@@ -261,10 +261,10 @@ Block Explorers:
 - [GRC Testnet]({})
 
 BOINC Related:
-- [Boinc.Berkeley]({})
+- [Boinc Main Site]({})
 - [BoincOS]({})
 - [Boinc Italy Linux Distro]({})
-- [Boinc Wiki Manual]({})
+- [Boinc Wiki]({})
 - [Overclockers Boinc FAQ]({})
 
 Media and community:
@@ -276,7 +276,7 @@ Media and community:
 - [Steem]({})
 - [Cryptocurrencytalk]({})
 - [Tumblr]({})
-'''.format(links[3], links[15], links[16], link[55], links[17], links[18],
+'''.format(links[3], links[15], links[16], links[55], links[17], links[18],
             links[19], links[10], links[20], links[21], links[22], links[23],
             links[24], links[0], links[25], links[26], links[27], links[28],
             links[11], links[29], links[30], links[7], links[8], links[31],
