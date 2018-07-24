@@ -315,6 +315,8 @@ async def on_message(msg):
                     await client.send_file(chan, bot.get_qr(USROBJ.address), filename=user + '.png')
             elif cmd.startswith('time'):
                 await client.send_message(chan, bot.check_times(USROBJ))
+            elif cmd in ['moon', 'whenmoon', 'grcmoon']:
+                await client.send_message(chan, bot.moon())
             # ADMINISTRATION COMMANDS
             elif user == g.owner_id and chan.is_private:
                 if cmd.startswith('blist'):

@@ -174,6 +174,15 @@ async def get_block(args):
         acc += key + str(data[key]) + '\n'
     return '```{}```'.format(acc)
 
+def moon():
+    clock = ':clock{}:'.format(r.randint(1, 12))
+    day = '{}{}'.format(r.choice(e.NUMS[:3]), r.choice(e.NUMS))
+    month = '{}{}'.format(r.choice(e.NUMS[:2]), r.choice(e.NUMS))
+    year = ':two::zero:{}{}'.format(r.choice(e.NUMS[2:]), r.choice(e.NUMS))
+    return '{}So when will we moon? Exactly on this date {} {}  {} / {} / {}'.format(
+            e.CHART_UP, clock, e.ARR_RIGHT, day, month, year)
+
+
 #check [usr] [chan]
 #ban [user] [chan]
 #unban [user]
