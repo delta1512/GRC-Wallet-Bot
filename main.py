@@ -317,6 +317,8 @@ async def on_message(msg):
                 await client.send_message(chan, bot.check_times(USROBJ))
             elif cmd in ['moon', 'whenmoon', 'grcmoon']:
                 await client.send_message(chan, bot.moon())
+            elif cmd in ['me', 'account', 'acc']:
+                await client.send_message(chan, bot.get_usr_info(USROBJ))
             # ADMINISTRATION COMMANDS
             elif user == g.owner_id and chan.is_private:
                 if cmd.startswith('blist'):

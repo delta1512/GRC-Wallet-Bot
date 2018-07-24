@@ -182,6 +182,22 @@ def moon():
     return '{}So when will we moon? Exactly on this date {} {}  {} / {} / {}'.format(
             e.CHART_UP, clock, e.ARR_RIGHT, day, month, year)
 
+def get_usr_info(usrobj):
+    faucet_req = 'n/a' if userobj.last_faucet == 0 else userobj.last_faucet
+    tx_time = 'n/a' if userobj.last_faucet[1] == 0 else userobj.last_faucet[1]
+    txid = 'n/a' if userobj.last_faucet[2] == 0 else userobj.last_faucet[2]
+    tx_amount = 'n/a' if userobj.active_tx[0] == 'NULL' else userobj.active_tx[0]
+    return '''```
+    Address: {}
+    Balance: {}
+    Donated: {}
+
+    Last faucet request (unix): {}
+    Last transaction (unix): {}
+    Last TXID out: {}
+    Last transaction amount: {}
+    ```'''.format(userobj.address, userobj.balance, userobj.donations,
+                    faucet_req, tx_time, txid, tx_amount)
 
 #check [usr] [chan]
 #ban [user] [chan]
