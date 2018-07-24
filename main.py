@@ -31,6 +31,7 @@ latest_users = {}
 price_fetcher = price_bot()
 blacklister = None
 rbot = None
+INITIALISED = False
 
 def checkspam(user):
     global latest_users
@@ -143,7 +144,8 @@ async def pluggable_loop():
 
 @client.event
 async def on_ready():
-    global UDB, LAST_BLK, blacklister, rbot
+    global UDB, LAST_BLK, blacklister, rbot, INITIALISED
+    if INITIALISED: return; # Prevents multiple on_ready calls
     if await w.query('getblockcount', []) > 5: # 5 is largest error return value
         logging.info('Gridcoin client is online')
     else:
