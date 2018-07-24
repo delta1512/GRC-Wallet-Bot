@@ -14,6 +14,7 @@ Type %help [topic] for more detailed information about the following:
 - faucet
 - qr
 - faq
+- block
 - status
 - time
 - rules
@@ -75,7 +76,7 @@ Rain on active users: %rain
 ```'''
 
 faucet = '''```
-Get some free GRC: %faucet
+Get some free GRC: %faucet %get
     Type this command to get some free Gridcoins.
     Amounts are random and you can only request once per {} hours.
     To help fund the faucet, you can type `%fgive [amount-GRC]`.
@@ -95,6 +96,13 @@ Read answers to frequently asked questions: %faq
 
     All answers are formulated by Delta, Foxifi and LavRadis, and checked by
     community members and developers.
+```'''
+
+block = '''```
+Explore blocks on the Gridcoin chain: %block
+    Format: %block [height]
+
+    Fetches information about a particular block on the Gridcoin blockchain.
 ```'''
 
 status = '''```
@@ -143,6 +151,7 @@ help_dict = {
     'faucet'    :   faucet,
     'qr'        :   qr,
     'faq'       :   faq,
+    'block'     :   block,
     'status'    :   status,
     'time'      :   time,
     'rules'     :   rules_help,
