@@ -11,7 +11,7 @@ DOWN = ':thumbsdown: | '
 BOOK = ':book: | '
 RAIN = ':cloud_rain: | '
 CELEBRATE = ':tada: | '
-CHART_UP = ':chart_with_upwards_trend: |'
+CHART_UP = ':chart_with_upwards_trend: | '
 ARR_RIGHT = ':arrow_right:'
-NUMS = [':zero:', ':one:', ':two:', ':three', ':four:', ':five:', ':six:',
+NUMS = [':zero:', ':one:', ':two:', ':three:', ':four:', ':five:', ':six:',
         ':seven:', ':eight:', ':nine:']

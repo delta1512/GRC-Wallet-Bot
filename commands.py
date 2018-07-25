@@ -177,27 +177,28 @@ async def get_block(args):
 def moon():
     clock = ':clock{}:'.format(r.randint(1, 12))
     day = '{}{}'.format(r.choice(e.NUMS[:3]), r.choice(e.NUMS))
-    month = '{}{}'.format(r.choice(e.NUMS[:2]), r.choice(e.NUMS))
+    month0 = r.choice(e.NUMS[:2])
+    month1 = r.choice(e.NUMS[:3]) if e.NUMS.index(month0) == 1 else r.choice(e.NUMS)
+    month = month0 + month1
     year = ':two::zero:{}{}'.format(r.choice(e.NUMS[2:]), r.choice(e.NUMS))
     return '{}So when will we moon? Exactly on this date {} {}  {} / {} / {}'.format(
             e.CHART_UP, clock, e.ARR_RIGHT, day, month, year)
 
 def get_usr_info(usrobj):
-    faucet_req = 'n/a' if userobj.last_faucet == 0 else userobj.last_faucet
-    tx_time = 'n/a' if userobj.last_faucet[1] == 0 else userobj.last_faucet[1]
-    txid = 'n/a' if userobj.last_faucet[2] == 0 else userobj.last_faucet[2]
-    tx_amount = 'n/a' if userobj.active_tx[0] == 'NULL' else userobj.active_tx[0]
+    faucet_req = 'n/a' if usrobj.last_faucet == 0 else usrobj.last_faucet
+    tx_time = 'n/a' if usrobj.active_tx[1] == 0 else usrobj.active_tx[1]
+    txid = 'n/a' if usrobj.active_tx[2] is None or '\'' in usrobj.active_tx[2] else usrobj.active_tx[2]
+    tx_amount = 'n/a' if usrobj.active_tx[0] is None else usrobj.active_tx[0]
     return '''```
-    Address: {}
-    Balance: {}
-    Donated: {}
+Address: {}
+Balance: {}
+Donated: {}
 
-    Last faucet request (unix): {}
-    Last transaction (unix): {}
-    Last TXID out: {}
-    Last transaction amount: {}
-    ```'''.format(userobj.address, userobj.balance, userobj.donations,
-                    faucet_req, tx_time, txid, tx_amount)
+Last faucet request (unix): {}
+Last transaction (unix): {}
+Last TXID out: {}
+Last transaction amount: {}```'''.format(usrobj.address, usrobj.balance,
+                    usrobj.donations, faucet_req, tx_time, txid, tx_amount)
 
 #check [usr] [chan]
 #ban [user] [chan]
