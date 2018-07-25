@@ -16,7 +16,7 @@ import FAQ
 def amt_filter(inp, userobj):
     try:
         inp = float(inp)
-        if (inp < 0) or (inp <= g.MIN_TX) or (inp == float('inf')):
+        if (inp < 0) or (inp <= g.MIN_TX) or (abs(inp) == float('inf')):
             return None
         else:
             return round(inp, 8)
