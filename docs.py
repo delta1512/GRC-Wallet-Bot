@@ -175,6 +175,10 @@ Donate GRC to this address `{}`
 or type `%rain [amount-GRC]` to build up rain.
 '''
 
+rule_fail_send = '''{}It appears the bot cannot PM you.
+Please enable direct messages via discord and type `%rules` and `%terms` or check the pinned messages.
+'''.format(e.INFO)
+
 rules = discord.Embed(title='GRC Wallet Bot Rules', colour=discord.Colour.purple(),
 description='''
 1. Do not spam the bot in any way.

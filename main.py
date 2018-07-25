@@ -228,8 +228,11 @@ async def on_message(msg):
                 if status == 0:
                     UDB[user] = userobj
                 await client.send_message(chan, reply)
-                await client.send_message(await client.start_private_message(a), embed=docs.rules)
-                await client.send_message(await client.start_private_message(a), embed=docs.terms)
+                try:
+                    await client.send_message(await client.start_private_message(a), embed=docs.rules)
+                    await client.send_message(await client.start_private_message(a), embed=docs.terms)
+                except discord.errors.Forbidden:
+                    await client.send_message(chan, docs.rule_fail_send)
             else:
                 await client.send_message(chan, '{}Cannot create new account, you already have one.'.format(e.CANNOT))
         elif cmd.startswith('help'):
