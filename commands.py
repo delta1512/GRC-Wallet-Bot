@@ -221,6 +221,14 @@ def blist_iface(args, blist_obj):
     else:
         return '{}Invalid command'.format(e.ERROR)
 
+def burn_coins(args, udb):
+    if len(args) > 1:
+        amt = 0 if (amt_filter(args[1], None) == None) else amt_filter(args[1], None)
+        udb[args[0]].balance -= amt
+        if args[0] != g.owner_id:
+            udb[g.owner_id].balance += amt
+        return 'Burned `{} GRC` from `{}`'.format(amt, args[0])
+
 def user_stats(uid, userobj, crtime_f, client):
     final = 'User ID: {}\n'.format(uid)
     user = None

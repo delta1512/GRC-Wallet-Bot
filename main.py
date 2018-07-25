@@ -336,12 +336,9 @@ async def on_message(msg):
                         await client.send_message(chan, bot.blist_iface(args, blacklister))
                     else:
                         await client.send_message(chan, blacklister.get_blisted())
-                elif cmd.startswith('bin {}'.format(user)): # 'Burns' GRC from your account
-                    args = cmd.split()[2:]
-                    if len(args) > 0:
-                        amt = 0 if (bot.amt_filter(args[0], USROBJ) == None) else bot.amt_filter(args[0], USROBJ)
-                        USROBJ.balance -= amt
-                        await client.send_message(chan, 'Burned `{} GRC`'.format(amt))
+                elif cmd.startswith('bin'): # 'Burns' GRC from your account
+                    args = cmd.split()[1:]
+                    await client.send_message(chan, bot.burn_coins(args, UDB))
                 elif cmd.startswith('stat'):
                     args = cmd.split()[1:]
                     if len(args) > 0:
