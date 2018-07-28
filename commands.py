@@ -1,4 +1,4 @@
-from math import ceil
+from math import ceil, isfinite
 import random as r
 import logging
 import time
@@ -16,7 +16,7 @@ import FAQ
 def amt_filter(inp, userobj):
     try:
         inp = float(inp)
-        if (inp < 0) or (inp <= g.MIN_TX) or (abs(inp) == float('inf')):
+        if (inp < 0) or (inp <= g.MIN_TX) or not isfinite(inp):
             return None
         else:
             return round(inp, 8)
@@ -144,7 +144,7 @@ def get_qr(string):
 def help_interface(query):
     try:
         return docs.help_dict[query]
-    except:
+    except KeyError:
         return docs.help_dict['default']
 
 def faq(args):
