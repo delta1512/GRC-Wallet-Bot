@@ -32,6 +32,7 @@ price_fetcher = price_bot()
 blacklister = None
 rbot = None
 INITIALISED = False
+UDB_LOCK = False
 
 def checkspam(user):
     global latest_users
@@ -127,7 +128,8 @@ async def pluggable_loop():
         if rbot.check_rain():
             await rbot.do_rain(UDB, client)
         if sleepcount % g.SLP == 0:
-            await db.save_db(UDB)
+            if not UDB_LOCK:
+                await db.save_db(UDB)
             with open(g.LST_BLK, 'w') as last_block:
                 last_block.write(str(LAST_BLK))
             with open(g.FEE_POOL, 'r') as fees:
@@ -199,7 +201,7 @@ async def on_ready():
 
 @client.event
 async def on_message(msg):
-    global UDB
+    global UDB, UDB_LOCK
     cmd = msg.content
     chan = msg.channel
     a = msg.author
@@ -223,6 +225,7 @@ async def on_message(msg):
             await client.send_message(chan, await bot.dump_cfg(price_fetcher, len(UDB)))
         elif cmd.startswith('new'):
             if not INDB:
+                UDB_LOCK = True
                 await client.send_message(chan, docs.welcome)
                 status, reply, userobj = await bot.new_user(user)
                 if status == 0:
@@ -233,6 +236,7 @@ async def on_message(msg):
                     await client.send_message(await client.start_private_message(a), embed=docs.terms)
                 except discord.errors.Forbidden:
                     await client.send_message(chan, docs.rule_fail_send)
+                UDB_LOCK = False
             else:
                 await client.send_message(chan, '{}Cannot create new account, you already have one.'.format(e.CANNOT))
         elif cmd.startswith('help'):
