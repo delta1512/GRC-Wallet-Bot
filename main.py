@@ -197,7 +197,15 @@ async def on_ready():
         exit(1)
 
     logging.info('Initialisation complete')
-    await pluggable_loop()
+    # Temporary Protection against errors in the loop
+    while True:
+        try:
+            await pluggable_loop()
+        except KeyboardInterrupt:
+            logging.info('Pluggable loop shutting down')
+            return
+        except Exception as E:
+            logging.error('Pluggable loop ran into an error: %s', E)
 
 @client.event
 async def on_message(msg):
