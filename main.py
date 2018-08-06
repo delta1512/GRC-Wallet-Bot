@@ -16,7 +16,7 @@ import wallet as w
 import docs
 
 # Set up logging functionality
-handler = [RotatingFileHandler(g.log_dir, maxBytes=10**7, backupCount=3)]
+handler = [RotatingFileHandler(g.log_dir+'walletbot.log', maxBytes=10**7, backupCount=3)]
 logging.basicConfig(format='[%(asctime)s] %(levelname)s: %(message)s',
                     datefmt='%d/%m %T',
                     level=logging.INFO,
@@ -54,71 +54,6 @@ def user_time(crtime):
     except ValueError:
         pass
     return time.mktime(time.strptime(crtime, '%Y-%m-%d %H:%M:%S'))
-
-async def check_tx(txid):
-    tx = await w.query('gettransaction', [txid])
-    recv_addrs = []
-    send_addrs = []
-    recv_vals = []
-    try:
-        if not isinstance(tx, int):
-            for details in tx['details']:
-                if details['category'] == 'receive':
-                    recv_addrs.append(details['address'])
-                    recv_vals.append(details['amount'])
-                elif details['category'] == 'send':
-                    send_addrs.append(details['address'])
-        elif tx == 1:
-            pass
-        else:
-            raise RuntimeError('Bad signal in GRC client: {}'.format(tx))
-    except RuntimeError as E:
-        logging.error(E)
-    except KeyError:
-        pass
-    return recv_addrs, send_addrs, recv_vals
-
-async def blk_searcher():
-    global UDB, LAST_BLK
-    newblock = await w.query('getblockcount', [])
-    if newblock > LAST_BLK:
-        try:
-            for blockheight in range(LAST_BLK+1, newblock+1):
-                blockhash = await w.query('getblockhash', [blockheight])
-                await asyncio.sleep(0.05) # Protections to guard against reusing the bind address
-                blockdata = await w.query('getblock', [blockhash])
-                if isinstance(blockdata, dict): # Protections to guard against reusing the bind address
-                    LAST_BLK = blockheight
-                    for txid in blockdata['tx']:
-                        if await db.check_deposit(txid) > 0: continue;
-                        recv_addrs, send_addrs, vals = await check_tx(txid)
-                        if len(recv_addrs) > 0:
-                            for uid in UDB:
-                                found = False
-                                usr_obj = UDB[uid]
-                                for i, addr in enumerate(recv_addrs):
-                                    if usr_obj.address == addr:
-                                        # Check whether change address
-                                        found = not addr in send_addrs
-                                        index = i
-                                        if found:
-                                            break
-                                if found:
-                                    usr_obj.balance += vals[index]
-                                    tmp = recv_addrs.pop(index)
-                                    await db.register_deposit(txid, vals[index], usr_obj.usrID)
-                                    logging.info('Processed deposit with TXID: %s for %s', txid, usr_obj.usrID)
-                                    try: # In event of change address
-                                        send_addrs.pop(send_addrs.index(tmp))
-                                    except ValueError:
-                                        pass
-                                    vals.pop(index)
-                elif blockdata == 3:
-                    pass # Don't render the reuse address error as an exception, otherwise it may flood the terminal
-                else:
-                    raise RuntimeError('Received erroneous signal in GRC client interface.')
-        except Exception as E:
-            logging.exception('Block searcher ran into an error: %s', E)
 
 async def pluggable_loop():
     sleepcount = 0

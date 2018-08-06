@@ -1,19 +1,18 @@
 from user import usr
 import grcconf as g
 import aiomysql
-import asyncio
 
 async def check_uid(uid):
     conn = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await conn.cursor()
     await c.execute('SELECT uid FROM {}.udb WHERE uid=%s'.format(g.udb_name), (uid))
-    response = c.fetchall()
+    response = await c.fetchall()
     conn.close()
     return response
 
 async def check_db():
     try:
-        asyncio.ensure_future(await check_uid('FAUCET')).result()
+        await check_uid('FAUCET')
     except:
         return 1
     return 0
@@ -33,15 +32,16 @@ async def read_db():
     db.close()
     return tmpdb
 
-async def check_deposit(txidq):
+async def depost_exists(txidq):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
     await c.execute('SELECT count(txid) FROM {}.deposits WHERE txid=%s'.format(g.udb_name), txidq)
     result = await c.fetchone()
     db.close()
-    return result[0]
+    return result[0] > 0
 
 async def register_deposit(txid, amount, uid):
+    # update the balance of the user
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
     await c.execute('INSERT INTO {}.deposits VALUES (%s, %s, %s)'.format(g.udb_name),
@@ -49,11 +49,15 @@ async def register_deposit(txid, amount, uid):
     await db.commit()
     db.close()
 
+async def get_addr_uid_dict():
+    pass
+    # go through the UDB table and gather a dict in the form {address : uid}
+
 async def save_db(udb):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
     for u in udb:
-        if len(asyncio.ensure_future(await check_uid(u)).result()) > 0:
+        if len(await check_uid(u)) > 0:
             await c.execute('''UPDATE {}.udb SET
                 last_faucet=%s,
                 balance=%s,
