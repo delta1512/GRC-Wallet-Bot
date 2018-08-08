@@ -48,7 +48,7 @@ async def get_addr_uid_dict():
     c = await db.cursor()
     await c.execute('SELECT address, uid FROM {}.udb'.format(g.udb_name))
     user_data = {}
-    for tup in await c.fetchall()
+    for tup in await c.fetchall():
         user_data[tup[0]] = tup[1]
     db.close()
     return user_data
