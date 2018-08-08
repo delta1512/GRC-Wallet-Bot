@@ -37,6 +37,7 @@ async def blk_searcher():
     newblock = await w.query('getblockcount', [])
     if newblock > LAST_BLK:
         try:
+            users = await q.get_addr_uid_dict()
             for blockheight in range(LAST_BLK+1, newblock+1):
                 blockhash = await w.query('getblockhash', [blockheight])
                 await asyncio.sleep(0.05) # Protections to guard against reusing the bind address
@@ -44,10 +45,9 @@ async def blk_searcher():
                 if isinstance(blockdata, dict):
                     LAST_BLK = blockheight
                     for txid in blockdata['tx']:
-                        if await q.deposit_exists(txid): continue;
+                        if await q.deposit_exists(txid): continue; # Don't check if deposit exists
                         recv_addrs, send_addrs, vals = await check_tx(txid)
                         if len(recv_addrs) > 0:
-                            users = await q.get_addr_uid_dict()
                             for uaddr in users:
                                 found = False
                                 for i, addr in enumerate(recv_addrs):
