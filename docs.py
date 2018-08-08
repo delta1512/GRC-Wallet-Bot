@@ -2,6 +2,7 @@ import grcconf as g
 import emotes as e
 import discord
 
+### GENERAL MESSAGES
 welcome = '{}Welcome to the GRC Wallet Bot! Type `%help` for more commands and be sure to read the `%terms` and `%rules`'.format(e.CELEBRATE)
 
 faucetmsg = '''
@@ -17,11 +18,26 @@ The rainbot currently contains `{} GRC` and will rain at `{} GRC`.
 Donate GRC to this address `{}`
 or type `%rain [amount-GRC]` to build up rain.
 '''
-
+### ERROR MESSAGES
 rule_fail_send = '''{}It appears the bot cannot PM you.
 Please enable direct messages via discord and type `%rules` and `%terms` or check the pinned messages.
 '''.format(e.INFO)
 
+wait_confirm = '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
+
+invalid_val = ''
+
+insufficient_funds = ''
+
+more_than_fee = ''
+
+tx_error = '{}Error: A transaction could not be made.'.format(e.ERROR)
+
+pm_restrict = '{}The bot cannot process this command through private messages.'.format(e.CANNOT)
+
+too_new_msg = '{}Your account is too new to be using the bot, please ensure your account is at least {} days old.'.format(e.CANNOT, g.NEW_USR_TIME)
+
+### RULES AND TERMS
 rules = discord.Embed(title='GRC Wallet Bot Rules', colour=discord.Colour.purple(),
 description='''
 1. Do not spam the bot in any way.
@@ -59,7 +75,3 @@ ii. In the event of catastrophic failure, explore everything in my capability to
 
 iii. To have sufficient reason in banning or removing a user account from the bot.
 ''')
-
-PM_msg = '{}The bot cannot process this command through private messages.'.format(e.CANNOT)
-
-new_usr_msg = '{}Your account is too new to be using the bot, please ensure your account is at least {} days old.'.format(e.CANNOT, g.NEW_USR_TIME)
