@@ -1,4 +1,4 @@
-from user import usr
+from user import User
 import grcconf as g
 import aiomysql
 
@@ -10,12 +10,15 @@ async def uid_exists(uid):
     conn.close()
     return response > 0
 
-async def check_db():
-    try:
-        await check_uid('FAUCET')
-    except:
-        return 1
-    return 0
+async def get_user(uid):
+    conn = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
+    c = await conn.cursor()
+    await c.execute('SELECT * FROM {}.udb WHERE uid=%s'.format(g.udb_name), (uid))
+    result = await c.fetchone()
+    db.close()
+    if len(result) == 0: return None;
+    return User(uid, address=result[1], last_faucet=result[2], balance=result[3],
+                donations=result[4], lastTX=[result[5], result[6], result[7]])
 
 async def deposit_exists(txidq):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
