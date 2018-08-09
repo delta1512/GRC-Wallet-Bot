@@ -1,19 +1,18 @@
 from math import ceil, isfinite
 import random as r
-import logging
 import time
 import io
 
 import qrcode
 
-from user import usr
 import grcconf as g
 import emotes as e
 import wallet as w
 import docs
 import FAQ
 
-def amt_filter(inp, userobj):
+
+def amt_filter(inp):
     try:
         inp = float(inp)
         if (inp < 0) or (inp <= g.MIN_TX) or not isfinite(inp):
@@ -22,6 +21,7 @@ def amt_filter(inp, userobj):
             return round(inp, 8)
     except:
         return None
+
 
 async def dump_cfg(price_fetcher, udb_len):
     block_height = await w.query('getblockcount', [])
@@ -41,23 +41,6 @@ Price (USD): ${}```'''.format(e.ONLINE, g.tx_fee, g.MIN_TX, g.tx_timeout,
                             g.FCT_REQ_LIM, udb_len, block_height, block_hash,
                             round(await price_fetcher.price(), 4))
 
-async def new_user(uid):
-    try:
-        addr = await w.query('getnewaddress', [])
-        if not isinstance(addr, str):
-            logging.error('Failed to get address from GRC client')
-            raise RuntimeError('Error in communicating with client')
-        userobj = usr(uid, address=addr)
-        logging.info('New user registered successfully, UID: %s', uid)
-        return 0, '{}User account created successfully. Your address is `{}`'.format(e.GOOD, userobj.address), userobj
-    except (RuntimeError, ValueError) as E:
-        logging.error('New user registration failed with error: %s', E)
-        return 1, '{}Error: Something went wrong when attempting to make your user account.'.format(e.ERROR), None
-
-async def fetch_balance(userobj, price_fetcher):
-    usrbal = userobj.balance
-    return '''{}Your balance for: `{}`
-```{} GRC (${} USD)```'''.format(e.BAL, userobj.address, round(usrbal, 8), await price_fetcher.conv(usrbal))
 
 async def donate(selection, amount, userobj):
     amount = amt_filter(amount, userobj)
@@ -75,6 +58,7 @@ async def donate(selection, amount, userobj):
         return await userobj.donate(address, amount)
     return '{}Invalid selection.'.format(e.ERROR)
 
+
 async def rdonate(amount, userobj):
     selection = r.randint(1, len(g.donation_accts))
     reply = await donate(selection, amount, userobj)
@@ -83,6 +67,7 @@ async def rdonate(amount, userobj):
         return reply + '\n\nYou donated to: {}'.format(list(acct_dict.keys())[0])
     return reply
 
+
 def index_displayer(header, index):
     acc = ''
     for count, acct in enumerate(index):
@@ -90,31 +75,6 @@ def index_displayer(header, index):
         acc += '\n{}. {}'.format(str(count+1), name)
     return '{}```{}```'.format(header, acc[1:])
 
-async def withdraw(amount, addr, userobj):
-    amount = amt_filter(amount, userobj)
-    if amount is None or amount <= 0:
-        return '{}Amount provided is invalid.'.format(e.ERROR)
-    if amount-g.tx_fee-g.MIN_TX <= 0:
-        return '{}Invalid amount, withdraw an amount higher than the fee and minimum. (`{} GRC`)'.format(e.ERROR, g.tx_fee+g.MIN_TX)
-    if round(userobj.balance, 8) < amount:
-        return '{}Insufficient funds to withdraw. You have `{} GRC`'.format(e.ERROR, round(userobj.balance, 2))
-    return await userobj.withdraw(amount, addr)
-
-def give(amount, current_usrobj, rec_usrobj, add_success_msg='', donation=False):
-    amount = amt_filter(amount, current_usrobj)
-    if current_usrobj.usrID == rec_usrobj.usrID:
-        return '{}Cannot give funds to yourself.'.format(e.CANNOT)
-    if amount != None:
-        if amount <= round(current_usrobj.balance, 8):
-            current_usrobj.balance -= amount
-            rec_usrobj.balance += amount
-            if donation:
-                current_usrobj.donations += amount
-            return '{}In-server transaction of `{} GRC` successful.{}'.format(e.GOOD, amount, add_success_msg)
-        else:
-            return '{}Insufficient funds to give. You have `{} GRC`'.format(e.ERROR, round(current_usrobj.balance, 8))
-    else:
-        return '{}Amount provided was invalid.'.format(e.ERROR)
 
 def faucet(faucet_usr, current_usr):
     nxtfct = current_usr.last_faucet+3600*g.FCT_REQ_LIM
@@ -126,6 +86,7 @@ def faucet(faucet_usr, current_usr):
                 time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(nxtfct-ctime))))
     current_usr.last_faucet = ctime
     return give(round(r.uniform(g.FCT_MIN, g.FCT_MAX), 8), faucet_usr, current_usr) + ' Your new balance is `{} GRC`'.format(round(current_usr.balance, 8))
+
 
 def get_qr(string):
     qr = qrcode.QRCode(
@@ -141,11 +102,13 @@ def get_qr(string):
     savedir.seek(0)
     return savedir
 
+
 def help_interface(query):
     try:
         return docs.help_dict[query]
     except KeyError:
         return docs.help_dict['default']
+
 
 def faq(args):
     if len(args) < 1:
@@ -158,6 +121,7 @@ def faq(args):
         article = FAQ.index[selection]
         return article[list(article.keys())[0]]
     return '{}Invalid selection.'.format(e.ERROR)
+
 
 async def get_block(args):
     try:
@@ -174,6 +138,7 @@ async def get_block(args):
         acc += key + str(data[key]) + '\n'
     return '```{}```'.format(acc)
 
+
 def moon():
     clock = ':clock{}:'.format(r.randint(1, 12))
     day = '{}{}'.format(r.choice(e.NUMS[:3]), r.choice(e.NUMS))
@@ -184,21 +149,6 @@ def moon():
     return '{}So when will we moon? Exactly on this date {} {}  {} / {} / {}'.format(
             e.CHART_UP, clock, e.ARR_RIGHT, day, month, year)
 
-def get_usr_info(usrobj):
-    faucet_req = 'n/a' if usrobj.last_faucet == 0 else usrobj.last_faucet
-    tx_time = 'n/a' if usrobj.active_tx[1] == 0 else usrobj.active_tx[1]
-    txid = 'n/a' if usrobj.active_tx[2] is None or '\'' in usrobj.active_tx[2] else usrobj.active_tx[2]
-    tx_amount = 'n/a' if usrobj.active_tx[0] is None else usrobj.active_tx[0]
-    return '''```
-Address: {}
-Balance: {}
-Donated: {}
-
-Last faucet request (unix): {}
-Last transaction (unix): {}
-Last TXID out: {}
-Last transaction amount: {}```'''.format(usrobj.address, usrobj.balance,
-                    usrobj.donations, faucet_req, tx_time, txid, tx_amount)
 
 #check [usr] [chan]
 #ban [user] [chan]
@@ -221,6 +171,7 @@ def blist_iface(args, blist_obj):
     else:
         return '{}Invalid command'.format(e.ERROR)
 
+
 def burn_coins(args, udb):
     if len(args) > 1:
         amt = 0 if (amt_filter(args[1], None) == None) else amt_filter(args[1], None)
@@ -228,6 +179,7 @@ def burn_coins(args, udb):
         if args[0] != g.owner_id:
             udb[g.owner_id].balance += amt
         return 'Burned `{} GRC` from `{}`'.format(amt, args[0])
+
 
 def user_stats(uid, userobj, crtime_f, client):
     final = 'User ID: {}\n'.format(uid)
@@ -250,6 +202,7 @@ Last TXID: {}
     jtime = round(time.mktime(member.joined_at.timetuple()))
     final += 'Joined at: {} {}'.format(jtime, time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(time.time()-jtime)))
     return '```{}```'.format(final)
+
 
 def check_times(userobj):
     ctime = time.time()
