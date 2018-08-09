@@ -187,7 +187,7 @@ async def new(ctx):
         try:
             addr = await w.query('getnewaddress', [])
             await q.new_user(ctx.author.id, addr)
-            await ctx.send(docs.new_user_success)
+            await ctx.send(docs.new_user_success.format(e.GOOD, addr))
         except Exception:
             await ctx.send(docs.new_user_fail)
             return
@@ -200,7 +200,7 @@ async def new(ctx):
         except discord.errors.Forbidden:
             await ctx.send(docs.rule_fail_send)
     else:
-        await ctx.send(f'{e.CANNOT}Cannot create new account, you already have one.')
+        await ctx.send(docs.already_user)
 
 
 @client.command(name='help')
@@ -225,7 +225,7 @@ async def faq(ctx, *query):
             await ctx.author.send(embed=reply)
             await ctx.message.add_reaction('\u2705')  # WHITE HEAVY CHECK MARK
         except discord.errors.Forbidden:
-            await ctx.send(docs.rule_fail_send)
+            await ctx.send(docs.fail_dm)
 
 
 @client.command()
@@ -259,7 +259,7 @@ async def terms(ctx):
 @in_udb()
 async def balance(ctx):
     data = await q.get_bal(ctx.author.id)
-    await ctx.send(docs.balance_template.format(data[1], data[0])) # address, balance
+    await ctx.send(docs.balance_template.format(data[1], data[0])) # emoji, address, balance, priceUSD
 
 
 @client.command(aliases=['addr'])
