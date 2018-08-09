@@ -7,17 +7,16 @@ from os import path
 import discord
 from discord.ext import commands
 
-import commands as bot
+import extras
 import docs
 import emotes as e
 import errors
 import grcconf as g
 import wallet as w
-import UDB_tools as db
+import queries as q
 from grc_pricebot import price_bot
 from blacklist import blist
 from rain_bot import rainbot
-from scavenger import blk_searcher
 
 # Set up logging functionality
 handler = [RotatingFileHandler(g.log_dir+'walletbot.log', maxBytes=10**7, backupCount=3)]
@@ -27,26 +26,21 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s: %(message)s',
                     handlers=handler)
 
 client = commands.Bot(command_prefix=g.pre)
-LAST_BLK = 0
 FCT = 'FAUCET'
 RN = 'RAIN'
-UDB = {}
 latest_users = {}
 price_fetcher = price_bot()
 blacklister = None
 rbot = None
 INITIALISED = False
-UDB_LOCK = False
 
 
 def in_udb():
     def predicate(ctx):
-        global UDB
-        if ctx.author.id not in UDB:
+        if await q.uid_exists(ctx.author.id): # Add async decorators here
             raise errors.NotInUDB()
         return True
-    return commands.check(predicate)
-
+    return commands.check(predicate())
 
 def checkspam(user): # Possible upgrade: use discord.utils.snowflake_time to get their discord account creation date
     global latest_users
@@ -75,14 +69,9 @@ async def pluggable_loop():
     sleepcount = 0
     while True:
         await asyncio.sleep(5)
-        await blk_searcher()
         if rbot.check_rain():
             await rbot.do_rain(UDB, client)
         if sleepcount % g.SLP == 0:
-            if not UDB_LOCK:
-                await db.save_db(UDB)
-            with open(g.LST_BLK, 'w') as last_block:
-                last_block.write(str(LAST_BLK))
             with open(g.FEE_POOL, 'r') as fees:
                 owed = float(fees.read())
             if owed >= g.FEE_WDR_THRESH:
@@ -90,7 +79,6 @@ async def pluggable_loop():
                 if not isinstance(txid, str):
                     logging.error('Admin fees could not be sent, exit_code: %s', txid)
                 else:
-                    logging.info('Admin fees sent')
                     with open(g.FEE_POOL, 'w') as fees:
                         fees.write('0')
         sleepcount += 5
@@ -122,7 +110,7 @@ async def on_command_error(ctx, error):
 
 @client.event
 async def on_ready():
-    global UDB, LAST_BLK, blacklister, rbot
+    global blacklister, rbot
     if hasattr(client, 'initialised'):
         return  # Prevents multiple on_ready call
     await client.remove_command('help')
@@ -131,10 +119,12 @@ async def on_ready():
     else:
         logging.error('GRC client is not online')
         await bot.logout()
+        return
 
-    if not await db.check_db() == 0:
+    if not await db.uid_exists('FAUCET'):
         logging.error('Could not connect to SQL database')
         await bot.logout()
+        return
     else:
         logging.info('SQL DB online and accessible')
 
@@ -144,22 +134,14 @@ async def on_ready():
     except Exception:
         logging.error('Blacklisting service failed to load')
         await bot.logout()
+        return
 
     for extension in ['cogs.admin']:
         try:
             client.load_extension(extension)
-        except Exception as e:
-            print(f'Failed to load extension {extension}.\n{e}')
+        except Exception as E:
+            logging.error('Failed to load extension %s. Exception: %s', (extension, E))
     client.cogs['cogs.admin'].blacklister = blacklister
-
-    if path.exists(g.LST_BLK):
-        with open(g.LST_BLK, 'r') as last_block:
-            LAST_BLK = int(last_block.read())
-    else:
-        with open(g.LST_BLK, 'w') as last_block:
-            LAST_BLK = await w.query('getblockcount', [])
-            last_block.write(str(LAST_BLK))
-        logging.info('No start block specified. Setting block to client latest')
 
     if not path.exists(g.FEE_POOL):
         logging.info('Fees owed file not found. Setting fees owed to 0')
@@ -171,15 +153,14 @@ async def on_ready():
     else:
         logging.error('There was a problem trying to unlock the gridcoin wallet')
         await bot.logout()
+        return
 
-    UDB = await db.read_db()
-
-    try:
-        rbot = rainbot(UDB[RN])
-        logging.info('Rainbot service loaded correctly')
-    except Exception:
+    rbot = await q.get_user(RN)
+    if rbot is None:
         logging.error('Rainbot service failed to load')
         await bot.logout()
+        return
+    logging.info('Rainbot service loaded correctly')
 
     client.initialised = True
     logging.info('Initialisation complete')
@@ -201,14 +182,16 @@ async def status(ctx):
 
 @client.command()
 async def new(ctx):
-    global UDB_LOCK
-    if ctx.author.id not in UDB:
-        UDB_LOCK = True
+    if not await uid_exists(ctx.author.id):
         await ctx.send(docs.welcome)
-        status, reply, user_object = await bot.new_user(ctx.author.id)
-        if not status:
-            UDB[ctx.author.id] = user_object
-        await ctx.send(reply)
+        try:
+            addr = await w.query('getnewaddress', [])
+            await q.new_user(ctx.author.id, addr)
+            await ctx.send(docs.new_user_success)
+        except Exception:
+            await ctx.send(docs.new_user_fail)
+            return
+
         if ctx.author.dm_channel is None:
             ctx.author.create_dm()
         try:
@@ -216,7 +199,6 @@ async def new(ctx):
             await ctx.author.send(embed=docs.terms)
         except discord.errors.Forbidden:
             await ctx.send(docs.rule_fail_send)
-        UDB_LOCK = False
     else:
         await ctx.send(f'{e.CANNOT}Cannot create new account, you already have one.')
 
@@ -252,7 +234,7 @@ async def block(ctx, *query):
 
 
 @client.command()
-async def rule(ctx):
+async def rules(ctx):
     if ctx.author.dm_channel is None:
         ctx.author.create_dm()
     try:
@@ -263,7 +245,7 @@ async def rule(ctx):
 
 
 @client.command()
-async def term(ctx):
+async def terms(ctx):
     if ctx.author.dm_channel is None:
         ctx.author.create_dm()
     try:
@@ -276,69 +258,71 @@ async def term(ctx):
 @client.command(aliases=['bal'])
 @in_udb()
 async def balance(ctx):
-    user_object = UDB[ctx.author.id]
-    await ctx.send(await bot.fetch_balance(user_object, price_fetcher))
+    data = await q.get_bal(ctx.author.id)
+    await ctx.send(docs.balance_template.format(data[1], data[0])) # address, balance
 
 
 @client.command(aliases=['addr'])
 @in_udb()
 async def address(ctx):
-    user_object = UDB[ctx.author.id]
-    await ctx.send(user_object.address)
+    await ctx.send((await q.get_bal(ctx.author.id))[1])
 
 
 @client.command(aliases=['wdr', 'send'])
 @in_udb()
-async def withdraw(ctx, address: str, amount: int):
-    user_object = UDB[ctx.author.id]
-    await ctx.send(await bot.withdraw(amount, address, user_object))
+async def withdraw(ctx, address: str, amount: float):
+    user_obj = await q.get_user(ctx.author.id)
+    await ctx.send(await user_obj.withdraw(extras.amt_filter(amount), address, g.tx_fee))
 
 
 @client.command()
 @in_udb()
-async def donate(ctx, selection: int, amount: int):
-    user_object = UDB[ctx.author.id]
-    await ctx.send(await bot.donate(selection, amount, user_object))
+async def donate(ctx, selection: int, amount: float):
+    user_obj = await q.get_user(ctx.author.id)
+    # use extras import
 
 
 @client.command()
 @in_udb()
-async def rdonate(ctx, amount: int):
-    user_object = UDB[ctx.author.id]
-    await ctx.send(await bot.rdonate(amount, user_object))
+async def rdonate(ctx, amount: float):
+    user_obj = await q.get_user(ctx.author.id)
+    # use extras import
 
 
 @client.command(aliases=['tip'])
 @commands.guild_only()
 @in_udb()
-async def give(ctx, receiver: discord.User, amount: int):
-    receiver_object = UDB.get(receiver.id, None)
-    if receiver_object is None:
+async def give(ctx, receiver: discord.User, amount: float):
+    if receiver.id == ctx.author.id:
+        return await ctx.send(docs.cannot_send_self)
+    sender_obj = await q.get_user(ctx.author.id)
+    receiver_obj = await q.get_user(receiver.id)
+    if receiver_obj is None:
         return await ctx.send(f'{e.ERROR}Invalid user specified.')
-    sender_object = UDB[ctx.author.id]
-    await ctx.send(bot.give(amount, sender_object, receiver_object))
+    await ctx.send(await sender_obj.send_internal_tx(receiver_obj, amount))
 
 
 @client.command()
 @in_udb()
 async def fgive(ctx, amount: int):
-    user_object = UDB[ctx.author.id]
-    await ctx.send(bot.give(amount, user_object, UDB[FCT], add_success_msg='\n\nThank you for donating to the faucet!', donation=True))
+    user_obj = await q.get_user(ctx.author.id)
+    await ctx.send(await user_obj.send_internal_tx(await q.get_user(FCT), amount, True))
+    await ctx.send(docs.faucet_thankyou)
 
 
 @client.command(aliases=['fct', 'get'])
 @commands.guild_only()
 @in_udb()
 async def faucet(ctx):
-    faucet_object = UDB[FCT]
-    user_object = UDB[ctx.author.id]
-    await ctx.send(docs.faucetmsg.format(round(faucet_object.balance, 8), g.FCT_REQ_LIM, faucet_object.address))
-    await ctx.send(bot.faucet(faucet_object, user_object))
+    faucet_obj = await q.get_user(FCT) # This is highly inefficient, an alternative is to be found
+    user_obj = await q.get_user(ctx.author.id)
+    # use extras import
 
 
 @client.command()
 async def rain(ctx, amount: float):
-    user_object = UDB[ctx.author.id]
+    user_obj = await q.get_user(ctx.author.id)
+    # To be checked
     await ctx.send(rbot.process_message([amount], user_object))
 
 
@@ -346,33 +330,32 @@ async def rain(ctx, amount: float):
 @commands.guild_only()
 async def qr(ctx, text=None):
     if text is None:
-        user_object = UDB[ctx.ctx.author.id]
-        return await ctx.send(file=discord.File(bot.get_qr(user_object.address), filename=f'{ctx.author.name}.png'))
+        addr = (await q.get_bal(ctx.author.id))[1]
+        return await ctx.send(file=discord.File(extras.get_qr(addr), filename=f'{ctx.author.name}.png'))
     await ctx.send(file=discord.File(bot.get_qr(text), filename=f'{ctx.author.name}.png'))
 
 
 @client.command()
 @in_udb()
 async def time(ctx):
-    user_object = UDB[ctx.author.id]
-    await ctx.send(bot.check_times(user_object))
+    user_obj = await q.get_user(ctx.author.id)
+    await ctx.send(extras.check_times(user_obj))
 
 
-@client.command(aliases=['grcmoon', 'whenmoon'])
+@client.command(aliases=['grcmoon', 'whenmoon', 'lambo', 'whenlambo'])
 async def moon(ctx):
-    await ctx.send(bot.moon())
+    await ctx.send(extras.moon())
 
 
 @client.command(aliases=['me', 'acc'])
 @in_udb()
 async def account(ctx):
-    user_object = UDB[ctx.author.id]
-    await ctx.send(bot.get_usr_info(user_object))
+    user_obj = await q.get_user(ctx.author.id)
+    await ctx.send(user_obj.get_stats())
 
 
 @client.event
 async def on_message(msg):
-    global UDB, UDB_LOCK
     cmd = msg.content
     chan = msg.channel
     is_private = isinstance(chan, discord.DMChannel)
@@ -386,12 +369,12 @@ async def on_message(msg):
         return await msg.channel.send(docs.too_new_msg)
     elif iscommand and (len(cmd) > 1):
         cmd = cmd[1:]
+        log_msg = 'COMMAND "%s" executed by %s (%s){}'
         if is_private:
-            logging.info('COMMAND "%s" executed by %s (%s) in private channel',
-            cmd.split()[0], user, uname)
+            log_msg.format(' in private channel')
         else:
-            logging.info('COMMAND "%s" executed by %s (%s)',
-            cmd.split()[0], user, uname)
+            log_msg.format('')
+        logging.info(log_msg, cmd.split()[0], user, uname)
     await client.process_commands(msg)
 
 
@@ -399,8 +382,9 @@ try:
     with open('API.key', 'r') as key_file:
         API_KEY = str(key_file.read().replace('\n', ''))
     logging.info('API Key loaded')
-except Exception: # Do not use bare except because it also catches BaseException
+except Exception:
     logging.error('Failed to load API key')
     exit(1)
+
 
 client.run(API_KEY)
