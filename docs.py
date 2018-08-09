@@ -18,6 +18,22 @@ The rainbot currently contains `{} GRC` and will rain at `{} GRC`.
 Donate GRC to this address `{}`
 or type `%rain [amount-GRC]` to build up rain.
 '''
+
+user_data_template = '''```
+Address: {}
+Balance: {}
+Donated: {}
+
+Last faucet request (unix): {}
+Last transaction (unix): {}
+Last TXID out: {}
+Last transaction amount: {}```'''
+
+### SUCCESS MESSAGES
+net_tx_success = '{}Transaction of `{} GRC` (inc. {} GRC fee) was successful, ID: `{}`{}'
+
+internal_tx_success = '{}In-server transaction of `{} GRC` was successful.'
+
 ### ERROR MESSAGES
 rule_fail_send = '''{}It appears the bot cannot PM you.
 Please enable direct messages via discord and type `%rules` and `%terms` or check the pinned messages.
@@ -30,6 +46,8 @@ invalid_val = ''
 insufficient_funds = ''
 
 more_than_fee = ''
+
+more_than_min = ''
 
 tx_error = '{}Error: A transaction could not be made.'.format(e.ERROR)
 

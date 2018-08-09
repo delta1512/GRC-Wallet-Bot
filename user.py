@@ -7,7 +7,7 @@ import wallet as w
 import queries as q
 import docs
 
-class usr:
+class User:
     def __init__(self, uid, **k):
         self.usrID = uid
         self.balance = k.get('balance', 0.0)
@@ -15,12 +15,10 @@ class usr:
         self.donations = k.get('donations', 0.0)
         self.last_faucet = k.get('last_faucet', 0)
         self.address = k.get('address', None)
-        if self.address is None:
-            raise ValueError('[ERROR] Null value passed to user instantiation')
 
     async def withdraw(self, amount, addr, fee):
         validation_result = can_transact(amount, fee, True)
-        if isinstance(valid, bool):
+        if isinstance(validation_result, bool):
             txid = await w.tx(addr, amount-fee)
             if isinstance(txid, str):
                 tx_time = round(time())
@@ -30,18 +28,26 @@ class usr:
                     fees.write(str(owed+fee))
                 self.active_tx = [amount, tx_time, txid.replace('\n', '')]
                 self.balance -= amount
-                await q.save_user(self)
+                await q.save_users(self)
                 logging.info('Transaction successfully made with txid: %s', txid)
-                return '{}Transaction of `{} GRC` (inc. {} GRC fee) was successful, ID: `{}`{}'.format(e.GOOD, round(amount, 8), fee, txid, '\n\nYour new balance is {} GRC.'.format(round(self.balance, 2)))
+                return docs.net_tx_success.format(e.GOOD, round(amount, 8), fee, txid, '\n\nYour new balance is {} GRC.'.format(round(self.balance, 2)))
             logging.error('Failed transaction. Addr: %s, Amt: %s, exit_code: %s', addr, amount, txid)
             return docs.tx_error
         return validation_result
 
-    async def internal_tx():
-        pass
+    async def send_internal_tx(other_user, amount):
+        validation_result = can_transact(amount, 0)
+        if isinstance(validation_result, bool):
+            self.balance -= amount
+            other_user.balance += amount
+            await q.save_users([self, other_user])
+            return docs.internal_tx_success.format(e.GOOD, amount)
+        return validation_result
 
     async def get_stats():
-        pass
+        return docs.user_data_template.format(self.address, self.balance,
+                    self.donations, self.last_faucet, self.active_tx[1],
+                    self.active_tx[2], self.active_tx[0])
 
     def next_net_tx(self):
         return self.active_tx[1]+1.5*60*g.tx_timeout
@@ -57,8 +63,9 @@ class usr:
 
     def can_transact(self, amount, fee, net_tx=False):
         if net_tx:
-            if not self.can_net_tx(): return docs.wait_confirm
-        if amount is None: return docs.invalid_val
-        if amount > self.balance: return docs.insufficient_funds
-        if fee != 0 and amount < (fee + g.MIN_TX): return docs.more_than_fee
+            if not self.can_net_tx(): return docs.wait_confirm;
+        if amount is None: return docs.invalid_val;
+        if amount > self.balance: return docs.insufficient_funds;
+        if fee != 0 and amount < (fee + g.MIN_TX): return docs.more_than_fee;
+        if amount < g.MIN_TX: return docs.more_than_min;
         return True # If values passed all checks
