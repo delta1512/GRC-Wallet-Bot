@@ -97,7 +97,7 @@ async def on_command_error(ctx, error):
         if ctx.command.name == 'withdraw':
             return await ctx.send(f'{e.INFO}To withdraw from your account type: `%wdr [address to send to] [amount-GRC]`\nA service fee of {g.tx_fee} GRC is subtracted from what you send. If you wish to send GRC to someone in the server, use `%give`')
         if ctx.command.name == 'donate':
-            return await ctx.send(bot.index_displayer(f'{e.GIVE}Be generous! Below are possible donation options.\nTo donate, type `%donate [selection no.] [amount-GRC]`\n', g.donation_accts))
+            return await ctx.send(extras.donate_list(f'{e.GIVE}Be generous! Below are possible donation options.\nTo donate, type `%donate [selection no.] [amount-GRC]`\n', g.donation_accts))
         if ctx.command.name == 'rdonate':
             return await ctx.send(f'{e.GIVE}To donate to a random contributor type: `%rdonate [amount-GRC]`')
         if ctx.command.name == 'give':
@@ -121,7 +121,7 @@ async def on_ready():
         await bot.logout()
         return
 
-    if not await db.uid_exists('FAUCET'):
+    if not await q.uid_exists(FCT):
         logging.error('Could not connect to SQL database')
         await bot.logout()
         return
@@ -177,7 +177,7 @@ async def on_ready():
 
 @client.command()
 async def status(ctx):
-    await ctx.send(await bot.dump_cfg(price_fetcher, len(UDB)))
+    await ctx.send(await extras.dump_cfg(price_fetcher, len(UDB)))
 
 
 @client.command()
@@ -205,7 +205,7 @@ async def new(ctx):
 
 @client.command(name='help')
 async def _help(ctx, command):  # Not overwriting the built-in help function
-    await ctx.send(bot.help_interface(command))
+    await ctx.send(extras.help_interface(command))
 
 
 @client.command()
@@ -215,7 +215,7 @@ async def info(ctx):
 
 @client.command()
 async def faq(ctx, *query):
-    reply = bot.faq(query)
+    reply = extras.faq(query)
     if isinstance(reply, str):
         await ctx.send(reply)
     else:
@@ -230,7 +230,7 @@ async def faq(ctx, *query):
 
 @client.command()
 async def block(ctx, *query):
-    await ctx.send(await bot.get_block(query))
+    await ctx.send(await extras.get_block(query))
 
 
 @client.command()
@@ -323,7 +323,7 @@ async def faucet(ctx):
 async def rain(ctx, amount: float):
     user_obj = await q.get_user(ctx.author.id)
     # To be checked
-    await ctx.send(rbot.process_message([amount], user_object))
+    await ctx.send(rbot.process_message([amount], user_obj))
 
 
 @client.command()
@@ -332,7 +332,7 @@ async def qr(ctx, text=None):
     if text is None:
         addr = (await q.get_bal(ctx.author.id))[1]
         return await ctx.send(file=discord.File(extras.get_qr(addr), filename=f'{ctx.author.name}.png'))
-    await ctx.send(file=discord.File(bot.get_qr(text), filename=f'{ctx.author.name}.png'))
+    await ctx.send(file=discord.File(extras.get_qr(text), filename=f'{ctx.author.name}.png'))
 
 
 @client.command()
@@ -365,9 +365,9 @@ async def on_message(msg):
     iscommand = cmd.startswith(g.pre)
     if a.bot or checkspam(user) or blacklister.is_banned(user, is_private):
         return
-    elif iscommand and time.time() < user_time(a.created_at)+24*60*60*g.NEW_USR_TIME:
+    if iscommand and time.time() < user_time(a.created_at)+24*60*60*g.NEW_USR_TIME:
         return await msg.channel.send(docs.too_new_msg)
-    elif iscommand and (len(cmd) > 1):
+    if iscommand and (len(cmd) > 1):
         cmd = cmd[1:]
         log_msg = 'COMMAND "%s" executed by %s (%s){}'
         if is_private:
