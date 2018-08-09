@@ -36,10 +36,27 @@ async def get_bal(uid):
 async def register_deposit(txid, amount, uid):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
-    await c.execute('INSERT INTO {}.deposits VALUES (%s, %s, %s)'.format(g.udb_name),
+    await c.execute('INSERT INTO {}.deposits VALUES (%s, %s, %s);'.format(g.udb_name),
                     (txid, amount, uid))
-    await c.execute('UPDATE {}.udb SET balance=%s WHERE uid=%s'.format(g.udb_name),
+    await c.execute('UPDATE {}.udb SET balance=%s WHERE uid=%s;'.format(g.udb_name),
                     (await get_bal(uid) + amount, uid))
+    await db.commit()
+    db.close()
+
+async def save_user(user_obj):
+    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
+    c = await db.cursor()
+    await c.execute('''UPDATE {}.udb SET
+        last_faucet=%s,
+        balance=%s,
+        donations=%s,
+        lastTX_amt=%s,
+        lastTX_time=%s,
+        lastTX_txid=%s
+        WHERE uid=%s;'''.format(g.udb_name),
+        (user_obj.last_faucet, user_obj.balance, user_obj.donations,
+        user_obj.active_tx[0], user_obj.active_tx[1], user_obj.active_tx[2],
+        user_obj.userID))
     await db.commit()
     db.close()
 

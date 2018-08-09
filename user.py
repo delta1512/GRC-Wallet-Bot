@@ -30,7 +30,7 @@ class usr:
                     fees.write(str(owed+fee))
                 self.active_tx = [amount, tx_time, txid.replace('\n', '')]
                 self.balance -= amount
-                # await q.save_user()
+                await q.save_user(self)
                 logging.info('Transaction successfully made with txid: %s', txid)
                 return '{}Transaction of `{} GRC` (inc. {} GRC fee) was successful, ID: `{}`{}'.format(e.GOOD, round(amount, 8), fee, txid, '\n\nYour new balance is {} GRC.'.format(round(self.balance, 2)))
             logging.error('Failed transaction. Addr: %s, Amt: %s, exit_code: %s', addr, amount, txid)
