@@ -16,6 +16,7 @@ class User:
         self.last_faucet = k.get('last_faucet', 0)
         self.address = k.get('address', None)
 
+
     async def withdraw(self, amount, addr, fee):
         validation_result = can_transact(amount, fee, True)
         if isinstance(validation_result, bool):
@@ -35,31 +36,40 @@ class User:
             return docs.tx_error
         return validation_result
 
-    async def send_internal_tx(other_user, amount):
+
+    async def send_internal_tx(other_user, amount, donation=False):
         validation_result = can_transact(amount, 0)
         if isinstance(validation_result, bool):
             self.balance -= amount
             other_user.balance += amount
+            if donation:
+                self.donations += amount
             await q.save_users([self, other_user])
             return docs.internal_tx_success.format(e.GOOD, amount)
         return validation_result
 
-    async def get_stats():
+
+    def get_stats():
         return docs.user_data_template.format(self.address, self.balance,
                     self.donations, self.last_faucet, self.active_tx[1],
                     self.active_tx[2], self.active_tx[0])
 
+
     def next_net_tx(self):
         return self.active_tx[1]+1.5*60*g.tx_timeout
+
 
     def next_fct(self):
         return self.last_faucet+3600*g.FCT_REQ_LIM
 
+
     def can_net_tx(self):
         return time() > self.next_net_tx()
 
+
     def can_faucet(self):
         return time() > self.next_fct()
+
 
     def can_transact(self, amount, fee, net_tx=False):
         if net_tx:

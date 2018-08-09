@@ -2,6 +2,7 @@ from user import User
 import grcconf as g
 import aiomysql
 
+
 async def uid_exists(uid):
     conn = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await conn.cursor()
@@ -9,6 +10,7 @@ async def uid_exists(uid):
     response = await c.fetchall()
     conn.close()
     return response > 0
+
 
 async def get_user(uid):
     conn = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
@@ -20,6 +22,7 @@ async def get_user(uid):
     return User(uid, address=result[1], last_faucet=result[2], balance=result[3],
                 donations=result[4], lastTX=[result[5], result[6], result[7]])
 
+
 async def deposit_exists(txidq):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
@@ -28,13 +31,15 @@ async def deposit_exists(txidq):
     db.close()
     return result[0] > 0
 
+
 async def get_bal(uid):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
-    await c.execute('SELECT balance FROM {}.udb WHERE uid=%s'.format(g.udb_name), (uid))
+    await c.execute('SELECT balance, address FROM {}.udb WHERE uid=%s'.format(g.udb_name), (uid))
     result = await c.fetchone()
     db.close()
     return result[0]
+
 
 async def register_deposit(txid, amount, uid):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
@@ -45,6 +50,7 @@ async def register_deposit(txid, amount, uid):
                     (await get_bal(uid) + amount, uid))
     await db.commit()
     db.close()
+
 
 async def save_user(user_objs):
     if not issinstance(user_objs, list): user_objs = [user_objs];
@@ -65,6 +71,7 @@ async def save_user(user_objs):
     await db.commit()
     db.close()
 
+
 async def new_user(uid, address):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
@@ -72,6 +79,7 @@ async def new_user(uid, address):
                     (uid, address, 0, 0, 0, 0, 0))
     await db.commit()
     db.close()
+
 
 async def get_addr_uid_dict():
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
