@@ -145,6 +145,13 @@ async def on_ready():
         logging.error('Blacklisting service failed to load')
         await bot.logout()
 
+    for extension in ['cogs.admin']:
+        try:
+            client.load_extension(extension)
+        except Exception as e:
+            print(f'Failed to load extension {extension}.\n{e}')
+    client.cogs['cogs.admin'].blacklister = blacklister
+
     if path.exists(g.LST_BLK):
         with open(g.LST_BLK, 'r') as last_block:
             LAST_BLK = int(last_block.read())
@@ -361,28 +368,6 @@ async def moon(ctx):
 async def account(ctx):
     user_object = UDB[ctx.author.id]
     await ctx.send(bot.get_usr_info(user_object))
-
-
-@client.command()
-@commands.is_owner()
-async def blist(ctx, *args): # TODO: Add private message check -jorkermc
-    if len(args) > 0:
-        await ctx.send(bot.blist_iface(args, blacklister))
-    else:
-        await ctx.send(blacklister.get_blisted())
-
-
-@client.command(name='bin')
-@commands.is_owner()
-async def _bin(ctx, *args): # Not overriding built-in function bin
-    await ctx.send(bot.burn_coins(args, UDB))
-
-
-@client.command()
-@commands.is_owner()
-async def stat(ctx, *args):
-    if len(args) > 0:
-        await ctx.send(bot.user_stats(args[0], UDB.get(args[0], None), user_time, client))
 
 
 @client.event
