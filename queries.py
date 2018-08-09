@@ -46,20 +46,22 @@ async def register_deposit(txid, amount, uid):
     await db.commit()
     db.close()
 
-async def save_user(user_obj):
+async def save_user(user_objs):
+    if not issinstance(user_objs, list): user_objs = [user_objs];
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
-    await c.execute('''UPDATE {}.udb SET
-        last_faucet=%s,
-        balance=%s,
-        donations=%s,
-        lastTX_amt=%s,
-        lastTX_time=%s,
-        lastTX_txid=%s
-        WHERE uid=%s;'''.format(g.udb_name),
-        (user_obj.last_faucet, user_obj.balance, user_obj.donations,
-        user_obj.active_tx[0], user_obj.active_tx[1], user_obj.active_tx[2],
-        user_obj.userID))
+    for user in user_objs:
+        await c.execute('''UPDATE {}.udb SET
+            last_faucet=%s,
+            balance=%s,
+            donations=%s,
+            lastTX_amt=%s,
+            lastTX_time=%s,
+            lastTX_txid=%s
+            WHERE uid=%s;'''.format(g.udb_name),
+            (user.last_faucet, user.balance, user.donations,
+            user.active_tx[0], user.active_tx[1], user.active_tx[2],
+            user.userID))
     await db.commit()
     db.close()
 
