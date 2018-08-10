@@ -38,7 +38,7 @@ INITIALISED = False
 
 def in_udb():
     def predicate(ctx):
-        if await q.uid_exists(ctx.author.id): # Add async decorators here
+        if await q.uid_exists(ctx.author.id): # Add async decorators here if needed
             raise errors.NotInUDB()
         return True
     return commands.check(predicate())

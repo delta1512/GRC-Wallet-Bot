@@ -14,16 +14,20 @@ class AdminCog:
         if len(args) > 0:
             await ctx.send(bot_com.blist_iface(args, self.blacklister))
         else:
-            await ctx.send(self.blacklister.get_blisted())
+            await ctx.send(blacklister.get_blisted())
 
     @commands.command(name='bin')
     async def _bin(self, ctx, *args):  # Not overriding built-in function bin
-        await ctx.send(bot_com.burn_coins(args, UDB))
+        await ctx.send(bot_com.burn_coins(args))
 
     @commands.command()
     async def stat(self, ctx, *args):
-        if len(args) > 0:
-            await ctx.send(bot_com.user_stats(args[0], UDB.get(args[0], None), user_time, self.bot))
+        if len(args) == 0:
+            user_obj = await q.get_user(ctx.author.id)
+        else:
+            user_obj = await q.get_user(args[0])
+            if user_obj is None: return;
+        await ctx.send(extras.user_stats(user_obj, client))
 
 
 def setup(bot):

@@ -125,15 +125,10 @@ def moon():
             e.CHART_UP, clock, e.ARR_RIGHT, day, month, year)
 
 
-#check [usr] [chan]
 #ban [user] [chan]
 #unban [user]
 def blist_iface(args, blist_obj):
-    if args[0] == 'check':
-        if len(args) == 3:
-            return str(blist_obj.is_banned(args[1], True if args[2] == 'priv' else False))
-        return '{}Invalid args'.format(e.ERROR)
-    elif args[0] == 'ban':
+    if args[0] == 'ban':
         if len(args) == 3:
             blist_obj.new_blist(args[1], True if args[2] == 'priv' else False)
             return e.GOOD[:-3]
@@ -147,44 +142,44 @@ def blist_iface(args, blist_obj):
         return '{}Invalid command'.format(e.ERROR)
 
 
-def burn_coins(args, udb):
-    if len(args) > 1:
-        amt = 0 if (amt_filter(args[1], None) == None) else amt_filter(args[1], None)
-        udb[args[0]].balance -= amt
-        if args[0] != g.owner_id:
-            udb[g.owner_id].balance += amt
+async def burn_coins(args):
+    if len(args) == 2:
+        amt = 0 if (amt_filter(args[1]) == None)
+        from_user = await q.get_user(args[0])
+        if args[0] != g.owner_id and (not from_user is None):
+            to_user = await q.get_user(g.owner_id)
+            await from_user.send_internal_tx(to_user, amt)
+        else:
+            from_user.balance -= amt
+            await q.save_user(from_user)
         return 'Burned `{} GRC` from `{}`'.format(amt, args[0])
 
 
-def user_stats(uid, userobj, crtime_f, client):
-    final = 'User ID: {}\n'.format(uid)
+def user_stats(user_obj, client):
+    final = 'User ID: {}\n'.format(user_obj.userID)
     user = None
-    members = client.get_all_members() if g.main_server == '' else [server.members for server in client.servers if server.id == g.main_server][0]
+    members = client.get_all_members()
     for member in members:
-        if member.id == uid:
+        if member.id == user_obj.userID:
             user = member
-            crtime = round(crtime_f(member.created_at))
+            crtime = round(user_time(member.created_at))
             break
     if user is None:
         return '```{}```'.format(final)
-    if not userobj is None:
-        final += '''Address: {}
-Balance: {}
-Last TX time: {}
-Last TXID: {}
-'''.format(userobj.address, userobj.balance, userobj.active_tx[1], userobj.active_tx[2])
+    if not user_obj is None:
+        final += user_obj.get_stats().replace('`', '') + '\n'
     final += 'Created at: {} {}\n'.format(crtime, time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(time.time()-crtime)))
     jtime = round(time.mktime(member.joined_at.timetuple()))
     final += 'Joined at: {} {}'.format(jtime, time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(time.time()-jtime)))
     return '```{}```'.format(final)
 
 
-def check_times(userobj):
-    ctime = time.time()
+def check_times(user_obj):
+    ctime = round(time.time())
     return '''
 Faucet: {}
 Withdrawals: {}
 Donations: {}
-'''.format(e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(userobj.next_fct()-ctime)))) if not userobj.can_faucet() else e.GOOD[:-3],
-            e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(userobj.next_wdr()-ctime)))) if not userobj.can_withdraw() else e.GOOD[:-3],
-            e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(userobj.next_dnt()-ctime)))) if not userobj.can_donate() else e.GOOD[:-3])
+'''.format(e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(user_obj.next_fct()-ctime)))) if not user_obj.can_faucet() else e.GOOD[:-3],
+            e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(user_obj.next_wdr()-ctime)))) if not user_obj.can_withdraw() else e.GOOD[:-3],
+            e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(user_obj.next_dnt()-ctime)))) if not user_obj.can_donate() else e.GOOD[:-3])
