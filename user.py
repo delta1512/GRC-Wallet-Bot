@@ -23,10 +23,8 @@ class User:
             txid = await w.tx(addr, amount-fee)
             if isinstance(txid, str):
                 tx_time = round(time())
-                with open(g.FEE_POOL, 'r') as fees:
-                    owed = float(fees.read())
-                with open(g.FEE_POOL, 'w') as fees:
-                    fees.write(str(owed+fee))
+                if fee == g.MIN_TX:
+                    await q.add_to_fee_pool(fee)
                 self.active_tx = [amount, tx_time, txid.replace('\n', '')]
                 self.balance -= amount
                 if donation:

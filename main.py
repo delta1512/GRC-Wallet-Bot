@@ -66,23 +66,11 @@ def user_time(crtime):
     return time.mktime(time.strptime(crtime, '%Y-%m-%d %H:%M:%S'))
 
 
-async def pluggable_loop():
-    sleepcount = 0
+async def rain_loop():
     while True:
         await asyncio.sleep(5)
         if rbot.check_rain():
             await rbot.do_rain(client)
-        if sleepcount % g.SLP == 0:
-            with open(g.FEE_POOL, 'r') as fees:
-                owed = float(fees.read())
-            if owed >= g.FEE_WDR_THRESH:
-                txid = await w.tx(g.admin_wallet, owed)
-                if not isinstance(txid, str):
-                    logging.error('Admin fees could not be sent, exit_code: %s', txid)
-                else:
-                    with open(g.FEE_POOL, 'w') as fees:
-                        fees.write('0')
-        sleepcount += 5
 
 
 @client.event
@@ -170,7 +158,7 @@ async def on_ready():
     #Protection against errors in the loop
     while True:
         try:
-            await pluggable_loop()
+            await rain_loop()
         except KeyboardInterrupt:
             logging.info('Pluggable loop shutting down')
             return

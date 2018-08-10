@@ -1,7 +1,8 @@
-from user import User
-import grcconf as g
 import aiomysql
 
+from user import User
+import grcconf as g
+import wallet as w
 
 async def uid_exists(uid):
     conn = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
@@ -119,9 +120,25 @@ async def commit_ban(user, channel):
     await db.commit()
     db.close()
 
+
 async def commit_unban(user):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
     await c.execute('DELETE FROM {}.blacklist WHERE uid=%s;'.format(g.udb_name), (user))
+    await db.commit()
+    db.close()
+
+
+async def add_to_fee_pool(fee):
+    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
+    c = await db.cursor()
+    await c.execute('SELECT amount FROM {}.admin_claims WHERE txid="PENDING"'.format(udb_name))
+    current_owed = await c.fetchone()[0]
+    await c.execute('UPDATE {}.admin_claims SET amount = %s WHERE txid="PENDING";'.format(udb_name), (fee + current_owed))
+    if current_owed + fee > g.FEE_WDR_THRESH:
+        txid = await w.tx(g.admin_wallet, current_owed + fee)
+        if issinstance(txid, str):
+            await c.execute('UPDATE {}.admin_claims SET txid = %s WHERE txid="PENDING";'.format(udb_name), (txid))
+            await c.execute('INSERT INTO {}.admin_claims VALUES (%s, %s);'.format(g.udb_name), ('PENDING', 0))
     await db.commit()
     db.close()
