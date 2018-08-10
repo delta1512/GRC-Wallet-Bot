@@ -324,7 +324,7 @@ async def fgive(ctx, amount: int):
 async def faucet(ctx):
     faucet_obj = await q.get_user(FCT) # This is highly inefficient, an alternative is to be found
     user_obj = await q.get_user(ctx.author.id)
-    # use extras import
+    await ctx.send(await extras.faucet(faucet_obj, user_obj))
 
 
 @client.command()

@@ -64,16 +64,15 @@ def index_displayer(header, index):
     return '{}```{}```'.format(header, acc[1:])
 
 
-def faucet(faucet_usr, current_usr):
-    nxtfct = current_usr.last_faucet+3600*g.FCT_REQ_LIM
+async def faucet(faucet_obj, user_obj):
     ctime = round(time.time())
-    if faucet_usr.balance <= g.FCT_MAX:
-        return '{}Unfortunately the faucet balance is too low. Try again soon.'.format(e.DOWN)
-    elif ctime < nxtfct:
+    if not user_obj.can_faucet():
         return '{}Request too recent. Faucet timeout is {} hours. Try again in: {}'.format(e.CANNOT, g.FCT_REQ_LIM,
-                time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(nxtfct-ctime))))
-    current_usr.last_faucet = ctime
-    return give(round(r.uniform(g.FCT_MIN, g.FCT_MAX), 8), faucet_usr, current_usr) + ' Your new balance is `{} GRC`'.format(round(current_usr.balance, 8))
+        time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(user_obj.next_fct()-ctime))))
+    result = await faucet_obj.send_internal_tx(user_obj, round(r.uniform(g.FCT_MIN, g.FCT_MAX), 8), faucet=ctime)
+    if result == docs.insufficient_funds:
+        return '{}Unfortunately the faucet balance is too low. Try again soon.'.format(e.DOWN)
+    return result + ' Your new balance is `{} GRC`'.format(round(user_obj.balance, 8))
 
 
 def get_qr(string):

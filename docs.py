@@ -5,10 +5,9 @@ import discord
 ### GENERAL MESSAGES
 welcome = '{}Welcome to the GRC Wallet Bot! Type `%help` for more commands and be sure to read the `%terms` and `%rules`'.format(e.CELEBRATE)
 
-faucet_msg = '''The faucet currently contains `{} GRC` and has a timeout of {} hours.
+faucet_msg = '''The faucet currently contains `{} GRC`.
 
-Donate GRC to this address `{}`
-or type `%fgive [amount-GRC]` to help refill the faucet.'''
+Donate GRC to this address: `{}` or use `%fgive` to refill the faucet.'''
 
 rain_msg = '''The rainbot currently contains `{} GRC` and will rain at `{} GRC`.
 
