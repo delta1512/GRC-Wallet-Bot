@@ -15,7 +15,7 @@ import grcconf as g
 import wallet as w
 import queries as q
 from grc_pricebot import price_bot
-from blacklist import blist
+from blacklist import Blacklister
 from rain_bot import rainbot
 from FAQ import index
 
@@ -136,7 +136,7 @@ async def on_ready():
         logging.info('SQL DB online and accessible')
 
     try:
-        blacklister = blist()
+        blacklister = Blacklister(await q.get_blacklisted())
         logging.info('Blacklisting service loaded correctly')
     except Exception:
         logging.error('Blacklisting service failed to load')
@@ -149,11 +149,6 @@ async def on_ready():
         except Exception as E:
             logging.error('Failed to load extension %s. Exception: %s', (extension, E))
     client.cogs['cogs.admin'].blacklister = blacklister
-
-    if not path.exists(g.FEE_POOL):
-        logging.info('Fees owed file not found. Setting fees owed to 0')
-        with open(g.FEE_POOL, 'w') as fees:
-            fees.write('0')
 
     if await w.unlock() is None:
         logging.info('Wallet successfully unlocked')

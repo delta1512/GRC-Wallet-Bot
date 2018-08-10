@@ -1,10 +1,10 @@
 import logging
 
-class blist:
-    blacklist = {}
+class Blacklister:
+    blacklist = {} # {user ID : private channel ban}
 
-    def __init__(self):
-        self.read_blists()
+    def __init__(self, blacklisted):
+        self.blacklist = blacklisted
 
     def is_banned(self, user, ispriv):
         try:
@@ -16,34 +16,13 @@ class blist:
     def get_blisted(self):
         return '```UID | Private ban\n{}```'.format(''.join(['{} | {}\n'.format(u, self.blacklist[u]) for u in self.blacklist]))
 
-    def new_blist(self, user, priv_ban):
+    async def new_blist(self, user, priv_ban):
         logging.info('New ban made for UID: %s', user)
         self.blacklist[user] = priv_ban
-        if priv_ban:
-            f = 'priv_blist'
-        else:
-            f = 'blist'
-        with open(f, 'a') as b:
-            b.write(user + '\n')
+        await q.commit_ban(user, priv_ban)
 
     def remove_blist(self, user):
-        logging.info('Attempted ban removal for UID: %s', user)
+        logging.info('Removed ban for UID: %s', user)
         if user in self.blacklist:
-            if self.blacklist.pop(user):
-                with open('priv_blist', 'w') as b:
-                    for u in self.blacklist:
-                        if self.blacklist[u] is True:
-                            b.write(u + '\n')
-            else:
-                with open('blist', 'w') as b:
-                    for u in self.blacklist:
-                        if self.blacklist[u] is False:
-                            b.write(u + '\n')
-
-    def read_blists(self):
-        with open('blist', 'r') as b:
-            for ln in b.read().split():
-                self.blacklist[ln.replace('\n', '')] = False
-        with open('priv_blist', 'r') as b:
-            for ln in b.read().split():
-                self.blacklist[ln.replace('\n', '')] = True
+            await q.commit_unban(user)
+            self.blacklist.pop(user)
