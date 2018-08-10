@@ -104,6 +104,8 @@ async def on_command_error(ctx, error):
             return await ctx.send(f'{e.INFO}To give funds to a member in the server, type `%give [discord mention of user] [amount to give]`.\nThe person must also have an account with the bot.')
         if ctx.command.name == 'fgive':
             return await ctx.send(f'{e.ERROR}Please specify an amount to give.')
+        if ctx.command.name == 'rain':
+            return await ctx.send(rbot.status())
     if isinstance(error, commands.NoPrivateMessage):
         return await ctx.send(docs.pm_restrict)
 
@@ -155,12 +157,13 @@ async def on_ready():
         await bot.logout()
         return
 
-    rbot = await q.get_user(RN)
-    if rbot is None:
+    try:
+        rbot = Rainbot(await q.get_user(RN))
+        logging.info('Rainbot service loaded correctly')
+    except:
         logging.error('Rainbot service failed to load')
         await bot.logout()
         return
-    logging.info('Rainbot service loaded correctly')
 
     client.initialised = True
     logging.info('Initialisation complete')
@@ -322,8 +325,7 @@ async def faucet(ctx):
 @client.command()
 async def rain(ctx, amount: float):
     user_obj = await q.get_user(ctx.author.id)
-    # To be checked
-    await ctx.send(rbot.process_message([amount], user_obj))
+    await ctx.send(rbot.contribute(extras.amt_fileter(amount), user_obj))
 
 
 @client.command()

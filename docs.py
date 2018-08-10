@@ -30,6 +30,8 @@ balance_template = '''{}Your balance for: `{}`
 
 faucet_thankyou = '{}Thank you for donating to the faucet!'.format(e.HEART)
 
+rain_thankyou = '\n\nThank you for raining on the users! The rain pot is now at `{} GRC`'
+
 ### SUCCESS MESSAGES
 new_user_success = '{}User account created successfully. Your address is `{}`'
 

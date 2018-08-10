@@ -6,12 +6,14 @@ import grcconf as g
 import emotes as e
 import docs
 
-class rainbot:
+class Rainbot:
     RBOT = None
     thresh = 0
 
 
     def __init__(self, rainuser):
+        if rainuser is None:
+            raise TypeError
         self.RBOT = rainuser
         self.get_next_thresh()
 
@@ -31,6 +33,8 @@ class rainbot:
         for val in self.get_rain_vals(num_rain, self.RBOT.balance-remainder):
             final_rains[online.pop()] = val
         await q.apply_balance_changes(final_rains)
+        self.RBOT.balance -= rain_amt
+        await q.save_user(self.RBOT)
 
         big_string = '{}Rained `{} GRC`\n'.format(e.RAIN, rain_amt)
         for user in final_rains:
@@ -49,15 +53,12 @@ class rainbot:
         return self.RBOT.balance > self.thresh
 
 
-    def process_message(self, args, user):
-        if len(args) == 0:
-            return docs.rain_msg.format(round(self.RBOT.balance, 8),
-                                        round(self.thresh, 8),
-                                        self.RBOT.address)
-        if 0 < len(args) < 2:
-            return give(args[0], user, self.RBOT,
-                        add_success_msg='\n\nThank you for raining on the users!', donation=True)
-        return '{}Too many arguments provided'.format(e.CANNOT)
+    def status(self):
+        return docs.rain_msg.format(round(self.RBOT.balance, 8), round(self.thresh, 8), self.RBOT.address)
+
+
+    def contribute(amount, user_obj):
+        return user_obj.send_internal_tx(self.RBOT, amount, True) + docs.rain_thanks.format(round(self.RBOT.balance, 3))
 
 
     def get_rain_vals(self, n, amount):
