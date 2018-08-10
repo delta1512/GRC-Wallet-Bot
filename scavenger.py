@@ -34,16 +34,18 @@ async def check_tx(txid):
     return recv_addrs, send_addrs, recv_vals
 
 async def blk_searcher():
+    with open(g.LST_BLK, 'r') as last_block_file:
+        last_block = int(last_block_file.read().replace('\n', ''))
     newblock = await w.query('getblockcount', [])
-    if newblock > LAST_BLK:
+    if newblock > last_block:
         try:
             users = await q.get_addr_uid_dict()
-            for blockheight in range(LAST_BLK+1, newblock+1):
+            for blockheight in range(last_block+1, newblock+1):
                 blockhash = await w.query('getblockhash', [blockheight])
                 await asyncio.sleep(0.05) # Protections to guard against reusing the bind address
                 blockdata = await w.query('getblock', [blockhash])
                 if isinstance(blockdata, dict):
-                    LAST_BLK = blockheight
+                    last_block = blockheight
                     for txid in blockdata['tx']:
                         if await q.deposit_exists(txid): continue; # Don't check if deposit exists
                         recv_addrs, send_addrs, vals = await check_tx(txid)
@@ -72,3 +74,5 @@ async def blk_searcher():
                     logging.error('Bad signal in GRC client: %s', blockdata)
         except Exception as E:
             logging.exception('Block searcher ran into an error: %s', E)
+        with open(g.LST_BLK, 'w') as last_block_file:
+            last_block_file.write(str(last_block))
