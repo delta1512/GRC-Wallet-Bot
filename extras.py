@@ -24,7 +24,7 @@ def amt_filter(inp):
         return None
 
 
-async def dump_cfg(price_fetcher, udb_len):
+async def dump_cfg(price_fetcher):
     block_height = await w.query('getblockcount', [])
     block_hash = await w.query('getblockhash', [block_height])
     if block_height < 5 or not isinstance(block_hash, str): # 5 is largest error return value
@@ -39,7 +39,7 @@ Users: {}
 Block height: {}
 Latest hash: {}
 Price (USD): ${}```'''.format(e.ONLINE, g.tx_fee, g.MIN_TX, g.tx_timeout,
-                            g.FCT_REQ_LIM, udb_len, block_height, block_hash,
+                            g.FCT_REQ_LIM, len(await q.get_addr_uid_dict()), block_height, block_hash,
                             round(await price_fetcher.price(), 4))
 
 
@@ -118,13 +118,7 @@ def faq(query):
     return '{}Invalid selection.'.format(e.ERROR)
 
 
-async def get_block(args):
-    try:
-        height = await w.query('getblockcount', [])
-        if len(args) >= 1:
-            height = int(args[0])
-    except:
-        return '{}Invalid number provided.'.format(e.ERROR)
+async def show_block(height):
     data = await w.get_block(height)
     if data is None:
         return '{}Could not fetch block data.'.format(e.ERROR)

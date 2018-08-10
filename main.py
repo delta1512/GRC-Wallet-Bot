@@ -71,7 +71,7 @@ async def pluggable_loop():
     while True:
         await asyncio.sleep(5)
         if rbot.check_rain():
-            await rbot.do_rain(UDB, client)
+            await rbot.do_rain(client)
         if sleepcount % g.SLP == 0:
             with open(g.FEE_POOL, 'r') as fees:
                 owed = float(fees.read())
@@ -109,6 +109,8 @@ async def on_command_error(ctx, error):
             return await ctx.send(rbot.status())
         if ctx.command.name == 'faq':
             return await ctx.send(extras.index_displayer(docs.faq_msg, index) + '\n*Thanks to LavRadis and Foxifi for making these resources.*')
+        if ctx.command.name == 'block':
+            return await ctx.send(extras.show_block(await w.query('getblockcount', [])))
     if isinstance(error, commands.NoPrivateMessage):
         return await ctx.send(docs.pm_restrict)
 
@@ -170,7 +172,7 @@ async def on_ready():
 
     client.initialised = True
     logging.info('Initialisation complete')
-    # Temporary Protection against errors in the loop
+    #Protection against errors in the loop
     while True:
         try:
             await pluggable_loop()
@@ -183,7 +185,7 @@ async def on_ready():
 
 @client.command()
 async def status(ctx):
-    await ctx.send(await extras.dump_cfg(price_fetcher, len(UDB)))
+    await ctx.send(await extras.dump_cfg(price_fetcher))
 
 
 @client.command()
@@ -236,7 +238,7 @@ async def faq(ctx, query: int):
 
 @client.command()
 async def block(ctx, query: int):
-    await ctx.send(await extras.get_block(query))
+    await ctx.send(await extras.show_block(query))
 
 
 @client.command()
