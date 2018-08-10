@@ -34,12 +34,16 @@ rain_thankyou = '\n\nThank you for raining on the users! The rain pot is now at 
 
 faq_msg = '{}The following are currently documented FAQ articles. To read, type `%faq [selection no.]` '.format(e.BOOK)
 
+donation_recipient = '\nYou donated to {}!'
+
+
 ### SUCCESS MESSAGES
 new_user_success = '{}User account created successfully. Your address is `{}`'
 
 net_tx_success = '{}Transaction of `{} GRC` (inc. {} GRC fee) was successful, ID: `{}`{}'
 
 internal_tx_success = '{}In-server transaction of `{} GRC` was successful.'
+
 
 ### ERROR MESSAGES
 new_user_fail = '{}Something went wrong when trying to make your account, please contact the owner.'.format(e.ERROR)
@@ -56,6 +60,8 @@ wait_confirm = '{}Please wait for your previous transaction to be confirmed.'.fo
 
 invalid_val = '{}The value provided was invalid.'.format(e.ERROR)
 
+invalid_selection = '{}Invalid selection.'.format(e.ERROR)
+
 insufficient_funds = '{}You have insufficient funds to make that transfer.'.format(e.ERROR)
 
 more_than_fee = '{}You must provide an amount that is greater than the fee (`{} GRC`).'.format(e.ERROR, g.tx_fee)
@@ -67,6 +73,7 @@ tx_error = '{}Error: A transaction could not be made.'.format(e.ERROR)
 pm_restrict = '{}The bot cannot process this command through private messages.'.format(e.CANNOT)
 
 too_new_msg = '{}Your account is too new to be using the bot, please ensure your account is at least {} days old.'.format(e.CANNOT, g.NEW_USR_TIME)
+
 
 ### RULES AND TERMS
 rules = discord.Embed(title='GRC Wallet Bot Rules', colour=discord.Colour.purple(),

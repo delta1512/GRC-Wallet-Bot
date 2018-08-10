@@ -39,34 +39,21 @@ Users: {}
 Block height: {}
 Latest hash: {}
 Price (USD): ${}```'''.format(e.ONLINE, g.tx_fee, g.MIN_TX, g.tx_timeout,
-                            g.FCT_REQ_LIM, len(await q.get_addr_uid_dict()), block_height, block_hash,
-                            round(await price_fetcher.price(), 4))
+g.FCT_REQ_LIM, len(await q.get_addr_uid_dict()), block_height, block_hash,
+round(await price_fetcher.price(), 4))
 
 
-async def donate(selection, amount, userobj):
-    amount = amt_filter(amount, userobj)
-    try:
-        selection = int(selection)-1
-    except ValueError:
-        return '{}Invalid selection.'.format(e.ERROR)
-    if amount is None:
-        return '{}Amount provided is invalid.'.format(e.ERROR)
-    if round(userobj.balance, 8) < amount:
-        return '{}Insufficient funds to donate. You have `{} GRC`'.format(e.ERROR, round(userobj.balance, 2))
+async def donate(user_obj, selection, amount):
     if 0 <= selection < len(g.donation_accts):
         acct_dict = g.donation_accts[selection]
-        address = acct_dict[list(acct_dict.keys())[0]]
-        return await userobj.donate(address, amount)
-    return '{}Invalid selection.'.format(e.ERROR)
+        selection_name = list(acct_dict.keys())[0]
+        addr = acct_dict[selection_name]
+        return await user_obj.withdraw(amount, addr, g.net_fee, True) + docs.donation_recipient.format(selection_name)
+    return docs.invalid_selection
 
 
-async def rdonate(amount, userobj):
-    selection = r.randint(1, len(g.donation_accts))
-    reply = await donate(selection, amount, userobj)
-    if reply.startswith(e.GOOD):
-        acct_dict = g.donation_accts[selection-1]
-        return reply + '\n\nYou donated to: {}'.format(list(acct_dict.keys())[0])
-    return reply
+async def rdonate(user_obj, amount):
+    return await donate(user_obj, r.randint(1, len(g.donation_accts)), amount)
 
 
 def index_displayer(header, index):
@@ -115,7 +102,7 @@ def faq(query):
     if 0 <= query < len(FAQ.index):
         article = FAQ.index[query]
         return article[list(article.keys())[0]]
-    return '{}Invalid selection.'.format(e.ERROR)
+    return docs.invalid_selection
 
 
 async def show_block(height):

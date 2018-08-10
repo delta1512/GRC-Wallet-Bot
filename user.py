@@ -17,7 +17,7 @@ class User:
         self.address = k.get('address', None)
 
 
-    async def withdraw(self, amount, addr, fee):
+    async def withdraw(self, amount, addr, fee, donation=False):
         validation_result = can_transact(amount, fee, True)
         if isinstance(validation_result, bool):
             txid = await w.tx(addr, amount-fee)
@@ -29,6 +29,8 @@ class User:
                     fees.write(str(owed+fee))
                 self.active_tx = [amount, tx_time, txid.replace('\n', '')]
                 self.balance -= amount
+                if donation:
+                    self.donations += amount - fee
                 await q.save_users(self)
                 logging.info('Transaction successfully made with txid: %s', txid)
                 return docs.net_tx_success.format(e.GOOD, round(amount, 8), fee, txid, '\n\nYour new balance is {} GRC.'.format(round(self.balance, 2)))

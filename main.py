@@ -287,14 +287,14 @@ async def withdraw(ctx, address: str, amount: float):
 @in_udb()
 async def donate(ctx, selection: int, amount: float):
     user_obj = await q.get_user(ctx.author.id)
-    # use extras import
+    await ctx.send(extras.donate(user_obj, selection, extras.amt_filter(amount)))
 
 
 @client.command()
 @in_udb()
 async def rdonate(ctx, amount: float):
     user_obj = await q.get_user(ctx.author.id)
-    # use extras import
+    await ctx.send(await extras.rdonate(user_obj, extras.amt_filter(amount)))
 
 
 @client.command(aliases=['tip'])
