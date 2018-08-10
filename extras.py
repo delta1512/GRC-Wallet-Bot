@@ -8,6 +8,7 @@ import qrcode
 import grcconf as g
 import emotes as e
 import wallet as w
+import help_docs
 import docs
 import FAQ
 
@@ -105,20 +106,14 @@ def get_qr(string):
 
 def help_interface(query):
     try:
-        return docs.help_dict[query]
+        return help_docs.help_dict[query]
     except KeyError:
-        return docs.help_dict['default']
+        return help_docs.help_main()
 
 
-def faq(args):
-    if len(args) < 1:
-        return index_displayer('{}The following are currently documented FAQ articles. To read, type `%faq [selection no.]` '.format(e.BOOK), FAQ.index) + '\n*Thanks to LavRadis and Foxifi for making these resources.*'
-    try:
-        selection = int(args[0])-1
-    except ValueError:
-        return '{}Invalid selection.'.format(e.ERROR)
-    if 0 <= selection < len(FAQ.index):
-        article = FAQ.index[selection]
+def faq(query):
+    if 0 <= query < len(FAQ.index):
+        article = FAQ.index[query]
         return article[list(article.keys())[0]]
     return '{}Invalid selection.'.format(e.ERROR)
 

@@ -5,7 +5,7 @@ import discord
 ### GENERAL MESSAGES
 welcome = '{}Welcome to the GRC Wallet Bot! Type `%help` for more commands and be sure to read the `%terms` and `%rules`'.format(e.CELEBRATE)
 
-faucetmsg = '''The faucet currently contains `{} GRC` and has a timeout of {} hours.
+faucet_msg = '''The faucet currently contains `{} GRC` and has a timeout of {} hours.
 
 Donate GRC to this address `{}`
 or type `%fgive [amount-GRC]` to help refill the faucet.'''
@@ -31,6 +31,8 @@ balance_template = '''{}Your balance for: `{}`
 faucet_thankyou = '{}Thank you for donating to the faucet!'.format(e.HEART)
 
 rain_thankyou = '\n\nThank you for raining on the users! The rain pot is now at `{} GRC`'
+
+faq_msg = '{}The following are currently documented FAQ articles. To read, type `%faq [selection no.]` '.format(e.BOOK)
 
 ### SUCCESS MESSAGES
 new_user_success = '{}User account created successfully. Your address is `{}`'

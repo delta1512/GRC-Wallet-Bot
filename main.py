@@ -17,6 +17,7 @@ import queries as q
 from grc_pricebot import price_bot
 from blacklist import blist
 from rain_bot import rainbot
+from FAQ import index
 
 # Set up logging functionality
 handler = [RotatingFileHandler(g.log_dir+'walletbot.log', maxBytes=10**7, backupCount=3)]
@@ -106,6 +107,8 @@ async def on_command_error(ctx, error):
             return await ctx.send(f'{e.ERROR}Please specify an amount to give.')
         if ctx.command.name == 'rain':
             return await ctx.send(rbot.status())
+        if ctx.command.name == 'faq':
+            return await ctx.send(extras.index_displayer(docs.faq_msg, index) + '\n*Thanks to LavRadis and Foxifi for making these resources.*')
     if isinstance(error, commands.NoPrivateMessage):
         return await ctx.send(docs.pm_restrict)
 
@@ -208,7 +211,7 @@ async def new(ctx):
 
 @client.command(name='help')
 async def _help(ctx, command):  # Not overwriting the built-in help function
-    await ctx.send(extras.help_interface(command))
+    await ctx.send(embed=extras.help_interface(command))
 
 
 @client.command()
@@ -217,7 +220,7 @@ async def info(ctx):
 
 
 @client.command()
-async def faq(ctx, *query):
+async def faq(ctx, query: int):
     reply = extras.faq(query)
     if isinstance(reply, str):
         await ctx.send(reply)
@@ -232,7 +235,7 @@ async def faq(ctx, *query):
 
 
 @client.command()
-async def block(ctx, *query):
+async def block(ctx, query: int):
     await ctx.send(await extras.get_block(query))
 
 
