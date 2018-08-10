@@ -90,3 +90,13 @@ async def get_addr_uid_dict():
         user_data[tup[0]] = tup[1]
     db.close()
     return user_data
+
+
+async def apply_balance_changes(user_vals):
+    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
+    c = await db.cursor()
+    for uid in user_vals:
+        await c.execute('UPDATE {}.udb SET balance = balance + %s WHERE uid=%s'.format(g.udb_name),
+                        (user_vals[uid], uid))
+    await db.commit()
+    db.close()
