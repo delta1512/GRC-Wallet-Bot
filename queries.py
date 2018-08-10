@@ -7,7 +7,7 @@ import wallet as w
 async def uid_exists(uid):
     conn = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await conn.cursor()
-    await c.execute('SELECT uid FROM {}.udb WHERE uid=%s'.format(g.udb_name), (uid))
+    await c.execute('SELECT uid FROM {}.udb WHERE uid=%s'.format(g.db_name), (uid))
     response = await c.fetchall()
     conn.close()
     return response > 0
@@ -16,7 +16,7 @@ async def uid_exists(uid):
 async def get_user(uid):
     conn = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await conn.cursor()
-    await c.execute('SELECT * FROM {}.udb WHERE uid=%s'.format(g.udb_name), (uid))
+    await c.execute('SELECT * FROM {}.udb WHERE uid=%s'.format(g.db_name), (uid))
     result = await c.fetchone()
     db.close()
     if len(result) == 0: return None;
@@ -27,7 +27,7 @@ async def get_user(uid):
 async def deposit_exists(txidq):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
-    await c.execute('SELECT count(txid) FROM {}.deposits WHERE txid=%s'.format(g.udb_name), txidq)
+    await c.execute('SELECT count(txid) FROM {}.deposits WHERE txid=%s'.format(g.db_name), txidq)
     result = await c.fetchone()
     db.close()
     return result[0] > 0
@@ -36,7 +36,7 @@ async def deposit_exists(txidq):
 async def get_bal(uid):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
-    await c.execute('SELECT balance, address FROM {}.udb WHERE uid=%s'.format(g.udb_name), (uid))
+    await c.execute('SELECT balance, address FROM {}.udb WHERE uid=%s'.format(g.db_name), (uid))
     result = await c.fetchone()
     db.close()
     return result[0]
@@ -45,9 +45,9 @@ async def get_bal(uid):
 async def register_deposit(txid, amount, uid):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
-    await c.execute('INSERT INTO {}.deposits VALUES (%s, %s, %s);'.format(g.udb_name),
+    await c.execute('INSERT INTO {}.deposits VALUES (%s, %s, %s);'.format(g.db_name),
                     (txid, amount, uid))
-    await c.execute('UPDATE {}.udb SET balance=%s WHERE uid=%s;'.format(g.udb_name),
+    await c.execute('UPDATE {}.udb SET balance=%s WHERE uid=%s;'.format(g.db_name),
                     (await get_bal(uid) + amount, uid))
     await db.commit()
     db.close()
@@ -65,7 +65,7 @@ async def save_user(user_objs):
             lastTX_amt=%s,
             lastTX_time=%s,
             lastTX_txid=%s
-            WHERE uid=%s;'''.format(g.udb_name),
+            WHERE uid=%s;'''.format(g.db_name),
             (user.last_faucet, user.balance, user.donations,
             user.active_tx[0], user.active_tx[1], user.active_tx[2],
             user.userID))
@@ -76,7 +76,7 @@ async def save_user(user_objs):
 async def new_user(uid, address):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
-    await c.execute('INSERT INTO {}.udb VALUES (%s, %s, %s, %s, %s, %s, %s);'.format(g.udb_name),
+    await c.execute('INSERT INTO {}.udb VALUES (%s, %s, %s, %s, %s, %s, %s);'.format(g.db_name),
                     (uid, address, 0, 0, 0, 0, 0))
     await db.commit()
     db.close()
@@ -85,7 +85,7 @@ async def new_user(uid, address):
 async def get_addr_uid_dict():
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
-    await c.execute('SELECT address, uid FROM {}.udb'.format(g.udb_name))
+    await c.execute('SELECT address, uid FROM {}.udb'.format(g.db_name))
     user_data = {}
     for tup in await c.fetchall():
         user_data[tup[0]] = tup[1]
@@ -97,7 +97,7 @@ async def apply_balance_changes(user_vals):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
     for uid in user_vals:
-        await c.execute('UPDATE {}.udb SET balance = balance + %s WHERE uid=%s;'.format(g.udb_name),
+        await c.execute('UPDATE {}.udb SET balance = balance + %s WHERE uid=%s;'.format(g.db_name),
                         (user_vals[uid], uid))
     await db.commit()
     db.close()
@@ -106,7 +106,7 @@ async def apply_balance_changes(user_vals):
 async def get_blacklisted():
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
-    await c.execute('SELECT uid, channel FROM {}.blacklist'.format(g.udb_name))
+    await c.execute('SELECT uid, channel FROM {}.blacklist'.format(g.db_name))
     blacklisted = {}
     for tup in await c.fetchall():
         blacklisted[tup[0]] = tup[1]
@@ -116,7 +116,7 @@ async def get_blacklisted():
 async def commit_ban(user, channel):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
-    await c.execute('INSERT INTO {}.blacklist VALUES (%s, %s);'.format(g.udb_name), (user, channel))
+    await c.execute('INSERT INTO {}.blacklist VALUES (%s, %s);'.format(g.db_name), (user, channel))
     await db.commit()
     db.close()
 
@@ -124,7 +124,7 @@ async def commit_ban(user, channel):
 async def commit_unban(user):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
-    await c.execute('DELETE FROM {}.blacklist WHERE uid=%s;'.format(g.udb_name), (user))
+    await c.execute('DELETE FROM {}.blacklist WHERE uid=%s;'.format(g.db_name), (user))
     await db.commit()
     db.close()
 
@@ -139,6 +139,6 @@ async def add_to_fee_pool(fee):
         txid = await w.tx(g.admin_wallet, current_owed + fee)
         if issinstance(txid, str):
             await c.execute('UPDATE {}.admin_claims SET txid = %s WHERE txid="PENDING";'.format(udb_name), (txid))
-            await c.execute('INSERT INTO {}.admin_claims VALUES (%s, %s);'.format(g.udb_name), ('PENDING', 0))
+            await c.execute('INSERT INTO {}.admin_claims VALUES (%s, %s);'.format(g.db_name), ('PENDING', 0))
     await db.commit()
     db.close()

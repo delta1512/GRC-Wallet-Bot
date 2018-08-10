@@ -11,7 +11,7 @@ grc_pass = ''
 sql_db_host = '[host]'
 sql_db_usr = '[username]'
 sql_db_pass = '[password]'
-udb_name = '[name of database and table]'
+db_name = '[name of database and table]'
 log_dir = '[where to save the log file]'
 # All banned UIDs must be of type string
 banned = []
@@ -22,8 +22,7 @@ donation_accts = [
 
 ### CONFIGURATION CONSTANTS
 pre = '%'
-FEE_POOL = '[location of amount of fees owed file]'
-LST_BLK = '[location of last block height file (temporary)]'
+LST_BLK = '[location of last block height file]'
 MIN_TX = 0.001
 FEE_WDR_THRESH = 10       # (GRC) When to send out the collected fees to admin
 SLP = 30                  # Save interval
