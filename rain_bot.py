@@ -19,7 +19,8 @@ class Rainbot:
 
 
     async def do_rain(self, client):
-        ulist = await q.get_addr_uid_dict()
+        ulist_dict = await q.get_addr_uid_dict()
+        ulist = [ulist_dict[addr] for addr in ulist_dict]
         online = set()
         remainder = uniform(0.001, 0.01)
         rain_amt = round(self.RBOT.balance - remainder, 8)
