@@ -21,7 +21,7 @@ class Blacklister:
         self.blacklist[user] = priv_ban
         await q.commit_ban(user, priv_ban)
 
-    def remove_blist(self, user):
+    async def remove_blist(self, user):
         logging.info('Removed ban for UID: %s', user)
         if user in self.blacklist:
             await q.commit_unban(user)

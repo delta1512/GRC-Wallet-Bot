@@ -18,7 +18,7 @@ class User:
 
 
     async def withdraw(self, amount, addr, fee, donation=False):
-        validation_result = can_transact(amount, fee, True)
+        validation_result = self.can_transact(amount, fee, True)
         if isinstance(validation_result, bool):
             txid = await w.tx(addr, amount-fee)
             if isinstance(txid, str):
@@ -37,8 +37,8 @@ class User:
         return validation_result
 
 
-    async def send_internal_tx(other_user, amount, donation=False, faucet=None):
-        validation_result = can_transact(amount, 0)
+    async def send_internal_tx(self, other_user, amount, donation=False, faucet=None):
+        validation_result = self.can_transact(amount, 0)
         if isinstance(validation_result, bool):
             self.balance -= amount
             other_user.balance += amount
@@ -46,12 +46,12 @@ class User:
                 self.donations += amount
             if not faucet is None:
                 other_user.last_faucet = faucet
-            await q.save_users([self, other_user])
+            await q.save_user([self, other_user])
             return docs.internal_tx_success.format(e.GOOD, amount)
         return validation_result
 
 
-    def get_stats():
+    def get_stats(self):
         return docs.user_data_template.format(self.address, self.balance,
                     self.donations, self.last_faucet, self.active_tx[1],
                     self.active_tx[2], self.active_tx[0])

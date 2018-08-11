@@ -1,5 +1,5 @@
 from discord.ext import commands
-import commands as bot_com
+import extras
 
 
 class AdminCog:
@@ -12,13 +12,13 @@ class AdminCog:
     @commands.command()
     async def blist(self, ctx, *args):  # TODO: Add private message check -jorkermc
         if len(args) > 0:
-            await ctx.send(bot_com.blist_iface(args, self.blacklister))
+            await ctx.send(await extras.blist_iface(args, self.blacklister))
         else:
             await ctx.send(blacklister.get_blisted())
 
     @commands.command(name='bin')
     async def _bin(self, ctx, *args):  # Not overriding built-in function bin
-        await ctx.send(bot_com.burn_coins(args))
+        await ctx.send(await extras.burn_coins(args))
 
     @commands.command()
     async def stat(self, ctx, *args):

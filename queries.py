@@ -5,17 +5,17 @@ import grcconf as g
 import wallet as w
 
 async def uid_exists(uid):
-    conn = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
-    c = await conn.cursor()
+    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
+    c = await db.cursor()
     await c.execute('SELECT uid FROM {}.udb WHERE uid=%s'.format(g.db_name), (uid))
     response = await c.fetchall()
-    conn.close()
-    return response > 0
+    db.close()
+    return len(response) > 0
 
 
 async def get_user(uid):
-    conn = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
-    c = await conn.cursor()
+    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
+    c = await db.cursor()
     await c.execute('SELECT * FROM {}.udb WHERE uid=%s'.format(g.db_name), (uid))
     result = await c.fetchone()
     db.close()
@@ -39,7 +39,7 @@ async def get_bal(uid):
     await c.execute('SELECT balance, address FROM {}.udb WHERE uid=%s'.format(g.db_name), (uid))
     result = await c.fetchone()
     db.close()
-    return result[0]
+    return result
 
 
 async def register_deposit(txid, amount, uid):
@@ -54,7 +54,7 @@ async def register_deposit(txid, amount, uid):
 
 
 async def save_user(user_objs):
-    if not issinstance(user_objs, list): user_objs = [user_objs];
+    if not isinstance(user_objs, list): user_objs = [user_objs];
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
     for user in user_objs:
@@ -68,7 +68,7 @@ async def save_user(user_objs):
             WHERE uid=%s;'''.format(g.db_name),
             (user.last_faucet, user.balance, user.donations,
             user.active_tx[0], user.active_tx[1], user.active_tx[2],
-            user.userID))
+            user.usrID))
     await db.commit()
     db.close()
 

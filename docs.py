@@ -35,6 +35,19 @@ faq_msg = '{}The following are currently documented FAQ articles. To read, type 
 
 donation_recipient = '\nYou donated to {}!'
 
+info = discord.Embed(title='This bot is the original work of Delta and various contributors.', colour=discord.Colour.orange(),
+description='''
+The source code for the bot can be found [here](https://github.com/delta1512/GRC-Wallet-Bot).
+
+If there are any problems, glitches or crashes, please notify me or the contributors below as soon as possible. Any queries can be sent to `boincosdelta@gmail.com`.
+
+Notable mentions:
+- [Jorkermc](https://github.com/jorkermc)
+- Nathanielcwm
+- Foxifi
+- [LavRadis](https://steemit.com/@lavradis)
+''')
+
 
 ### SUCCESS MESSAGES
 new_user_success = '{}User account created successfully. Your address is `{}`'

@@ -127,15 +127,15 @@ def moon():
 
 #ban [user] [chan]
 #unban [user]
-def blist_iface(args, blist_obj):
+async def blist_iface(args, blist_obj):
     if args[0] == 'ban':
         if len(args) == 3:
-            blist_obj.new_blist(args[1], True if args[2] == 'priv' else False)
+            await blist_obj.new_blist(args[1], True if args[2] == 'priv' else False)
             return e.GOOD[:-3]
         return '{}Invalid args'.format(e.ERROR)
     elif args[0] == 'unban':
         if len(args) == 2:
-            blist_obj.remove_blist(args[1])
+            await blist_obj.remove_blist(args[1])
             return e.GOOD[:-3]
         return '{}Invalid args'.format(e.ERROR)
     else:
@@ -144,7 +144,10 @@ def blist_iface(args, blist_obj):
 
 async def burn_coins(args):
     if len(args) == 2:
-        amt = 0 if (amt_filter(args[1]) == None)
+        if (amt_filter(args[1]) is None):
+            amt = 0
+        else:
+            amt = amt_filter(args[1])
         from_user = await q.get_user(args[0])
         if args[0] != g.owner_id and (not from_user is None):
             to_user = await q.get_user(g.owner_id)
@@ -181,5 +184,5 @@ Faucet: {}
 Withdrawals: {}
 Donations: {}
 '''.format(e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(user_obj.next_fct()-ctime)))) if not user_obj.can_faucet() else e.GOOD[:-3],
-            e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(user_obj.next_wdr()-ctime)))) if not user_obj.can_withdraw() else e.GOOD[:-3],
-            e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(user_obj.next_dnt()-ctime)))) if not user_obj.can_donate() else e.GOOD[:-3])
+            e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(user_obj.next_net_tx()-ctime)))) if not user_obj.can_net_tx() else e.GOOD[:-3],
+            e.CANNOT[:-3] + ' ({})'.format(time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(user_obj.next_net_tx()-ctime)))) if not user_obj.can_net_tx() else e.GOOD[:-3])

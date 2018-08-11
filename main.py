@@ -1,6 +1,6 @@
 import asyncio
 import logging
-import time
+from time import time, mktime, strptime
 from logging.handlers import RotatingFileHandler
 from os import path
 
@@ -14,9 +14,10 @@ import errors
 import grcconf as g
 import wallet as w
 import queries as q
+import help_docs
 from grc_pricebot import price_bot
 from blacklist import Blacklister
-from rain_bot import rainbot
+from rain_bot import Rainbot
 from FAQ import index
 
 # Set up logging functionality
@@ -27,6 +28,7 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s: %(message)s',
                     handlers=handler)
 
 client = commands.Bot(command_prefix=g.pre)
+client.remove_command('help')
 FCT = 'FAUCET'
 RN = 'RAIN'
 latest_users = {}
@@ -37,30 +39,30 @@ INITIALISED = False
 
 
 def in_udb():
-    def predicate(ctx):
-        if not await q.uid_exists(ctx.author.id):
+    async def predicate(ctx):
+        if not await q.uid_exists(str(ctx.author.id)):
             raise errors.NotInUDB()
         return True
-    return commands.check(predicate())
+    return commands.check(predicate)
 
 
 def limit_to_main_channel():
     def predicate(ctx):
-        return ctx.channel.id == g.main_channel
+        return str(ctx.channel.id) == g.main_channel
     return commands.check(predicate)
 
-
+# DEPRECATED
 def checkspam(user): # Possible upgrade: use discord.utils.snowflake_time to get their discord account creation date
     global latest_users
     if user in latest_users:
-        if time.time()-latest_users[user] > 1:
-            latest_users[user] = time.time()
+        if time()-latest_users[user] > 1:
+            latest_users[user] = time()
             return False
         else:
-            latest_users[user] = time.time()
+            latest_users[user] = time()
             return True
     else:
-        latest_users[user] = time.time()
+        latest_users[user] = time()
         return False
 
 
@@ -70,7 +72,7 @@ def user_time(crtime):
         crtime = crtime[:crtime.index('.')]
     except ValueError:
         pass
-    return time.mktime(time.strptime(crtime, '%Y-%m-%d %H:%M:%S'))
+    return mktime(strptime(crtime, '%Y-%m-%d %H:%M:%S'))
 
 
 async def rain_loop():
@@ -93,7 +95,7 @@ async def on_command_error(ctx, error):
         if ctx.command.name == 'withdraw':
             return await ctx.send(f'{e.INFO}To withdraw from your account type: `%wdr [address to send to] [amount-GRC]`\nA service fee of {g.tx_fee} GRC is subtracted from what you send. If you wish to send GRC to someone in the server, use `%give`')
         if ctx.command.name == 'donate':
-            return await ctx.send(extras.donate_list(f'{e.GIVE}Be generous! Below are possible donation options.\nTo donate, type `%donate [selection no.] [amount-GRC]`\n', g.donation_accts))
+            return await ctx.send(extras.index_displayer(f'{e.GIVE}Be generous! Below are possible donation options.\nTo donate, type `%donate [selection no.] [amount-GRC]`\n', g.donation_accts))
         if ctx.command.name == 'rdonate':
             return await ctx.send(f'{e.GIVE}To donate to a random contributor type: `%rdonate [amount-GRC]`')
         if ctx.command.name == 'give':
@@ -106,6 +108,8 @@ async def on_command_error(ctx, error):
             return await ctx.send(extras.index_displayer(docs.faq_msg, index) + '\n*Thanks to LavRadis and Foxifi for making these resources.*')
         if ctx.command.name == 'block':
             return await ctx.send(extras.show_block(await w.query('getblockcount', [])))
+        if ctx.command.name == 'help':
+            return await ctx.send(help_docs.help_main())
     if isinstance(error, commands.NoPrivateMessage):
         return await ctx.send(docs.pm_restrict)
 
@@ -115,17 +119,17 @@ async def on_ready():
     global blacklister, rbot
     if hasattr(client, 'initialised'):
         return  # Prevents multiple on_ready call
-    await client.remove_command('help')
+
     if await w.query('getblockcount', []) > 5:  # 5 is largest error return value
         logging.info('Gridcoin client is online')
     else:
         logging.error('GRC client is not online')
-        await bot.logout()
+        await client.logout()
         return
 
     if not await q.uid_exists(FCT):
         logging.error('Could not connect to SQL database')
-        await bot.logout()
+        await client.logout()
         return
     else:
         logging.info('SQL DB online and accessible')
@@ -135,29 +139,29 @@ async def on_ready():
         logging.info('Blacklisting service loaded correctly')
     except Exception:
         logging.error('Blacklisting service failed to load')
-        await bot.logout()
+        await client.logout()
         return
-
+    '''
     for extension in ['cogs.admin']:
         try:
             client.load_extension(extension)
         except Exception as E:
             logging.error('Failed to load extension %s. Exception: %s', (extension, E))
     client.cogs['cogs.admin'].blacklister = blacklister
-
+    '''
     if await w.unlock() is None:
         logging.info('Wallet successfully unlocked')
     else:
         logging.error('There was a problem trying to unlock the gridcoin wallet')
-        await bot.logout()
+        await client.logout()
         return
 
     try:
         rbot = Rainbot(await q.get_user(RN))
         logging.info('Rainbot service loaded correctly')
-    except:
-        logging.error('Rainbot service failed to load')
-        await bot.logout()
+    except Exception as E:
+        logging.error('Rainbot service failed to load: %s', E)
+        await client.logout()
         return
 
     client.initialised = True
@@ -181,11 +185,11 @@ async def status(ctx):
 
 @client.command()
 async def new(ctx):
-    if not await uid_exists(ctx.author.id):
+    if not await q.uid_exists(str(ctx.author.id)):
         await ctx.send(docs.welcome)
         try:
             addr = await w.query('getnewaddress', [])
-            await q.new_user(ctx.author.id, addr)
+            await q.new_user(str(ctx.author.id), addr)
             await ctx.send(docs.new_user_success.format(e.GOOD, addr))
         except Exception:
             await ctx.send(docs.new_user_fail)
@@ -222,7 +226,7 @@ async def faq(ctx, query: int):
         await ctx.send(reply)
     else:
         if ctx.author.dm_channel is None:
-            ctx.author.create_dm()
+            await ctx.author.create_dm()
         try:
             await ctx.author.send(embed=reply)
             await ctx.message.add_reaction('\u2705')  # WHITE HEAVY CHECK MARK
@@ -260,22 +264,22 @@ async def terms(ctx):
 @client.command(aliases=['bal'])
 @in_udb()
 async def balance(ctx):
-    data = await q.get_bal(ctx.author.id)
-    await ctx.send(docs.balance_template.format(data[1], data[0])) # emoji, address, balance, priceUSD
+    data = await q.get_bal(str(ctx.author.id))
+    await ctx.send(docs.balance_template.format(e.BAL, data[1], data[0], round(await price_fetcher.conv(data[0]), 3))) # emoji, address, balance, priceUSD
 
 
 @client.command(aliases=['addr'])
 @in_udb()
 @limit_to_main_channel()
 async def address(ctx):
-    await ctx.send((await q.get_bal(ctx.author.id))[1])
+    await ctx.send((await q.get_bal(str(ctx.author.id)))[1])
 
 
 @client.command(aliases=['wdr', 'send'])
 @in_udb()
 @limit_to_main_channel()
 async def withdraw(ctx, address: str, amount: float):
-    user_obj = await q.get_user(ctx.author.id)
+    user_obj = await q.get_user(str(ctx.author.id))
     await ctx.send(await user_obj.withdraw(extras.amt_filter(amount), address, g.tx_fee))
 
 
@@ -283,15 +287,15 @@ async def withdraw(ctx, address: str, amount: float):
 @in_udb()
 @limit_to_main_channel()
 async def donate(ctx, selection: int, amount: float):
-    user_obj = await q.get_user(ctx.author.id)
-    await ctx.send(extras.donate(user_obj, selection, extras.amt_filter(amount)))
+    user_obj = await q.get_user(str(ctx.author.id))
+    await ctx.send(await extras.donate(user_obj, selection, extras.amt_filter(amount)))
 
 
 @client.command()
 @in_udb()
 @limit_to_main_channel()
 async def rdonate(ctx, amount: float):
-    user_obj = await q.get_user(ctx.author.id)
+    user_obj = await q.get_user(str(ctx.author.id))
     await ctx.send(await extras.rdonate(user_obj, extras.amt_filter(amount)))
 
 
@@ -299,19 +303,19 @@ async def rdonate(ctx, amount: float):
 @commands.guild_only()
 @in_udb()
 async def give(ctx, receiver: discord.User, amount: float):
-    if receiver.id == ctx.author.id:
+    if str(receiver.id) == str(ctx.author.id):
         return await ctx.send(docs.cannot_send_self)
-    sender_obj = await q.get_user(ctx.author.id)
-    receiver_obj = await q.get_user(receiver.id)
+    sender_obj = await q.get_user(str(ctx.author.id))
+    receiver_obj = await q.get_user(str(receiver.id))
     if receiver_obj is None:
         return await ctx.send(f'{e.ERROR}Invalid user specified.')
-    await ctx.send(await sender_obj.send_internal_tx(receiver_obj, amount))
+    await ctx.send(await sender_obj.send_internal_tx(receiver_obj, extras.amt_filter(amount)))
 
 
 @client.command()
 @in_udb()
 async def fgive(ctx, amount: int):
-    user_obj = await q.get_user(ctx.author.id)
+    user_obj = await q.get_user(str(ctx.author.id))
     await ctx.send(await user_obj.send_internal_tx(await q.get_user(FCT), amount, True))
     await ctx.send(docs.faucet_thankyou)
 
@@ -322,14 +326,17 @@ async def fgive(ctx, amount: int):
 @limit_to_main_channel()
 async def faucet(ctx):
     faucet_obj = await q.get_user(FCT) # This is highly inefficient, an alternative is to be found
-    user_obj = await q.get_user(ctx.author.id)
-    await ctx.send(await extras.faucet(faucet_obj, user_obj))
+    user_obj = await q.get_user(str(ctx.author.id))
+    result = await extras.faucet(faucet_obj, user_obj)
+    if not result.startswith(e.CANNOT):
+        await ctx.send(docs.faucet_msg.format(faucet_obj.balance, faucet_obj.address))
+    await ctx.send(result)
 
 
 @client.command()
 async def rain(ctx, amount: float):
-    user_obj = await q.get_user(ctx.author.id)
-    await ctx.send(rbot.contribute(extras.amt_fileter(amount), user_obj))
+    user_obj = await q.get_user(str(ctx.author.id))
+    await ctx.send(rbot.contribute(extras.amt_filter(amount), user_obj))
 
 
 @client.command()
@@ -337,16 +344,16 @@ async def rain(ctx, amount: float):
 @limit_to_main_channel()
 async def qr(ctx, text=None):
     if text is None:
-        addr = (await q.get_bal(ctx.author.id))[1]
+        addr = (await q.get_bal(str(ctx.author.id)))[1]
         return await ctx.send(file=discord.File(extras.get_qr(addr), filename=f'{ctx.author.name}.png'))
     await ctx.send(file=discord.File(extras.get_qr(text), filename=f'{ctx.author.name}.png'))
 
 
-@client.command()
+@client.command(name='time')
 @in_udb()
 @limit_to_main_channel()
-async def time(ctx):
-    user_obj = await q.get_user(ctx.author.id)
+async def _time(ctx):
+    user_obj = await q.get_user(str(ctx.author.id))
     await ctx.send(extras.check_times(user_obj))
 
 
@@ -359,8 +366,37 @@ async def moon(ctx):
 @in_udb()
 @limit_to_main_channel()
 async def account(ctx):
-    user_obj = await q.get_user(ctx.author.id)
+    user_obj = await q.get_user(str(ctx.author.id))
     await ctx.send(user_obj.get_stats())
+
+
+
+
+
+
+@commands.command()
+async def blist(self, ctx, *args):  # TODO: Add private message check -jorkermc
+    if len(args) > 0:
+        await ctx.send(await extras.blist_iface(args, self.blacklister))
+    else:
+        await ctx.send(blacklister.get_blisted())
+
+@commands.command(name='bin')
+async def _bin(self, ctx, *args):  # Not overriding built-in function bin
+    await ctx.send(await extras.burn_coins(args))
+
+@commands.command()
+async def stat(self, ctx, *args):
+    if len(args) == 0:
+        user_obj = await q.get_user(ctx.author.id)
+    else:
+        user_obj = await q.get_user(args[0])
+        if user_obj is None: return;
+    await ctx.send(extras.user_stats(user_obj, client))
+
+
+
+
 
 
 @client.event
@@ -372,17 +408,18 @@ async def on_message(msg):
     uname = a.name
     user = a.id
     iscommand = cmd.startswith(g.pre)
+    # DEPRECATED, Remove checkspam()
     if a.bot or checkspam(user) or blacklister.is_banned(user, is_private):
         return
-    if iscommand and time.time() < user_time(a.created_at)+24*60*60*g.NEW_USR_TIME:
+    if iscommand and time() < user_time(a.created_at)+24*60*60*g.NEW_USR_TIME:
         return await msg.channel.send(docs.too_new_msg)
     if iscommand and (len(cmd) > 1):
         cmd = cmd[1:]
-        log_msg = 'COMMAND "%s" executed by %s (%s){}'
+        log_msg = 'COMMAND "%s" executed by %s (%s)'
         if is_private:
-            log_msg.format(' in private channel')
+            log_msg.format(log_msg + ' in private channel')
         else:
-            log_msg.format('')
+            log_msg.format(log_msg)
         logging.info(log_msg, cmd.split()[0], user, uname)
     await client.process_commands(msg)
 
