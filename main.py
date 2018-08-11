@@ -38,10 +38,17 @@ INITIALISED = False
 
 def in_udb():
     def predicate(ctx):
-        if await q.uid_exists(ctx.author.id): # Add async decorators here if needed
+        if not await q.uid_exists(ctx.author.id):
             raise errors.NotInUDB()
         return True
     return commands.check(predicate())
+
+
+def limit_to_main_channel():
+    def predicate(ctx):
+        return ctx.channel.id == g.main_channel
+    return commands.check(predicate)
+
 
 def checkspam(user): # Possible upgrade: use discord.utils.snowflake_time to get their discord account creation date
     global latest_users
@@ -167,6 +174,7 @@ async def on_ready():
 
 
 @client.command()
+@limit_to_main_channel()
 async def status(ctx):
     await ctx.send(await extras.dump_cfg(price_fetcher))
 
@@ -195,16 +203,19 @@ async def new(ctx):
 
 
 @client.command(name='help')
+@limit_to_main_channel()
 async def _help(ctx, command):  # Not overwriting the built-in help function
     await ctx.send(embed=extras.help_interface(command))
 
 
 @client.command()
+@limit_to_main_channel()
 async def info(ctx):
     await ctx.send(embed=docs.info)
 
 
 @client.command()
+@limit_to_main_channel()
 async def faq(ctx, query: int):
     reply = extras.faq(query)
     if isinstance(reply, str):
@@ -255,12 +266,14 @@ async def balance(ctx):
 
 @client.command(aliases=['addr'])
 @in_udb()
+@limit_to_main_channel()
 async def address(ctx):
     await ctx.send((await q.get_bal(ctx.author.id))[1])
 
 
 @client.command(aliases=['wdr', 'send'])
 @in_udb()
+@limit_to_main_channel()
 async def withdraw(ctx, address: str, amount: float):
     user_obj = await q.get_user(ctx.author.id)
     await ctx.send(await user_obj.withdraw(extras.amt_filter(amount), address, g.tx_fee))
@@ -268,6 +281,7 @@ async def withdraw(ctx, address: str, amount: float):
 
 @client.command()
 @in_udb()
+@limit_to_main_channel()
 async def donate(ctx, selection: int, amount: float):
     user_obj = await q.get_user(ctx.author.id)
     await ctx.send(extras.donate(user_obj, selection, extras.amt_filter(amount)))
@@ -275,6 +289,7 @@ async def donate(ctx, selection: int, amount: float):
 
 @client.command()
 @in_udb()
+@limit_to_main_channel()
 async def rdonate(ctx, amount: float):
     user_obj = await q.get_user(ctx.author.id)
     await ctx.send(await extras.rdonate(user_obj, extras.amt_filter(amount)))
@@ -304,6 +319,7 @@ async def fgive(ctx, amount: int):
 @client.command(aliases=['fct', 'get'])
 @commands.guild_only()
 @in_udb()
+@limit_to_main_channel()
 async def faucet(ctx):
     faucet_obj = await q.get_user(FCT) # This is highly inefficient, an alternative is to be found
     user_obj = await q.get_user(ctx.author.id)
@@ -318,6 +334,7 @@ async def rain(ctx, amount: float):
 
 @client.command()
 @commands.guild_only()
+@limit_to_main_channel()
 async def qr(ctx, text=None):
     if text is None:
         addr = (await q.get_bal(ctx.author.id))[1]
@@ -327,6 +344,7 @@ async def qr(ctx, text=None):
 
 @client.command()
 @in_udb()
+@limit_to_main_channel()
 async def time(ctx):
     user_obj = await q.get_user(ctx.author.id)
     await ctx.send(extras.check_times(user_obj))
@@ -339,6 +357,7 @@ async def moon(ctx):
 
 @client.command(aliases=['me', 'acc'])
 @in_udb()
+@limit_to_main_channel()
 async def account(ctx):
     user_obj = await q.get_user(ctx.author.id)
     await ctx.send(user_obj.get_stats())
