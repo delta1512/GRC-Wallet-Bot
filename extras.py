@@ -5,6 +5,7 @@ import io
 
 import qrcode
 
+import queries as q
 import grcconf as g
 import emotes as e
 import wallet as w

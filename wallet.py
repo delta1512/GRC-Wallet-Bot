@@ -53,7 +53,6 @@ async def get_block(height):
         data['Timestamp: '] = block_data['time']
         data['Difficulty: '] = "{:4f}".format(block_data['difficulty'])
         data['No. of TXs: '] = len(block_data['tx'])
-        data['Mint Type: '] = 'POR' if ('proof-of-research' in block_data['flags']) else 'POS'
         data['Amount Minted: '] = block_data['mint']
         data['Superblock: '] = 'No' if (block_data['IsSuperBlock'] == 0) else 'Yes'
         return data
