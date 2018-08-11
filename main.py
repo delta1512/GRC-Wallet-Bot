@@ -52,7 +52,7 @@ def limit_to_main_channel():
         return str(ctx.channel.id) == g.main_channel
     return commands.check(predicate)
 
-# DEPRECATED
+
 def checkspam(user): # Possible upgrade: use discord.utils.snowflake_time to get their discord account creation date
     global latest_users
     if user in latest_users:
@@ -371,10 +371,15 @@ async def account(ctx):
     await ctx.send(user_obj.get_stats())
 
 
+@client.command()
+async def ping(ctx):
+    t1 = perf_counter()
+    t2 = perf_counter()
+    time_delta = round((t2 - t1) * 1000)
+    await ctx.send(f"`{time_delta}ms`")
 
 
-
-
+### ADMINISTRATION COMMANDS
 @commands.command()
 async def blist(self, ctx, *args):  # TODO: Add private message check -jorkermc
     if len(args) > 0:
@@ -382,9 +387,11 @@ async def blist(self, ctx, *args):  # TODO: Add private message check -jorkermc
     else:
         await ctx.send(blacklister.get_blisted())
 
+
 @commands.command(name='bin')
 async def _bin(self, ctx, *args):  # Not overriding built-in function bin
     await ctx.send(await extras.burn_coins(args))
+
 
 @commands.command()
 async def stat(self, ctx, *args):
@@ -396,15 +403,6 @@ async def stat(self, ctx, *args):
     await ctx.send(extras.user_stats(user_obj, client))
 
 
-@client.command()
-async def ping(ctx):
-    t1 = perf_counter()
-    await ctx.trigger_typing()
-    t2 = perf_counter()
-    time_delta = round((t2 - t1) * 1000)
-    await ctx.send(f"`{time_delta}ms`")
-
-
 @client.event
 async def on_message(msg):
     cmd = msg.content
@@ -414,17 +412,23 @@ async def on_message(msg):
     uname = a.name
     user = a.id
     iscommand = cmd.startswith(g.pre)
-    # DEPRECATED, Remove checkspam()
-    if a.bot or checkspam(user) or blacklister.is_banned(user, is_private):
-        return
+    '''
     counter = 0
     async for message in chan.history(limit=20, after=datetime.now() - timedelta(seconds=7.5)):
         if message.author == a:
             counter += 1
-    if counter >= 10:
+    if counter >= 2:
         pass  # TODO: Add the ban mechanism -jorkermc to Delta
+    '''
+    # Check for if the user is a bot, spamming or is blacklisted
+    if a.bot or checkspam(user) or blacklister.is_banned(user, is_private):
+        return
+
+    # Check for new user
     if iscommand and time() < user_time(a.created_at)+24*60*60*g.NEW_USR_TIME:
         return await msg.channel.send(docs.too_new_msg)
+
+    # Execute command if it is more than a single prefix character
     if iscommand and (len(cmd) > 1):
         cmd = cmd[1:]
         log_msg = 'COMMAND "%s" executed by %s (%s)'
