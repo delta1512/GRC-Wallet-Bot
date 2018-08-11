@@ -1,8 +1,9 @@
 import asyncio
 import logging
-from time import time, mktime, strptime
+from time import time, mktime, strptime, perf_counter
 from logging.handlers import RotatingFileHandler
-from os import path
+from datetime import datetime, timedelta
+from os import path # Unused import?
 
 import discord
 from discord.ext import commands
@@ -395,8 +396,13 @@ async def stat(self, ctx, *args):
     await ctx.send(extras.user_stats(user_obj, client))
 
 
-
-
+@client.command()
+async def ping(ctx):
+    t1 = perf_counter()
+    await ctx.trigger_typing()
+    t2 = perf_counter()
+    time_delta = round((t2 - t1) * 1000)
+    await ctx.send(f"`{time_delta}ms`")
 
 
 @client.event
@@ -411,6 +417,12 @@ async def on_message(msg):
     # DEPRECATED, Remove checkspam()
     if a.bot or checkspam(user) or blacklister.is_banned(user, is_private):
         return
+    counter = 0
+    async for message in chan.history(limit=20, after=datetime.now() - timedelta(seconds=7.5)):
+        if message.author == a:
+            counter += 1
+    if counter >= 10:
+        pass  # TODO: Add the ban mechanism -jorkermc to Delta
     if iscommand and time() < user_time(a.created_at)+24*60*60*g.NEW_USR_TIME:
         return await msg.channel.send(docs.too_new_msg)
     if iscommand and (len(cmd) > 1):
