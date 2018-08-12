@@ -76,9 +76,7 @@ invalid_selection = '{}Invalid selection.'.format(e.ERROR)
 
 insufficient_funds = '{}You have insufficient funds to make that transfer.'.format(e.ERROR)
 
-more_than_fee = '{}You must provide an amount that is greater than the fee (`{} GRC`).'.format(e.ERROR, g.tx_fee)
-
-more_than_min = '{}You must provide an amount that is greater than the minimum allowed transaction (`{} GRC`).'.format(e.ERROR, g.MIN_TX)
+more_than_fee_and_min = '{}You must provide an amount that is greater than the fee and minimum (`{} GRC`).'.format(e.ERROR, g.tx_fee + g.MIN_TX)
 
 tx_error = '{}Error: A transaction could not be made.'.format(e.ERROR)
 

@@ -4,6 +4,7 @@ owner_id = ''             # Discord ID of owner
 main_server = ''          # Main server ID
 main_channel = ''         # Channel for %faucet
 tx_fee = 0.5
+net_fee = 0.0001
 tx_timeout = 1            # Confirmations
 rpc_usr = ''
 rpc_pass = ''

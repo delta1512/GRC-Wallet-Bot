@@ -29,7 +29,7 @@ class User:
                 self.balance -= amount
                 if donation:
                     self.donations += amount - fee
-                await q.save_users(self)
+                await q.save_user(self)
                 logging.info('Transaction successfully made with txid: %s', txid)
                 return docs.net_tx_success.format(e.GOOD, round(amount, 8), fee, txid, '\n\nYour new balance is {} GRC.'.format(round(self.balance, 2)))
             logging.error('Failed transaction. Addr: %s, Amt: %s, exit_code: %s', addr, amount, txid)
@@ -78,6 +78,5 @@ class User:
             if not self.can_net_tx(): return docs.wait_confirm;
         if amount is None: return docs.invalid_val;
         if amount > self.balance: return docs.insufficient_funds;
-        if fee != 0 and amount < (fee + g.MIN_TX): return docs.more_than_fee;
-        if amount < g.MIN_TX: return docs.more_than_min;
+        if fee != 0 and amount < (fee + g.MIN_TX): return docs.more_than_fee_and_min;
         return True # If values passed all checks

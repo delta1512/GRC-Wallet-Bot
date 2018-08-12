@@ -88,7 +88,8 @@ async def rain_loop():
     while True:
         await asyncio.sleep(5)
         if rbot.check_rain():
-            await rbot.do_rain(client)
+            pass
+            #await rbot.do_rain(client)
 
 
 #@client.event
@@ -193,12 +194,12 @@ async def new(ctx):
             addr = await w.query('getnewaddress', [])
             await q.new_user(str(ctx.author.id), addr)
             await ctx.send(docs.new_user_success.format(e.GOOD, addr))
-        except Exception:
-            await ctx.send(docs.new_user_fail)
-            return
+        except Exception as E:
+            logging.error('Could not create new user for %s. Error: %s', ctx.author.id, E)
+            return await ctx.send(docs.new_user_fail)
 
         if ctx.author.dm_channel is None:
-            ctx.author.create_dm()
+            await ctx.author.create_dm()
         try:
             await ctx.author.send(embed=docs.rules)
             await ctx.author.send(embed=docs.terms)
@@ -231,7 +232,7 @@ async def faq(ctx, query: int):
             await ctx.author.create_dm()
         try:
             await ctx.author.send(embed=reply)
-            await ctx.message.add_reaction('\u2705')  # WHITE HEAVY CHECK MARK
+            await ctx.message.add_reaction(e.WHITE_CHECK)
         except discord.errors.Forbidden:
             await ctx.send(docs.fail_dm)
 
@@ -244,10 +245,10 @@ async def block(ctx, query: int):
 @client.command()
 async def rules(ctx):
     if ctx.author.dm_channel is None:
-        ctx.author.create_dm()
+        await ctx.author.create_dm()
     try:
         await ctx.author.send(embed=docs.rules)
-        await ctx.message.add_reaction('\u2705')  # WHITE HEAVY CHECK MARK
+        await ctx.message.add_reaction(e.WHITE_CHECK)
     except discord.errors.Forbidden:
         await ctx.send(docs.rule_fail_send)
 
@@ -255,10 +256,10 @@ async def rules(ctx):
 @client.command()
 async def terms(ctx):
     if ctx.author.dm_channel is None:
-        ctx.author.create_dm()
+        await ctx.author.create_dm()
     try:
         await ctx.author.send(embed=docs.terms)
-        await ctx.message.add_reaction('\u2705')  # WHITE HEAVY CHECK MARK
+        await ctx.message.add_reaction(e.WHITE_CHECK)
     except discord.errors.Forbidden:
         await ctx.send(docs.rule_fail_send)
 
