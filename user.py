@@ -4,8 +4,10 @@ import logging
 import grcconf as g
 import emotes as e
 import wallet as w
+import queries as q
+import docs
 
-class usr:
+class User:
     def __init__(self, uid, **k):
         self.usrID = uid
         self.balance = k.get('balance', 0.0)
@@ -13,52 +15,68 @@ class usr:
         self.donations = k.get('donations', 0.0)
         self.last_faucet = k.get('last_faucet', 0)
         self.address = k.get('address', None)
-        if self.address is None:
-            raise ValueError('[ERROR] Null value passed to user instantiation')
 
-    async def withdraw(self, amount, addr):
-        if self.can_withdraw():
-            txid = await w.tx(addr, amount-g.tx_fee)
+
+    async def withdraw(self, amount, addr, fee, donation=False):
+        validation_result = self.can_transact(amount, fee, True)
+        if isinstance(validation_result, bool):
+            txid = await w.tx(addr, amount-fee)
             if isinstance(txid, str):
-                with open(g.FEE_POOL, 'r') as fees:
-                    owed = float(fees.read())
-                with open(g.FEE_POOL, 'w') as fees:
-                    fees.write(str(owed+g.tx_fee))
-                self.active_tx = [amount, round(time()), txid.replace('\n', '')]
+                tx_time = round(time())
+                if fee == g.tx_fee:
+                    await q.add_to_fee_pool(fee)
+                self.active_tx = [amount, tx_time, txid.replace('\n', '')]
                 self.balance -= amount
+                if donation:
+                    self.donations += amount - fee
+                await q.save_user(self)
                 logging.info('Transaction successfully made with txid: %s', txid)
-                return '{}Transaction of `{} GRC` (inc. {} GRC fee) was successful, ID: `{}`{}'.format(e.GOOD, round(amount, 8), g.tx_fee, txid, '\n\nYour new balance is {} GRC.'.format(round(self.balance, 2)))
+                return docs.net_tx_success.format(e.GOOD, round(amount, 8), fee, txid, '\n\nYour new balance is {} GRC.'.format(round(self.balance, 2)))
             logging.error('Failed transaction. Addr: %s, Amt: %s, exit_code: %s', addr, amount, txid)
-            return '{}Error: The withdraw operation failed.'.format(e.ERROR)
-        return '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
+            return docs.tx_error
+        return validation_result
 
-    async def donate(self, addr, amount):
-        if self.can_donate():
-            txid = await w.tx(addr, amount-0.0001)
-            if isinstance(txid, str):
-                self.active_tx = [amount, round(time()), txid.replace('\n', '')]
+
+    async def send_internal_tx(self, other_user, amount, donation=False, faucet=None):
+        validation_result = self.can_transact(amount, 0)
+        if isinstance(validation_result, bool):
+            self.balance -= amount
+            other_user.balance += amount
+            if donation:
                 self.donations += amount
-                self.balance -= amount
-                logging.info('Donation successfully made with txid: %s', txid)
-                return '{}Donation of `{} GRC` was successful, ID: `{}`{}'.format(e.GOOD, round(amount, 8), txid, '\n\nThankyou for donating! Your new balance is {} GRC.'.format(round(self.balance, 2)))
-            logging.error('Failed transaction. Addr: %s, Amt: %s, exit_code: %s', addr, amount, txid)
-            return '{}Error: Transaction was unsuccessful.'.format(e.ERROR)
-        return '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
+            if not faucet is None:
+                other_user.last_faucet = faucet
+            await q.save_user([self, other_user])
+            return docs.internal_tx_success.format(e.GOOD, amount)
+        return validation_result
 
-    def next_wdr(self):
+
+    def get_stats(self):
+        return docs.user_data_template.format(self.address, self.balance,
+                    self.donations, self.last_faucet, self.active_tx[1],
+                    self.active_tx[2], self.active_tx[0])
+
+
+    def next_net_tx(self):
         return self.active_tx[1]+1.5*60*g.tx_timeout
 
-    def next_dnt(self):
-        return self.active_tx[1]+1.5*60*(g.tx_timeout/2)
 
     def next_fct(self):
         return self.last_faucet+3600*g.FCT_REQ_LIM
 
-    def can_withdraw(self):
-        return time() > self.next_wdr()
 
-    def can_donate(self):
-        return time() > self.next_dnt()
+    def can_net_tx(self):
+        return time() > self.next_net_tx()
+
 
     def can_faucet(self):
         return time() > self.next_fct()
+
+
+    def can_transact(self, amount, fee, net_tx=False):
+        if net_tx:
+            if not self.can_net_tx(): return docs.wait_confirm;
+        if amount is None: return docs.invalid_val;
+        if amount > self.balance: return docs.insufficient_funds;
+        if fee != 0 and amount < (fee + g.MIN_TX): return docs.more_than_fee_and_min;
+        return True # If values passed all checks

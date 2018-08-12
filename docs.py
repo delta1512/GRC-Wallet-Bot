@@ -2,132 +2,40 @@ import grcconf as g
 import emotes as e
 import discord
 
-hlp = '''```
-Type %help [topic] for more detailed information about the following:
-- new
-- balance
-- withdraw
-- donate
-- rdonate
-- give
-- rain
-- faucet
-- qr
-- faq
-- block
-- status
-- time
-- rules
-- terms
-- info
-```'''
+### GENERAL MESSAGES
+welcome = '{}Welcome to the GRC Wallet Bot! Type `%help` for more commands and be sure to read the `%terms` and `%rules`'.format(e.CELEBRATE)
 
-new = '''```
-Create an new account: %new
-    An account is required to use the bot. (No personal details required)
-```'''
+faucet_msg = '''The faucet currently contains `{} GRC`.
 
-bal = '''```
-Balance: %bal, %balance
-    Checks your current balance and shows your deposit address.
-    To get a clipboard friendly address, use %addr.
-    Deposits should arrive within 5 minutes of a transaction taking place.
-    If the bot is offline, you are still safe to make deposits.
-```'''
+Donate GRC to this address: `{}` or use `%fgive` to refill the faucet.'''
 
-wdr = '''```
-Withdraw your funds: %wdr, %withdraw, %send
-    Format: %wdr [address to send to] [amount-GRC]
+rain_msg = '''The rainbot currently contains `{} GRC` and will rain at `{} GRC`.
 
-    Takes your GRC out of the bot's wallet.
-    Fee for withdraw is {} GRC and is automatically deducted.
-    If you wish to transfer to another user, use %give instead.
-```'''.format(g.tx_fee)
+Donate GRC to this address `{}`
+or type `%rain [amount-GRC]` to build up rain.'''
 
-donate = '''```
-Donate to someone: %donate
-    Format: %donate [selection no.] [amount-GRC]
+user_data_template = '''```
+Address: {}
+Balance: {}
+Donated: {}
 
-    A list of possible donation addresses to encourage generosity.
-    Choose a number from the list of selections and then the amount to donate.
-```'''
+Last faucet request (unix): {}
+Last transaction (unix): {}
+Last TXID out: {}
+Last transaction amount: {}```'''
 
-rdonate = '''```
-Donate to a random contributor: %rdonate
-    Format: %rdonate [amount-GRC]
+balance_template = '''{}Your balance for: `{}`
+```{} GRC (${} USD)```'''
 
-    Same as %donate but a random person on the bot's donation list is chosen for you.
-```'''
+faucet_thankyou = '{}Thank you for donating to the faucet!'.format(e.HEART)
 
-give = '''```
-Give funds to another user: %give %tip
-    Format: %give [discord mention of user] [amount-GRC]
+rain_thankyou = '\n\nThank you for raining on the users! The rain pot is now at `{} GRC`'
 
-    Give some GRC to another person within the server. (no fees apply)
-    Requires the mentioned user to also have an account with the bot through %new.
-```'''
+faq_msg = '{}The following are currently documented FAQ articles. To read, type `%faq [selection no.]` '.format(e.BOOK)
 
-rain = '''```
-Rain on active users: %rain
-    Typing %rain on its own will display the current rain balance and threshold.
-    Once the balance of the rainbot exceeds the threshold, it will rain on all online users.
+donation_recipient = '\nYou donated to {}!'
 
-    To contribute GRC to the rain pool, type: %rain [amount-GRC]
-```'''
-
-faucet = '''```
-Get some free GRC: %faucet %get
-    Type this command to get some free Gridcoins.
-    Amounts are random and you can only request once per {} hours.
-    To help fund the faucet, you can type `%fgive [amount-GRC]`.
-```'''.format(g.FCT_REQ_LIM)
-
-qr = '''```
-Generate a QR code: %qr
-    Format: %qr [optional data]
-
-    Generates a qr code. If no data is given, it will send a QR code of your
-    wallet address. Any data given must contain no spaces.
-```'''
-
-faq = '''```
-Read answers to frequently asked questions: %faq
-    Format: %faq [selection no.]
-
-    All answers are formulated by Delta, Foxifi and LavRadis, and checked by
-    community members and developers.
-```'''
-
-block = '''```
-Explore blocks on the Gridcoin chain: %block
-    Format: %block [height]
-
-    Fetches information about a particular block on the Gridcoin blockchain.
-```'''
-
-status = '''```
-Bot and network status: %status
-```'''
-
-time = '''```
-Shows what functionality is available given recent activity: %time
-    Specifically shows faucet, withdrawal and donation availability.
-    Requested by LavRadis.
-```'''
-
-rules_help = '''```
-Rules about using the bot and what may result in a ban: %rules
-```'''
-
-terms_help = '''```
-Terms and conditions for making an account with the bot: %terms
-```'''
-
-info_help = '''```
-Info about author and this bot: %info
-```'''
-
-info = discord.Embed(title='This bot is the original work of Delta and various contributors.', colour=discord.Colour.purple(),
+info = discord.Embed(title='This bot is the original work of Delta and various contributors.', colour=discord.Colour.orange(),
 description='''
 The source code for the bot can be found [here](https://github.com/delta1512/GRC-Wallet-Bot).
 
@@ -135,50 +43,51 @@ If there are any problems, glitches or crashes, please notify me or the contribu
 
 Notable mentions:
 - [Jorkermc](https://github.com/jorkermc)
+- Nathanielcwm
 - Foxifi
 - [LavRadis](https://steemit.com/@lavradis)
 ''')
 
-help_dict = {
-    'default'   :   hlp,
-    'new'       :   new,
-    'balance'   :   bal,
-    'withdraw'  :   wdr,
-    'donate'    :   donate,
-    'rdonate'   :   rdonate,
-    'give'      :   give,
-    'rain'      :   rain,
-    'faucet'    :   faucet,
-    'qr'        :   qr,
-    'faq'       :   faq,
-    'block'     :   block,
-    'status'    :   status,
-    'time'      :   time,
-    'rules'     :   rules_help,
-    'terms'     :   terms_help,
-    'info'      :   info_help
-}
+claim = '{}You claimed `{} GRC` from the faucet!'
 
-welcome = '{}Welcome to the GRC Wallet Bot! Type `%help` for more commands and be sure to read the `%terms` and `%rules`'.format(e.CELEBRATE)
 
-faucetmsg = '''
-The faucet currently contains `{} GRC` and has a timeout of {} hours.
+### SUCCESS MESSAGES
+new_user_success = '{}User account created successfully. Your address is `{}`'
 
-Donate GRC to this address `{}`
-or type `%fgive [amount-GRC]` to help refill the faucet.
-'''
+net_tx_success = '{}Transaction of `{} GRC` (inc. {} GRC fee) was successful, ID: `{}`{}'
 
-rain_msg = '''
-The rainbot currently contains `{} GRC` and will rain at `{} GRC`.
+internal_tx_success = '{}In-server transaction of `{} GRC` was successful.'
 
-Donate GRC to this address `{}`
-or type `%rain [amount-GRC]` to build up rain.
-'''
 
-rule_fail_send = '''{}It appears the bot cannot PM you.
-Please enable direct messages via discord and type `%rules` and `%terms` or check the pinned messages.
-'''.format(e.INFO)
+### ERROR MESSAGES
+new_user_fail = '{}Something went wrong when trying to make your account, please contact the owner.'.format(e.ERROR)
 
+already_user = '{}Cannot create new account, you already have one.'.format(e.CANNOT)
+
+fail_dm = '{}It appears the bot cannot PM you.'.format(e.INFO)
+
+cannot_send_self = '{}You cannot send funds to yourself.'.format(e.ERROR)
+
+rule_fail_send = fail_dm + '\nPlease enable direct messages via discord and type `%rules` and `%terms` or check the pinned messages.'.format(e.INFO)
+
+wait_confirm = '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
+
+invalid_val = '{}The value provided was invalid.'.format(e.ERROR)
+
+invalid_selection = '{}Invalid selection.'.format(e.ERROR)
+
+insufficient_funds = '{}You have insufficient funds to make that transfer.'.format(e.ERROR)
+
+more_than_fee_and_min = '{}You must provide an amount that is greater than the fee and minimum (`{} GRC`).'.format(e.ERROR, g.tx_fee + g.MIN_TX)
+
+tx_error = '{}Error: A transaction could not be made.'.format(e.ERROR)
+
+pm_restrict = '{}The bot cannot process this command through private messages.'.format(e.CANNOT)
+
+too_new_msg = '{}Your account is too new to be using the bot, please ensure your account is at least {} days old.'.format(e.CANNOT, g.NEW_USR_TIME)
+
+
+### RULES AND TERMS
 rules = discord.Embed(title='GRC Wallet Bot Rules', colour=discord.Colour.purple(),
 description='''
 1. Do not spam the bot in any way.
@@ -216,7 +125,3 @@ ii. In the event of catastrophic failure, explore everything in my capability to
 
 iii. To have sufficient reason in banning or removing a user account from the bot.
 ''')
-
-PM_msg = '{}The bot cannot process this command through private messages.'.format(e.CANNOT)
-
-new_usr_msg = '{}Your account is too new to be using the bot, please ensure your account is at least {} days old.'.format(e.CANNOT, g.NEW_USR_TIME)

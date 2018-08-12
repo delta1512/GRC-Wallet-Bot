@@ -13,5 +13,7 @@ RAIN = ':cloud_rain: | '
 CELEBRATE = ':tada: | '
 CHART_UP = ':chart_with_upwards_trend: | '
 ARR_RIGHT = ':arrow_right:'
+HEART = ':heart: | '
 NUMS = [':zero:', ':one:', ':two:', ':three:', ':four:', ':five:', ':six:',
         ':seven:', ':eight:', ':nine:']
+WHITE_CHECK = '\u2705'

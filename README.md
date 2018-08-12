@@ -14,17 +14,17 @@ This bot aims to be a third part wallet service for the Gridcoin cryptocurrency 
 
 * Filled out configuration file
 
-* Two files in the same directory as main.py called **blist** and **priv_blist** (these are your total and private message blacklists)
-
 * A record in the DB with the userID `'FAUCET'` and a preset GRC address
 
 * A record in the DB with the userID `'RAIN'` and a preset GRC address
 
+* [scavenger.py](./scavenger.py) running as a background process
+
 ## Database Setup
 
-The following is an example SQL script for creating a table that is compatible with the bot:
+The following is an example SQL script for creating a user table that is compatible with the bot:
 ```
-CREATE TABLE `YOURDB`.`YOURTABLE` (
+CREATE TABLE `YOURDB`.`udb` (
   `uid` CHAR(18) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
   `address` CHAR(34) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
   `last_faucet` BIGINT(20) NULL DEFAULT NULL,
@@ -35,6 +35,14 @@ CREATE TABLE `YOURDB`.`YOURTABLE` (
   `lastTX_txid` CHAR(70) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL DEFAULT NULL,
   PRIMARY KEY (`uid`, `address`));
 ```
+
+The bot also requires a few other tables:
+
+* A table called `deposits` with fields: `txid: text, uid: text, amount: double` with txid and uid forming a compound key
+
+* A table called `admin_claims` with fields: `txid: text, amount: double` and an initial record in the form: `txid: "PENDING", amount: 0`
+
+* A table called `blackist` with the fields: `uid: text, channel: bool`
 
 ### Feature ideas:
 
