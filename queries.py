@@ -17,9 +17,10 @@ async def get_user(uid):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
     await c.execute('SELECT * FROM {}.udb WHERE uid=%s'.format(g.db_name), (uid))
-    result = await c.fetchone()
+    result = await c.fetchall()
     db.close()
     if len(result) == 0: return None;
+    result = result[0]
     return User(uid, address=result[1], last_faucet=result[2], balance=result[3],
                 donations=result[4], lastTX=[result[5], result[6], result[7]])
 
@@ -28,9 +29,9 @@ async def deposit_exists(txidq):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
     await c.execute('SELECT count(txid) FROM {}.deposits WHERE txid=%s'.format(g.db_name), txidq)
-    result = await c.fetchone()
+    result = await c.fetchall()
     db.close()
-    return result[0] > 0
+    return len(result) > 0
 
 
 async def get_bal(uid):
@@ -109,7 +110,8 @@ async def get_blacklisted():
     await c.execute('SELECT uid, channel FROM {}.blacklist'.format(g.db_name))
     blacklisted = {}
     for tup in await c.fetchall():
-        blacklisted[tup[0]] = tup[1]
+        channel = int.from_bytes(tup[1], 'big')
+        blacklisted[tup[0]] = True if channel == 1 else False
     db.close()
     return blacklisted
 

@@ -39,6 +39,7 @@ rbot = None
 INITIALISED = False
 
 
+### DECORATORS
 def in_udb():
     async def predicate(ctx):
         if not await q.uid_exists(str(ctx.author.id)):
@@ -51,6 +52,13 @@ def limit_to_main_channel():
     def predicate(ctx):
         return str(ctx.channel.id) == g.main_channel
     return commands.check(predicate)
+
+
+def is_owner():
+    def predicate(ctx):
+        return str(ctx.author.id) == g.owner_id
+    return commands.check(predicate)
+###
 
 
 def checkspam(user): # Possible upgrade: use discord.utils.snowflake_time to get their discord account creation date
@@ -83,7 +91,7 @@ async def rain_loop():
             await rbot.do_rain(client)
 
 
-@client.event
+#@client.event
 async def on_command_error(ctx, error):
     if hasattr(ctx.command, 'on_error'):
         return
@@ -142,14 +150,7 @@ async def on_ready():
         logging.error('Blacklisting service failed to load')
         await client.logout()
         return
-    '''
-    for extension in ['cogs.admin']:
-        try:
-            client.load_extension(extension)
-        except Exception as E:
-            logging.error('Failed to load extension %s. Exception: %s', (extension, E))
-    client.cogs['cogs.admin'].blacklister = blacklister
-    '''
+
     if await w.unlock() is None:
         logging.info('Wallet successfully unlocked')
     else:
@@ -172,10 +173,10 @@ async def on_ready():
         try:
             await rain_loop()
         except KeyboardInterrupt:
-            logging.info('Pluggable loop shutting down')
+            logging.info('Rain loop shutting down')
             return
         except Exception as E:
-            logging.error('Pluggable loop ran into an error: %s', E)
+            logging.error('Rain loop ran into an error: %s', E)
 
 
 @client.command()
@@ -329,7 +330,7 @@ async def faucet(ctx):
     faucet_obj = await q.get_user(FCT) # This is highly inefficient, an alternative is to be found
     user_obj = await q.get_user(str(ctx.author.id))
     result = await extras.faucet(faucet_obj, user_obj)
-    if not result.startswith(e.CANNOT):
+    if result.startswith(e.GOOD):
         await ctx.send(docs.faucet_msg.format(faucet_obj.balance, faucet_obj.address))
     await ctx.send(result)
 
@@ -337,7 +338,7 @@ async def faucet(ctx):
 @client.command()
 async def rain(ctx, amount: float):
     user_obj = await q.get_user(str(ctx.author.id))
-    await ctx.send(rbot.contribute(extras.amt_filter(amount), user_obj))
+    await ctx.send(await rbot.contribute(extras.amt_filter(amount), user_obj))
 
 
 @client.command()
@@ -374,33 +375,39 @@ async def account(ctx):
 @client.command()
 async def ping(ctx):
     t1 = perf_counter()
+    await ctx.trigger_typing()
     t2 = perf_counter()
     time_delta = round((t2 - t1) * 1000)
     await ctx.send(f"`{time_delta}ms`")
 
 
 ### ADMINISTRATION COMMANDS
-@commands.command()
-async def blist(self, ctx, *args):  # TODO: Add private message check -jorkermc
+@client.command()
+@is_owner()
+async def blist(ctx, *args):  # TODO: Add private message check -jorkermc
     if len(args) > 0:
-        await ctx.send(await extras.blist_iface(args, self.blacklister))
+        await ctx.send(await extras.blist_iface(args, blacklister))
     else:
         await ctx.send(blacklister.get_blisted())
 
 
-@commands.command(name='bin')
-async def _bin(self, ctx, *args):  # Not overriding built-in function bin
-    await ctx.send(await extras.burn_coins(args))
+@client.command(name='bin')
+@is_owner()
+async def _bin(ctx, *args):  # Not overriding built-in function bin
+    if len(args) == 2:
+        await ctx.send(await extras.burn_coins(args))
 
 
-@commands.command()
-async def stat(self, ctx, *args):
+@client.command()
+@is_owner()
+async def stat(ctx, *args):
     if len(args) == 0:
-        user_obj = await q.get_user(ctx.author.id)
+        user_obj = await q.get_user(str(ctx.author.id))
     else:
         user_obj = await q.get_user(args[0])
         if user_obj is None: return;
-    await ctx.send(extras.user_stats(user_obj, client))
+    await ctx.send(extras.user_stats(user_obj, client, user_time))
+###
 
 
 @client.event
@@ -410,16 +417,9 @@ async def on_message(msg):
     is_private = isinstance(chan, discord.DMChannel)
     a = msg.author
     uname = a.name
-    user = a.id
+    user = str(a.id)
     iscommand = cmd.startswith(g.pre)
-    '''
-    counter = 0
-    async for message in chan.history(limit=20, after=datetime.now() - timedelta(seconds=7.5)):
-        if message.author == a:
-            counter += 1
-    if counter >= 2:
-        pass  # TODO: Add the ban mechanism -jorkermc to Delta
-    '''
+
     # Check for if the user is a bot, spamming or is blacklisted
     if a.bot or checkspam(user) or blacklister.is_banned(user, is_private):
         return
@@ -433,7 +433,8 @@ async def on_message(msg):
         cmd = cmd[1:]
         log_msg = 'COMMAND "%s" executed by %s (%s)'
         if is_private:
-            log_msg.format(log_msg + ' in private channel')
+            log_msg = log_msg + ' in private channel'
+            log_msg.format(log_msg, cmd.split()[0], user, uname)
         else:
             log_msg.format(log_msg)
         logging.info(log_msg, cmd.split()[0], user, uname)

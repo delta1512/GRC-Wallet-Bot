@@ -144,34 +144,31 @@ async def blist_iface(args, blist_obj):
 
 
 async def burn_coins(args):
-    if len(args) == 2:
-        if (amt_filter(args[1]) is None):
-            amt = 0
-        else:
-            amt = amt_filter(args[1])
-        from_user = await q.get_user(args[0])
-        if args[0] != g.owner_id and (not from_user is None):
-            to_user = await q.get_user(g.owner_id)
-            await from_user.send_internal_tx(to_user, amt)
-        else:
-            from_user.balance -= amt
-            await q.save_user(from_user)
-        return 'Burned `{} GRC` from `{}`'.format(amt, args[0])
+    if (amt_filter(args[1]) is None):
+        amt = 0
+    else:
+        amt = amt_filter(args[1])
+    from_user = await q.get_user(args[0])
+    if args[0] != g.owner_id and (not from_user is None):
+        to_user = await q.get_user(g.owner_id)
+        await from_user.send_internal_tx(to_user, amt)
+    else:
+        from_user.balance -= amt
+        await q.save_user(from_user)
+    return 'Burned `{} GRC` from `{}`'.format(amt, args[0])
 
 
-def user_stats(user_obj, client):
-    final = 'User ID: {}\n'.format(user_obj.userID)
+def user_stats(user_obj, client, user_time):
+    final = 'User ID: {}\n'.format(user_obj.usrID)
     user = None
-    members = client.get_all_members()
-    for member in members:
-        if member.id == user_obj.userID:
+    for member in client.get_all_members():
+        if str(member.id) == user_obj.usrID:
             user = member
             crtime = round(user_time(member.created_at))
             break
     if user is None:
         return '```{}```'.format(final)
-    if not user_obj is None:
-        final += user_obj.get_stats().replace('`', '') + '\n'
+    final += user_obj.get_stats().replace('`', '') + '\n'
     final += 'Created at: {} {}\n'.format(crtime, time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(time.time()-crtime)))
     jtime = round(time.mktime(member.joined_at.timetuple()))
     final += 'Joined at: {} {}'.format(jtime, time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(time.time()-jtime)))

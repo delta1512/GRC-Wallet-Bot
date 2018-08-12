@@ -1,5 +1,7 @@
 import logging
 
+import queries as q
+
 class Blacklister:
     blacklist = {} # {user ID : private channel ban}
 
