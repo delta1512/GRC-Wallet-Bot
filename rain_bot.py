@@ -61,7 +61,11 @@ class Rainbot:
 
 
     async def contribute(self, amount, user_obj):
-        return (await user_obj.send_internal_tx(self.RBOT, amount, True)) + docs.rain_thankyou.format(round(self.RBOT.balance, 3))
+        result = await user_obj.send_internal_tx(self.RBOT, amount, True)
+        if result.startswith(e.GOOD):
+            result += docs.rain_thankyou.format(round(self.RBOT.balance, 3))
+        return result
+
 
 
     def get_rain_vals(self, n, amount):

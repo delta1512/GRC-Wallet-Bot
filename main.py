@@ -258,7 +258,7 @@ async def terms(ctx):
 @in_udb()
 async def balance(ctx):
     data = await q.get_bal(str(ctx.author.id))
-    await ctx.send(docs.balance_template.format(e.BAL, data[1], data[0], round(await price_fetcher.conv(data[0]), 3))) # emoji, address, balance, priceUSD
+    await ctx.send(docs.balance_template.format(e.BAL, data[1], round(data[0], 8), round(await price_fetcher.conv(data[0]), 3)))
 
 
 @client.command(aliases=['addr'])
