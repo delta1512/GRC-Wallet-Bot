@@ -3,7 +3,6 @@ import logging
 from time import time, mktime, strptime, perf_counter
 from logging.handlers import RotatingFileHandler
 from datetime import datetime, timedelta
-from os import path # Unused import?
 
 import discord
 from discord.ext import commands
@@ -317,10 +316,12 @@ async def give(ctx, receiver: discord.User, amount: float):
 
 @client.command()
 @in_udb()
-async def fgive(ctx, amount: int):
+async def fgive(ctx, amount: float):
     user_obj = await q.get_user(str(ctx.author.id))
-    await ctx.send(await user_obj.send_internal_tx(await q.get_user(FCT), amount, True))
-    await ctx.send(docs.faucet_thankyou)
+    result = await user_obj.send_internal_tx(await q.get_user(FCT), extras.amt_filter(amount), True)
+    await ctx.send(result)
+    if result.startswith(e.GOOD):
+        await ctx.send(docs.faucet_thankyou)
 
 
 @client.command(aliases=['fct', 'get'])
@@ -328,12 +329,7 @@ async def fgive(ctx, amount: int):
 @in_udb()
 @limit_to_main_channel()
 async def faucet(ctx):
-    faucet_obj = await q.get_user(FCT) # This is highly inefficient, an alternative is to be found
-    user_obj = await q.get_user(str(ctx.author.id))
-    result = await extras.faucet(faucet_obj, user_obj)
-    if result.startswith(e.GOOD):
-        await ctx.send(docs.faucet_msg.format(faucet_obj.balance, faucet_obj.address))
-    await ctx.send(result)
+    await ctx.send(await extras.faucet(str(ctx.author.id)))
 
 
 @client.command()

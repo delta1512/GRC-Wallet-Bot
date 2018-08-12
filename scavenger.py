@@ -1,7 +1,10 @@
+import asyncio
 import logging
+from logging.handlers import RotatingFileHandler
 
 import wallet as w
 import queries as q
+import grcconf as g
 
 # Set up logging functionality
 handler = [RotatingFileHandler(g.log_dir+'deposits.log', maxBytes=10**7, backupCount=3)]
@@ -47,7 +50,6 @@ async def blk_searcher():
                 if isinstance(blockdata, dict):
                     last_block = blockheight
                     for txid in blockdata['tx']:
-                        if await q.deposit_exists(txid): continue; # Don't check if deposit exists
                         recv_addrs, send_addrs, vals = await check_tx(txid)
                         if len(recv_addrs) > 0:
                             for uaddr in users:
@@ -61,8 +63,8 @@ async def blk_searcher():
                                             break
                                 if found:
                                     uid = users[uaddr]
-                                    await db.register_deposit(txid, vals[index], uid)
-                                    logging.info('Processed deposit with TXID: %s for %s', txid, uid)
+                                    if await q.register_deposit(txid, vals[index], uid):
+                                        logging.info('Processed deposit with TXID: %s for %s', txid, uid)
                                     try: # In event of change address
                                         send_addrs.pop(send_addrs.index(recv_addrs.pop(index)))
                                     except ValueError:
@@ -76,3 +78,18 @@ async def blk_searcher():
             logging.exception('Block searcher ran into an error: %s', E)
         with open(g.LST_BLK, 'w') as last_block_file:
             last_block_file.write(str(last_block))
+
+async def scavenge():
+    with open(g.LST_BLK, 'r') as last_block_file:
+        logging.info('Starting blockchain scavenger at height: {}.'.format(last_block_file.read().replace('\n', '')))
+    while True:
+        try:
+            await blk_searcher()
+            await asyncio.sleep(1.5*60)
+        except KeyboardInterrupt:
+            return
+
+loop = asyncio.get_event_loop()
+task = asyncio.ensure_future(scavenge())
+loop.run_until_complete(task)
+loop.close()

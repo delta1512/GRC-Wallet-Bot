@@ -48,6 +48,8 @@ Notable mentions:
 - [LavRadis](https://steemit.com/@lavradis)
 ''')
 
+claim = '{}You claimed `{} GRC` from the faucet!'
+
 
 ### SUCCESS MESSAGES
 new_user_success = '{}User account created successfully. Your address is `{}`'

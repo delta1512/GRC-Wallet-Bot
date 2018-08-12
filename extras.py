@@ -39,9 +39,11 @@ Faucet timeout: {} Hours
 Users: {}
 Block height: {}
 Latest hash: {}
-Price (USD): ${}```'''.format(e.ONLINE, g.tx_fee, g.MIN_TX, g.tx_timeout,
+Price (USD): ${}
+
+Faucet funds: {} GRC```'''.format(e.ONLINE, g.tx_fee, g.MIN_TX, g.tx_timeout,
 g.FCT_REQ_LIM, len(await q.get_addr_uid_dict()), block_height, block_hash,
-round(await price_fetcher.price(), 4))
+round(await price_fetcher.price(), 4), (await q.get_bal('FAUCET'))[0])
 
 
 async def donate(user_obj, selection, amount):
@@ -50,7 +52,10 @@ async def donate(user_obj, selection, amount):
         acct_dict = g.donation_accts[selection]
         selection_name = list(acct_dict.keys())[0]
         addr = acct_dict[selection_name]
-        return await user_obj.withdraw(amount, addr, g.net_fee, True) + docs.donation_recipient.format(selection_name)
+        result = await user_obj.withdraw(amount, addr, g.net_fee, True)
+        if result.startswith(e.GOOD):
+            return result + docs.donation_recipient.format(selection_name)
+        return result
     return docs.invalid_selection
 
 
@@ -66,15 +71,16 @@ def index_displayer(header, index):
     return '{}```{}```'.format(header, acc[1:])
 
 
-async def faucet(faucet_obj, user_obj):
+async def faucet(uid):
     ctime = round(time.time())
-    if not user_obj.can_faucet():
+    amount = round(r.uniform(g.FCT_MIN, g.FCT_MAX), 8)
+    user_obj, exit_code = await q.faucet_operations(uid, amount, ctime)
+    if exit_code == 1:
         return '{}Request too recent. Faucet timeout is {} hours. Try again in: {}'.format(e.CANNOT, g.FCT_REQ_LIM,
         time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(user_obj.next_fct()-ctime))))
-    result = await faucet_obj.send_internal_tx(user_obj, round(r.uniform(g.FCT_MIN, g.FCT_MAX), 8), faucet=ctime)
-    if result == docs.insufficient_funds:
+    if exit_code == 2:
         return '{}Unfortunately the faucet balance is too low. Try again soon.'.format(e.DOWN)
-    return result + ' Your new balance is `{} GRC`'.format(round(user_obj.balance, 8))
+    return docs.claim.format(e.GOOD, amount) + ' Your new balance is `{} GRC`'.format(round(user_obj.balance, 8))
 
 
 def get_qr(string):
