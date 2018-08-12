@@ -45,6 +45,7 @@ round(await price_fetcher.price(), 4))
 
 
 async def donate(user_obj, selection, amount):
+    selection -= 1
     if 0 <= selection < len(g.donation_accts):
         acct_dict = g.donation_accts[selection]
         selection_name = list(acct_dict.keys())[0]
