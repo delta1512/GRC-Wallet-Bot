@@ -26,13 +26,15 @@ class Rainbot:
         rain_amt = round(self.RBOT.balance - remainder, 8)
 
         for member in client.get_all_members():
-            if member.status == discord.Status.online and member.id in ulist:
-                online.add(member.id)
+            if member.status == discord.Status.online and str(member.id) in ulist:
+                online.add(str(member.id))
         num_rain = len(online)
 
+        print(online)
         final_rains = {}
         for val in self.get_rain_vals(num_rain, self.RBOT.balance-remainder):
             final_rains[online.pop()] = val
+        print(final_rains)
         await q.apply_balance_changes(final_rains)
         self.RBOT.balance -= rain_amt
         await q.save_user(self.RBOT)
@@ -42,15 +44,15 @@ class Rainbot:
             big_string += '<@{}>\n'.format(user)
         if len(big_string) >= 2000:
             big_string = '{}Rainbot has rained `{} GRC` on {} users. See if you are lucky!'.format(e.RAIN, rain_amt, num_rain)
-        await client.send_message(client.get_channel(g.RAIN_CHAN), big_string)
         self.get_next_thresh()
+        return big_string
 
 
     def get_next_thresh(self):
         self.thresh = round(uniform(g.MIN_RAIN, g.MAX_RAIN), 8)
 
 
-    def check_rain(self):
+    def can_rain(self):
         return self.RBOT.balance > self.thresh
 
 
@@ -58,8 +60,8 @@ class Rainbot:
         return docs.rain_msg.format(round(self.RBOT.balance, 8), round(self.thresh, 8), self.RBOT.address)
 
 
-    def contribute(amount, user_obj):
-        return user_obj.send_internal_tx(self.RBOT, amount, True) + docs.rain_thanks.format(round(self.RBOT.balance, 3))
+    async def contribute(self, amount, user_obj):
+        return (await user_obj.send_internal_tx(self.RBOT, amount, True)) + docs.rain_thankyou.format(round(self.RBOT.balance, 3))
 
 
     def get_rain_vals(self, n, amount):

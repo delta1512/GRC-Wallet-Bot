@@ -60,6 +60,7 @@ def is_owner():
 ###
 
 
+### GENERAL FUNCTIONS
 def checkspam(user): # Possible upgrade: use discord.utils.snowflake_time to get their discord account creation date
     global latest_users
     if user in latest_users:
@@ -83,12 +84,10 @@ def user_time(crtime):
     return mktime(strptime(crtime, '%Y-%m-%d %H:%M:%S'))
 
 
-async def rain_loop():
-    while True:
-        await asyncio.sleep(5)
-        if rbot.check_rain():
-            pass
-            #await rbot.do_rain(client)
+async def check_rain(ctx):
+    if rbot.can_rain():
+        await ctx.send(await rbot.do_rain(client))
+###
 
 
 @client.event
@@ -113,6 +112,7 @@ async def on_command_error(ctx, error):
             return await ctx.send(f'{e.ERROR}Please specify an amount to give.')
         if ctx.command.name == 'rain':
             return await ctx.send(rbot.status())
+            await check_rain(ctx)
         if ctx.command.name == 'faq':
             return await ctx.send(extras.index_displayer(docs.faq_msg, index) + '\n*Thanks to LavRadis and Foxifi for making these resources.*')
         if ctx.command.name == 'block':
@@ -168,15 +168,6 @@ async def on_ready():
 
     client.initialised = True
     logging.info('Initialisation complete')
-    #Protection against errors in the loop
-    while True:
-        try:
-            await rain_loop()
-        except KeyboardInterrupt:
-            logging.info('Rain loop shutting down')
-            return
-        except Exception as E:
-            logging.error('Rain loop ran into an error: %s', E)
 
 
 @client.command()
@@ -336,6 +327,7 @@ async def faucet(ctx):
 async def rain(ctx, amount: float):
     user_obj = await q.get_user(str(ctx.author.id))
     await ctx.send(await rbot.contribute(extras.amt_filter(amount), user_obj))
+    await check_rain(ctx)
 
 
 @client.command()

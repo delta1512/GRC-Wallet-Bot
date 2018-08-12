@@ -23,7 +23,7 @@ class User:
             txid = await w.tx(addr, amount-fee)
             if isinstance(txid, str):
                 tx_time = round(time())
-                if fee == g.MIN_TX:
+                if fee == g.tx_fee:
                     await q.add_to_fee_pool(fee)
                 self.active_tx = [amount, tx_time, txid.replace('\n', '')]
                 self.balance -= amount
