@@ -25,6 +25,7 @@ donation_accts = [
 ### CONFIGURATION CONSTANTS
 pre = '%'
 LST_BLK = '[location of last block height file]'
+SCAV_SLP = 30
 MIN_TX = 0.001
 FEE_WDR_THRESH = 10       # (GRC) When to send out the collected fees to admin
 SLP = 30                  # Save interval
