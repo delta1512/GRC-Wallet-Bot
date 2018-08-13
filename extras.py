@@ -28,6 +28,8 @@ def amt_filter(inp):
 async def dump_cfg(price_fetcher):
     block_height = await w.query('getblockcount', [])
     block_hash = await w.query('getblockhash', [block_height])
+    fct_info = await q.get_bal('FAUCET')
+    rain_info = await q.get_bal('RAIN')
     if block_height < 5 or not isinstance(block_hash, str): # 5 is largest error return value
         return '{}Could not access the Gridcoin client.'.format(e.ERROR)
 
@@ -41,9 +43,11 @@ Block height: {}
 Latest hash: {}
 Price (USD): ${}
 
-Faucet funds: {} GRC```'''.format(e.ONLINE, g.tx_fee, g.MIN_TX, g.tx_timeout,
+Faucet funds: {} GRC ({})
+Rain Funds: {} GRC ({})```'''.format(e.ONLINE, g.tx_fee, g.MIN_TX, g.tx_timeout,
 g.FCT_REQ_LIM, len(await q.get_addr_uid_dict()), block_height, block_hash,
-round(await price_fetcher.price(), 4), (await q.get_bal('FAUCET'))[0])
+round(await price_fetcher.price(), 4), round(fct_info[0], 8), fct_info[1],
+round(rain_info[0], 8), rain_info[1])
 
 
 async def donate(user_obj, selection, amount):
@@ -106,6 +110,7 @@ def help_interface(query):
 
 
 def faq(query):
+    query -= 1
     if 0 <= query < len(FAQ.index):
         article = FAQ.index[query]
         return article[list(article.keys())[0]]

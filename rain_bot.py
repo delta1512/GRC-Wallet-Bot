@@ -30,7 +30,6 @@ class Rainbot:
                 online.add(str(member.id))
         num_rain = len(online)
 
-        print(online)
         final_rains = {}
         for val in self.get_rain_vals(num_rain, self.RBOT.balance-remainder):
             final_rains[online.pop()] = val

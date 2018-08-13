@@ -37,7 +37,7 @@ async def get_bal(uid):
 async def register_deposit(txid, amount, uid):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
-    await c.execute('SELECT count(txid) FROM {}.deposits WHERE txid=%s'.format(g.db_name), txid)
+    await c.execute('SELECT count(txid) FROM {}.deposits WHERE txid=%s AND uid=%s'.format(g.db_name), (txid, uid))
     unique = (await c.fetchone())[0] == 0
     if unique:
         await c.execute('INSERT INTO {}.deposits VALUES (%s, %s, %s);'.format(g.db_name),
