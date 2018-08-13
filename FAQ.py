@@ -57,7 +57,8 @@ links = [
 'https://market.rudex.org/', #53
 'https://gridcoin.ml/', #54
 'https://gridcoin.io/', #55
-'https://gridcoin.tumblr.com/' #56
+'https://gridcoin.tumblr.com/', #56
+'http://netbook.arikado.ru/faucet/' #57
 ]
 
 # What is Gridcoin?
@@ -221,8 +222,9 @@ description='''
 - [Uscore]({})
 - [Delta's GRC Discord bot]({})
 - [Gridcoin Faucet Android App]({})
+- [Arikado Pool Faucet]({})
 '''.format(links[3], links[10], links[40], links[41], links[42], links[43],
-            links[11], links[54]))
+            links[11], links[54], links[57]))
 
 # Supported exchanges
 exchanges = discord.Embed(title='Supported exchanges', colour=discord.Colour.purple(),
@@ -327,8 +329,7 @@ addnode=nl.gridcoin.pl # Netherlands
 addnode=de.gridcoin.pl # Germany
 ```''')
 
-index = [{'What is Gridcoin?': what_is_grc},
-        {'What is BOINC?' : what_is_boinc},
+index = {'What is BOINC?' : what_is_boinc},
         {'Do I need GRC to earn mining rewards?' : initial_grc},
         {'Should I join the pool or do solo mining?' : pool_or_solo},
         {'How is GRC staked/mined?' : how_to_stake},
