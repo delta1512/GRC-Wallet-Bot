@@ -329,7 +329,8 @@ addnode=nl.gridcoin.pl # Netherlands
 addnode=de.gridcoin.pl # Germany
 ```''')
 
-index = {'What is BOINC?' : what_is_boinc},
+index = [{'What is Gridcoin?': what_is_grc},
+        {'What is BOINC?' : what_is_boinc},
         {'Do I need GRC to earn mining rewards?' : initial_grc},
         {'Should I join the pool or do solo mining?' : pool_or_solo},
         {'How is GRC staked/mined?' : how_to_stake},
