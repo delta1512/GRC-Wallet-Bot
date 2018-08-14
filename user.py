@@ -58,7 +58,7 @@ class User:
 
 
     def next_net_tx(self):
-        return self.active_tx[1]+1.5*60*g.tx_timeout
+        return self.active_tx[1]+1.5*g.BLK_TIME*g.tx_timeout
 
 
     def next_fct(self):
