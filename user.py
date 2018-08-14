@@ -23,13 +23,13 @@ class User:
             txid = await w.tx(addr, amount-fee)
             if isinstance(txid, str):
                 tx_time = round(time())
-                if fee == g.tx_fee:
-                    await q.add_to_fee_pool(fee)
                 self.active_tx = [amount, tx_time, txid.replace('\n', '')]
                 self.balance -= amount
                 if donation:
                     self.donations += amount - fee
                 await q.save_user(self)
+                if fee == g.tx_fee:
+                    await q.add_to_fee_pool(fee)
                 logging.info('Transaction successfully made with txid: %s', txid)
                 return docs.net_tx_success.format(e.GOOD, round(amount, 8), fee, txid, '\n\nYour new balance is {} GRC.'.format(round(self.balance, 2)))
             logging.error('Failed transaction. Addr: %s, Amt: %s, exit_code: %s', addr, amount, txid)
