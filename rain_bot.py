@@ -33,7 +33,6 @@ class Rainbot:
         final_rains = {}
         for val in self.get_rain_vals(num_rain, self.RBOT.balance-remainder):
             final_rains[online.pop()] = val
-        print(final_rains)
         await q.apply_balance_changes(final_rains)
         self.RBOT.balance -= rain_amt
         await q.save_user(self.RBOT)
