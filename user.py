@@ -37,15 +37,13 @@ class User:
         return validation_result
 
 
-    async def send_internal_tx(self, other_user, amount, donation=False, faucet=None):
+    async def send_internal_tx(self, other_user, amount, donation=False):
         validation_result = self.can_transact(amount, 0)
         if isinstance(validation_result, bool):
             self.balance -= amount
             other_user.balance += amount
             if donation:
                 self.donations += amount
-            if not faucet is None:
-                other_user.last_faucet = faucet
             await q.save_user([self, other_user])
             return docs.internal_tx_success.format(e.GOOD, amount)
         return validation_result
