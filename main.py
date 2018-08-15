@@ -49,7 +49,7 @@ def in_udb():
 
 def limit_to_main_channel():
     def predicate(ctx):
-        return str(ctx.channel.id) == g.main_channel
+        return str(ctx.channel.id) == g.main_channel or isinstance(ctx.channel, discord.DMChannel)
     return commands.check(predicate)
 
 
