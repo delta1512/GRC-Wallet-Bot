@@ -59,7 +59,11 @@ links = [
 'https://gridcoin.io/', #55
 'https://gridcoin.tumblr.com/', #56
 'http://netbook.arikado.ru/faucet/', #57
-'https://www.southxchange.com/Market/List' #58
+'https://www.southxchange.com/Market/List', #58
+'https://fold.it/portal/', #59
+'https://www.vodafone.co.uk/dreamlab/', #60
+'https://csgrid.org/csg/wildlife/video_selector.php', #61
+'https://voice.mozilla.org/en' #62
 ]
 
 # What is Gridcoin?
@@ -204,19 +208,20 @@ description='''
 # Third-party wallets
 other_wallets = discord.Embed(title='Third-party wallets', colour=discord.Colour.purple(),
 description='''
+- [Official Wallet]({})
+- [Core Source Code]({})
 - [Coinomi wallet]({})
 - [Holy Transaction]({})
 - [Coinvault]({})
 - [Paper wallet]({})
 - [Bitshares wallet]({})
 - [Delta's GRC Discord bot]({})
-'''.format(links[35], links[36], links[37], links[38], links[39], links[11]))
+'''.format(links[3], links[10], links[35], links[36], links[37], links[38],
+        links[39], links[11]))
 
 # Faucets
 faucet_list = discord.Embed(title='Faucets', colour=discord.Colour.purple(),
 description='''
-- [Official Wallet]({})
-- [Core Source Code]({})
 - [GRC Switzerland]({})
 - [Gridcoin Stats]({})
 - [Eobot]({})
@@ -224,8 +229,7 @@ description='''
 - [Delta's GRC Discord bot]({})
 - [Gridcoin Faucet Android App]({})
 - [Arikado Pool Faucet]({})
-'''.format(links[3], links[10], links[40], links[41], links[42], links[43],
-            links[11], links[54], links[57]))
+'''.format(links[40], links[41], links[42], links[43], links[11], links[54], links[57]))
 
 # Supported exchanges
 exchanges = discord.Embed(title='Supported exchanges', colour=discord.Colour.purple(),
@@ -240,7 +244,7 @@ description='''
 - [BTSABC]({})
 - [Openledger]({})
 - [Rudex]({})
-- [Southxchange (Not yet trading as of 15/08/18)]({})
+- [Southxchange]({})
 '''.format(links[44], links[45], links[46], links[47], links[48],
             links[49], links[50], links[51], links[52], links[53], links[58]))
 
@@ -316,7 +320,7 @@ addnode=de.gridcoin.pl # Germany
 # Example GRC config linux
 example_linux = discord.Embed(description='''```
 email=YOUREMAIL@example.com
-boincdatadir=/var/lib/boinc/
+boincdatadir=/var/lib/boinc-client/
 addnode=la.grcnode.co.uk
 addnode=london.grcnode.co.uk
 addnode=miami.grcnode.co.uk
@@ -330,6 +334,15 @@ addnode=is.gridcoin.pl # Iceland
 addnode=nl.gridcoin.pl # Netherlands
 addnode=de.gridcoin.pl # Germany
 ```''')
+
+# Other ways to contribute to STEM fields
+other_science = discord.Embed(title='Other ways to contribute to STEM fields', colour=discord.Colour.purple(),
+description='''
+- [fold.it]({})
+- [Dream lab]({})
+- [CSG NN training]({})
+- [Mozilla common voice]({})
+'''.format(links[59], links[60], links[61], links[62]))
 
 index = [{'What is Gridcoin?': what_is_grc},
         {'What is BOINC?' : what_is_boinc},
@@ -347,4 +360,5 @@ index = [{'What is Gridcoin?': what_is_grc},
         {'Third-party wallets' : other_wallets},
         {'Supported exchanges' : exchanges},
         {'Faucets' : faucet_list},
-        {'Useful links' : useful_links}]
+        {'Useful links' : useful_links},
+        {'Other ways to contribute to STEM fields' : other_science}]
