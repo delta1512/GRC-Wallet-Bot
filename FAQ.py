@@ -57,7 +57,9 @@ links = [
 'https://market.rudex.org/', #53
 'https://gridcoin.ml/', #54
 'https://gridcoin.io/', #55
-'https://gridcoin.tumblr.com/' #56
+'https://gridcoin.tumblr.com/', #56
+'http://netbook.arikado.ru/faucet/', #57
+'https://www.southxchange.com/Market/List' #58
 ]
 
 # What is Gridcoin?
@@ -221,8 +223,9 @@ description='''
 - [Uscore]({})
 - [Delta's GRC Discord bot]({})
 - [Gridcoin Faucet Android App]({})
+- [Arikado Pool Faucet]({})
 '''.format(links[3], links[10], links[40], links[41], links[42], links[43],
-            links[11], links[54]))
+            links[11], links[54], links[57]))
 
 # Supported exchanges
 exchanges = discord.Embed(title='Supported exchanges', colour=discord.Colour.purple(),
@@ -237,8 +240,9 @@ description='''
 - [BTSABC]({})
 - [Openledger]({})
 - [Rudex]({})
+- [Southxchange (Not yet trading as of 15/08/18)]({})
 '''.format(links[44], links[45], links[46], links[47], links[48],
-            links[49], links[50], links[51], links[52], links[53]))
+            links[49], links[50], links[51], links[52], links[53], links[58]))
 
 # Useful links
 useful_links = discord.Embed(title='Useful links', colour=discord.Colour.purple(),
