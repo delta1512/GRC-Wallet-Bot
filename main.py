@@ -115,7 +115,7 @@ async def on_command_error(ctx, error):
         if ctx.command.name == 'faq':
             return await ctx.send(extras.index_displayer(docs.faq_msg, index) + '\n*Thanks to LavRadis and Foxifi for making these resources.*')
         if ctx.command.name == 'block':
-            return await ctx.send(extras.show_block(await w.query('getblockcount', [])))
+            return await ctx.send(await extras.show_block(await w.query('getblockcount', [])))
         if ctx.command.name == 'help':
             return await ctx.send(help_docs.help_main())
     if isinstance(error, commands.NoPrivateMessage):
