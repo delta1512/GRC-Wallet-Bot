@@ -141,6 +141,23 @@ async def add_to_fee_pool(fee):
     db.close()
 
 
+async def get_main_chans():
+    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
+    c = await db.cursor()
+    await c.execute('SELECT * FROM {}.channels'.format(g.db_name))
+    results = await c.fetchall()
+    db.close()
+    return results
+
+
+async def add_chan(chanID):
+    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
+    c = await db.cursor()
+    await c.execute('INSERT INTO {}.channels VALUES (%s);'.format(g.db_name), (chanID))
+    await db.commit()
+    db.close()
+
+
 # Highly redundant but efficient faucet operation
 async def faucet_operations(uid, amount, ctime):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)

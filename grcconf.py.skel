@@ -1,7 +1,6 @@
 ### ADMINISTRATION
 admin_wallet = ''
 owner_id = ''             # Discord ID of owner
-main_server = ''          # Main server ID
 main_channels = ['']      # Channel for %faucet
 tx_fee = 0.5
 net_fee = 0.0001
@@ -13,11 +12,8 @@ grc_pass = ''
 sql_db_host = '[host]'
 sql_db_usr = '[username]'
 sql_db_pass = '[password]'
-db_name = '[name of database and table]'
+db_name = '[name of database]'
 log_dir = '[where to save the log file]'
-# All banned UIDs must be of type string
-banned = []
-banned_priv = []
 donation_accts = [
     {'[name]' : '[addr]'},
     ]
@@ -32,5 +28,6 @@ FCT_REQ_LIM = 24          # Hours
 FCT_MAX = 1
 FCT_MIN = 0.1
 NEW_USR_TIME = 3          # Days
-MAX_RAIN = 30             # (GRC) Must be greater than 10
+MAX_RAIN = 30             # (GRC) Must be greater than MIN_RAIN
+MIN_RAIN = 10             # (GRC)
 BLK_TIME = 60             # Seconds

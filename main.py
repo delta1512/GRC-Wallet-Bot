@@ -35,6 +35,7 @@ latest_users = {}
 price_fetcher = price_bot()
 blacklister = None
 rbot = None
+main_chans = []
 
 
 ### DECORATORS
@@ -48,7 +49,7 @@ def in_udb():
 
 def limit_to_main_channel():
     def predicate(ctx):
-        return str(ctx.channel.id) in g.main_channels or isinstance(ctx.channel, discord.DMChannel)
+        return str(ctx.channel.id) in main_chans or isinstance(ctx.channel, discord.DMChannel)
     return commands.check(predicate)
 
 
@@ -124,7 +125,7 @@ async def on_command_error(ctx, error):
 
 @client.event
 async def on_ready():
-    global blacklister, rbot
+    global blacklister, rbot, main_chans
     if hasattr(client, 'initialised'):
         return  # Prevents multiple on_ready call
 
@@ -164,6 +165,12 @@ async def on_ready():
         logging.error('Rainbot service failed to load: %s', E)
         await client.logout()
         return
+
+    try:
+        main_chans = await q.get_main_chans()
+        logging.info('Loaded main channels:' + ''.join(['\n{}'.format(c) for c in main_chans]))
+    except Exception as E:
+        logging.error('Failed to load main channels: %s', E)
 
     client.initialised = True
     logging.info('Initialisation complete')
@@ -372,7 +379,7 @@ async def ping(ctx):
 ### ADMINISTRATION COMMANDS
 @client.command()
 @is_owner()
-async def blist(ctx, *args):  # TODO: Add private message check -jorkermc
+async def blist(ctx, *args):
     if len(args) > 0:
         await ctx.send(await extras.blist_iface(args, blacklister))
     else:
@@ -395,6 +402,16 @@ async def stat(ctx, *args):
         user_obj = await q.get_user(args[0])
         if user_obj is None: return;
     await ctx.send(extras.user_stats(user_obj, client, user_time))
+
+
+@client.command()
+@is_owner()
+async def channels(ctx, *args):
+    if len(args) > 0:
+        chan = str(args[0])
+        await q.add_chans(chan)
+        main_chans.append(chan)
+        await ctx.message.add_reaction(e.WHITE_CHECK)
 ###
 
 
