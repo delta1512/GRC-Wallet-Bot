@@ -1,7 +1,6 @@
 ### ADMINISTRATION
 admin_wallet = ''
 owner_id = ''             # Discord ID of owner
-main_channels = ['']      # Channel for %faucet
 tx_fee = 0.5
 net_fee = 0.0001
 tx_timeout = 1            # Confirmations
@@ -14,9 +13,6 @@ sql_db_usr = '[username]'
 sql_db_pass = '[password]'
 db_name = '[name of database]'
 log_dir = '[where to save the log file]'
-donation_accts = [
-    {'[name]' : '[addr]'},
-    ]
 
 ### CONFIGURATION CONSTANTS
 pre = '%'

@@ -103,7 +103,7 @@ async def on_command_error(ctx, error):
         if ctx.command.name == 'withdraw':
             return await ctx.send(f'{e.INFO}To withdraw from your account type: `%wdr [address to send to] [amount-GRC]`\nA service fee of {g.tx_fee} GRC is subtracted from what you send. If you wish to send GRC to someone in the server, use `%give`')
         if ctx.command.name == 'donate':
-            return await ctx.send(extras.index_displayer(f'{e.GIVE}Be generous! Below are possible donation options.\nTo donate, type `%donate [selection no.] [amount-GRC]`\n', g.donation_accts))
+            return await ctx.send(extras.index_displayer(f'{e.GIVE}Be generous! Below are possible donation options.\nTo donate, type `%donate [selection no.] [amount-GRC]`\n', await q.get_donors()))
         if ctx.command.name == 'rdonate':
             return await ctx.send(f'{e.GIVE}To donate to a random contributor type: `%rdonate [amount-GRC]`')
         if ctx.command.name == 'give':

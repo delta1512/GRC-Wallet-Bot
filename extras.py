@@ -52,8 +52,9 @@ round(rain_info[0], 8), rain_info[1])
 
 async def donate(user_obj, selection, amount):
     selection -= 1
-    if 0 <= selection < len(g.donation_accts):
-        acct_dict = g.donation_accts[selection]
+    donation_accts = await q.get_donors()
+    if 0 <= selection < len(donation_accts):
+        acct_dict = donation_accts[selection]
         selection_name = list(acct_dict.keys())[0]
         addr = acct_dict[selection_name]
         result = await user_obj.withdraw(amount, addr, g.net_fee, True)
