@@ -31,7 +31,7 @@ class User:
                 if fee == g.tx_fee:
                     await q.add_to_fee_pool(fee)
                 logging.info('Transaction successfully made with txid: %s', txid)
-                return docs.net_tx_success.format(e.GOOD, round(amount, 8), fee, txid, '\n\nYour new balance is {} GRC.'.format(round(self.balance, 2)))
+                return docs.net_tx_success.format(e.GOOD, round(amount, 8), fee, txid, '\n\nYour new balance is {} GRC.'.format(round(abs(self.balance), 2)))
             logging.error('Failed transaction. Addr: %s, Amt: %s, exit_code: %s', addr, amount, txid)
             return docs.tx_error
         return validation_result
@@ -75,6 +75,6 @@ class User:
         if net_tx:
             if not self.can_net_tx(): return docs.wait_confirm;
         if amount is None: return docs.invalid_val;
-        if amount > self.balance: return docs.insufficient_funds;
-        if fee != 0 and amount < (fee + g.MIN_TX): return docs.more_than_fee_and_min;
+        if amount > round(self.balance, 8): return docs.insufficient_funds;
+        if fee != 0 and amount <= (fee + g.MIN_TX): return docs.more_than_fee_and_min;
         return True # If values passed all checks

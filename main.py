@@ -264,10 +264,10 @@ async def terms(ctx):
 @in_udb()
 async def balance(ctx):
     data = await q.get_bal(str(ctx.author.id))
-    await ctx.send(docs.balance_template.format(e.BAL, data[1], round(data[0], 8), round(await price_fetcher.conv(data[0]), 3)))
+    await ctx.send(docs.balance_template.format(e.BAL, data[1], '{:.8f}'.format(abs(data[0])), await price_fetcher.conv(abs(data[0]))))
 
 
-@client.command(aliases=['addr'])
+@client.command(aliases=['addr', 'deposit'])
 @in_udb()
 @limit_to_main_channel()
 async def address(ctx):
@@ -330,6 +330,7 @@ async def faucet(ctx):
 
 
 @client.command()
+@commands.guild_only()
 async def rain(ctx, amount: float):
     user_obj = await q.get_user(str(ctx.author.id))
     await ctx.send(await rbot.contribute(extras.amt_filter(amount), user_obj))
@@ -406,12 +407,27 @@ async def stat(ctx, *args):
 
 @client.command()
 @is_owner()
-async def channels(ctx, *args):
+async def channel(ctx, *args):
     if len(args) > 0:
-        chan = str(args[0])
-        await q.add_chans(chan)
+        chan = args[0]
+        await q.add_chan(chan)
         main_chans.append(chan)
         await ctx.message.add_reaction(e.WHITE_CHECK)
+
+
+@client.command()
+@is_owner()
+async def announce(ctx):
+    announcement = discord.Embed(title='Announcement from the Wallet Bot Owner', colour=discord.Colour.red(),
+    description=ctx.message.content.replace('%announce ', ''))
+    chans = await q.get_main_chans()
+    for chanID in chans:
+        try:
+            chan = client.get_channel(int(chanID))
+            await chan.send(embed=announcement)
+        except Exception as E:
+            print(E)
+            pass
 ###
 
 
@@ -439,9 +455,6 @@ async def on_message(msg):
         log_msg = 'COMMAND "%s" executed by %s (%s)'
         if is_private:
             log_msg = log_msg + ' in private channel'
-            log_msg.format(log_msg, cmd.split()[0], user, uname)
-        else:
-            log_msg.format(log_msg)
         logging.info(log_msg, cmd.split()[0], user, uname)
     await client.process_commands(msg)
 

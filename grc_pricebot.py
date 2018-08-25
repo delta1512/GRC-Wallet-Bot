@@ -23,4 +23,4 @@ class price_bot:
         return self.last_price
 
     async def conv(self, amt):
-        return round(amt*(await self.price()), 2)
+        return '{:.2f}'.format(amt*(await self.price()))

@@ -145,7 +145,7 @@ async def get_main_chans():
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
     await c.execute('SELECT * FROM {}.channels'.format(g.db_name))
-    results = await c.fetchall()
+    results = [chan[0] for chan in await c.fetchall()]
     db.close()
     return results
 
@@ -167,6 +167,7 @@ async def get_donors():
         final.append({tup[0] : tup[1]})
     db.close()
     return final
+
 
 # Highly redundant but efficient faucet operation
 async def faucet_operations(uid, amount, ctime):

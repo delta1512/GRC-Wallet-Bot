@@ -17,7 +17,7 @@ import FAQ
 def amt_filter(inp):
     try:
         inp = float(inp)
-        if (inp < 0) or (inp <= g.MIN_TX) or not isfinite(inp):
+        if (inp < 0) or (inp < g.MIN_TX) or not isfinite(inp):
             return None
         else:
             return round(inp, 8)
@@ -65,7 +65,7 @@ async def donate(user_obj, selection, amount):
 
 
 async def rdonate(user_obj, amount):
-    return await donate(user_obj, r.randint(1, len(g.donation_accts)), amount)
+    return await donate(user_obj, r.randint(1, len(await q.get_donors())), amount)
 
 
 def index_displayer(header, index):
