@@ -65,8 +65,7 @@ class Rainbot:
         return result
 
 
-
     def get_rain_vals(self, n, amount):
-        rand_set = [uniform(0.1, 0.8) for i in range(n)]
+        rand_set = [uniform(0.1, 0.25) for i in range(n)]
         set_sum = sum(rand_set)
         return list(map(lambda x: (x/set_sum)*amount, rand_set))
