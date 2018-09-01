@@ -1,6 +1,7 @@
 from random import uniform
 import discord
 
+from extras import do_announce
 import queries as q
 import grcconf as g
 import emotes as e
@@ -37,13 +38,13 @@ class Rainbot:
         self.RBOT.balance -= rain_amt
         await q.save_user(self.RBOT)
 
-        big_string = '{}Rained `{} GRC`\n'.format(e.RAIN, rain_amt)
+        big_string = ''
         for user in final_rains:
             big_string += '<@{}>\n'.format(user)
         if len(big_string) >= 2000:
-            big_string = '{}Rainbot has rained `{} GRC` on {} users. See if you are lucky!'.format(e.RAIN, rain_amt, num_rain)
+            big_string = 'Rainbot has rained `{} GRC` on {} users. See if you are lucky!'.format(rain_amt, num_rain)
         self.get_next_thresh()
-        return big_string
+        await do_announce(big_string, docs.rain_title, client)
 
 
     def get_next_thresh(self):

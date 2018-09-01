@@ -29,7 +29,7 @@ balance_template = '''{}Your balance for: `{}`
 
 faucet_thankyou = '{}Thank you for donating to the faucet!'.format(e.HEART)
 
-rain_thankyou = '\n\nThank you for raining on the users! The rain pot is now at `{} GRC`'
+rain_thankyou = ' The rain pot is now at `{} GRC`'
 
 faq_msg = '{}The following are currently documented FAQ articles. To read, type `%faq [selection no.]` '.format(e.BOOK)
 
@@ -52,6 +52,9 @@ claim = '{}You claimed `{} GRC` from the faucet!'
 
 server_invite = '{}Come join us over at the Gridcoin Discord! {} https://discord.me/gridcoin'.format(e.HEART, e.ARR_RIGHT)
 
+announce_title = 'Announcement from the Wallet Bot Owner'
+
+rain_title = '{} RAIN!!!! {}'.format(e.RAIN, e.RAIN)
 
 ### SUCCESS MESSAGES
 new_user_success = '{}User account created successfully. Your address is `{}`'

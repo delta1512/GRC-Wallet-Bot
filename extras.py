@@ -1,4 +1,5 @@
 from math import ceil, isfinite
+import discord
 import random as r
 import time
 import io
@@ -137,6 +138,17 @@ def moon():
     year = ':two::zero:{}{}'.format(r.choice(e.NUMS[2:]), r.choice(e.NUMS))
     return '{}So when will we moon? Exactly on this date {} {}  {} / {} / {}'.format(
             e.CHART_UP, clock, e.ARR_RIGHT, day, month, year)
+
+
+async def do_announce(msg, title, client):
+    announcement = discord.Embed(title=title, colour=discord.Colour.red(), description=msg)
+    chans = await q.get_main_chans()
+    for chanID in chans:
+        try:
+            chan = client.get_channel(int(chanID))
+            await chan.send(embed=announcement)
+        except Exception:
+            pass
 
 
 #ban [user] [chan]

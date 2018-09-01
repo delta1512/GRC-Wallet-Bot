@@ -86,7 +86,7 @@ def user_time(crtime):
 
 async def check_rain(ctx):
     if rbot.can_rain():
-        await ctx.send(await rbot.do_rain(client))
+        await rbot.do_rain(client)
 ###
 
 
@@ -423,16 +423,7 @@ async def channel(ctx, *args):
 @client.command()
 @is_owner()
 async def announce(ctx):
-    announcement = discord.Embed(title='Announcement from the Wallet Bot Owner', colour=discord.Colour.red(),
-    description=ctx.message.content.replace('%announce ', ''))
-    chans = await q.get_main_chans()
-    for chanID in chans:
-        try:
-            chan = client.get_channel(int(chanID))
-            await chan.send(embed=announcement)
-        except Exception as E:
-            print(E)
-            pass
+    await extras.do_announce(ctx.message.content.replace('%announce ', ''), docs.announce_title, client)
 ###
 
 
