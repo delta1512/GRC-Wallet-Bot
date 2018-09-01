@@ -90,7 +90,7 @@ async def check_rain(ctx):
 ###
 
 
-#@client.event
+@client.event
 async def on_command_error(ctx, error):
     if hasattr(ctx.command, 'on_error'):
         return
