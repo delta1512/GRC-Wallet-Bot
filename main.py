@@ -90,7 +90,7 @@ async def check_rain(ctx):
 ###
 
 
-@client.event
+#@client.event
 async def on_command_error(ctx, error):
     if hasattr(ctx.command, 'on_error'):
         return
@@ -98,7 +98,7 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
         return await ctx.send(f'{e.INFO}Invalid command. Type `%help` for help.')
     if isinstance(error, errors.NotInUDB):
-        return await ctx.send(f'{e.ERROR}You are not in user database. (try `%new` or type `%help` for help)')
+        return await ctx.send(f'{e.ERROR}You do not have an account. (type `%new` to register or type `%help` for help)')
     if isinstance(error, commands.MissingRequiredArgument):
         if ctx.command.name == 'withdraw':
             return await ctx.send(f'{e.INFO}To withdraw from your account type: `%wdr [address to send to] [amount-GRC]`\nA service fee of {g.tx_fee} GRC is subtracted from what you send. If you wish to send GRC to someone in the server, use `%give`')
@@ -340,6 +340,7 @@ async def rain(ctx, amount: float):
 @client.command()
 @commands.guild_only()
 @limit_to_main_channel()
+@in_udb()
 async def qr(ctx, text=None):
     if text is None:
         addr = (await q.get_bal(str(ctx.author.id)))[1]
@@ -376,6 +377,10 @@ async def ping(ctx):
     time_delta = round((t2 - t1) * 1000)
     await ctx.send(f"`{time_delta}ms`")
 
+
+@client.command()
+async def invite(ctx):
+    await ctx.send(docs.server_invite)
 
 ### ADMINISTRATION COMMANDS
 @client.command()

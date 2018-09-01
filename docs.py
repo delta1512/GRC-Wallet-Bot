@@ -50,6 +50,8 @@ Notable mentions:
 
 claim = '{}You claimed `{} GRC` from the faucet!'
 
+server_invite = '{}Come join us over at the Gridcoin Discord! {} https://discord.me/gridcoin'.format(e.HEART, e.ARR_RIGHT)
+
 
 ### SUCCESS MESSAGES
 new_user_success = '{}User account created successfully. Your address is `{}`'
