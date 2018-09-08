@@ -91,7 +91,9 @@ def is_owner():
 
 def new_user_restriction():
     def predicate(ctx):
-        return user_time(ctx.message.author.created_at)+24*60*60*g.NEW_USR_TIME < time()
+        if user_time(ctx.message.author.created_at)+24*60*60*g.NEW_USR_TIME > time():
+            raise errors.TooNew()
+        return True
     return commands.check(predicate)
 ###
 
@@ -105,7 +107,7 @@ async def on_command_error(ctx, error):
         return await ctx.send(f'{e.INFO}Invalid command. Type `%help` for help.')
     if isinstance(error, errors.NotInUDB):
         return await ctx.send(f'{e.ERROR}You do not have an account. (type `%new` to register or type `%help` for help)')
-    if isinstance(error, error.TooNew):
+    if isinstance(error, errors.TooNew):
         return await ctx.send(docs.too_new_msg)
     if isinstance(error, commands.MissingRequiredArgument):
         if ctx.command.name == 'withdraw':
@@ -203,13 +205,8 @@ async def new(ctx):
             logging.error('Could not create new user for %s. Error: %s', ctx.author.id, E)
             return await ctx.send(docs.new_user_fail)
 
-        if ctx.author.dm_channel is None:
-            await ctx.author.create_dm()
-        try:
-            await ctx.author.send(embed=docs.rules)
-            await ctx.author.send(embed=docs.terms)
-        except discord.errors.Forbidden:
-            await ctx.send(docs.rule_fail_send)
+        await extras.dm_user(ctx, docs.rules, msg_on_fail=True)
+        await extras.dm_user(ctx, docs.terms, msg_on_fail=True)
     else:
         await ctx.send(docs.already_user)
 
@@ -232,14 +229,8 @@ async def faq(ctx, query: int):
     reply = extras.faq(query)
     if isinstance(reply, str):
         await ctx.send(reply)
-    else:
-        if ctx.author.dm_channel is None:
-            await ctx.author.create_dm()
-        try:
-            await ctx.author.send(embed=reply)
-            await ctx.message.add_reaction(e.WHITE_CHECK)
-        except discord.errors.Forbidden:
-            await ctx.send(docs.fail_dm)
+    elif await extras.dm_user(ctx, reply, msg_on_fail=True):
+        await ctx.message.add_reaction(e.WHITE_CHECK)
 
 
 @client.command()
@@ -249,24 +240,14 @@ async def block(ctx, query: int):
 
 @client.command()
 async def rules(ctx):
-    if ctx.author.dm_channel is None:
-        await ctx.author.create_dm()
-    try:
-        await ctx.author.send(embed=docs.rules)
+    if await extras.dm_user(ctx, docs.rules, msg_on_fail=True):
         await ctx.message.add_reaction(e.WHITE_CHECK)
-    except discord.errors.Forbidden:
-        await ctx.send(docs.rule_fail_send)
 
 
 @client.command()
 async def terms(ctx):
-    if ctx.author.dm_channel is None:
-        await ctx.author.create_dm()
-    try:
-        await ctx.author.send(embed=docs.terms)
+    if await extras.dm_user(ctx, docs.terms, msg_on_fail=True):
         await ctx.message.add_reaction(e.WHITE_CHECK)
-    except discord.errors.Forbidden:
-        await ctx.send(docs.rule_fail_send)
 
 
 @client.command(aliases=['bal'])
@@ -339,8 +320,7 @@ async def faucet(ctx):
 
 
 @client.command()
-@in_udb
-@commands.guild_only()
+@in_udb()
 async def rain(ctx, amount: float):
     user_obj = await q.get_user(str(ctx.author.id))
     await ctx.send(await rbot.contribute(extras.amt_filter(amount), user_obj))

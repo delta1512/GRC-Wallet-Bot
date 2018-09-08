@@ -1,7 +1,7 @@
 from random import uniform
 import discord
 
-from extras import do_announce
+from extras import do_announce, dm_user
 import queries as q
 import grcconf as g
 import emotes as e
@@ -22,29 +22,29 @@ class Rainbot:
     async def do_rain(self, client):
         ulist_dict = await q.get_addr_uid_dict()
         ulist = [ulist_dict[addr] for addr in ulist_dict]
-        online = set()
+        online_ids = set()
+        online_members = set()
         remainder = uniform(0.001, 0.01)
         rain_amt = round(self.RBOT.balance - remainder, 8)
 
         for member in client.get_all_members():
             if member.status == discord.Status.online and str(member.id) in ulist:
-                online.add(str(member.id))
-        num_rain = len(online)
+                online_ids.add(str(member.id))
+                online_members.add(member)
+        num_rain = len(online_ids)
 
         final_rains = {}
         for val in self.get_rain_vals(num_rain, self.RBOT.balance-remainder):
-            final_rains[online.pop()] = val
+            final_rains[online_ids.pop()] = val
         await q.apply_balance_changes(final_rains)
         self.RBOT.balance -= rain_amt
         await q.save_user(self.RBOT)
 
-        big_string = ''
-        for user in final_rains:
-            big_string += '<@{}>\n'.format(user)
-        if len(big_string) >= 2000:
-            big_string = 'Rainbot has rained `{} GRC` on {} users. See if you are lucky!'.format(rain_amt, num_rain)
+        for member in online_members:
+            await dm_user(member, docs.dm_rain_msg)
+        await do_announce('Rainbot has rained `{} GRC` on {} users!'.format(rain_amt, num_rain), docs.rain_title, client)
+
         self.get_next_thresh()
-        await do_announce(big_string, docs.rain_title, client)
 
 
     def get_next_thresh(self):

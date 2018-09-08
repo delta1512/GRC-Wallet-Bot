@@ -151,6 +151,21 @@ async def do_announce(msg, title, client):
             pass
 
 
+async def dm_user(authr, msg_embed, msg_on_fail=False):
+    if not isinstance(authr, discord.Member):
+        ctx = authr
+        authr = authr.author
+    if authr.dm_channel is None:
+        await authr.create_dm()
+    try:
+        await authr.send(embed=msg_embed)
+        return True
+    except discord.errors.Forbidden:
+        if msg_on_fail:
+            await ctx.send(docs.rule_fail_send)
+        return False
+
+
 #ban [user] [chan]
 #unban [user]
 async def blist_iface(args, blist_obj):
