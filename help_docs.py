@@ -56,7 +56,6 @@ Format: %rain [amount-GRC]
 Typing %rain on its own will display the current rain balance and threshold.
 Once the balance of the rainbot exceeds the threshold, it will rain on all **online** users.''')
 
-
 faucet = discord.Embed(title='Get some free GRC: %faucet %get', colour=discord.Colour.orange(),
 description='''
 Type this command to get some free Gridcoins.
@@ -91,6 +90,9 @@ time = discord.Embed(title='Show your timeouts: %time', colour=discord.Colour.or
 description='''
 Shows faucet, withdrawal and donation availability and time until eligibility.''')
 
+invite = discord.Embed(title='Get the link to the main server: %invite', colour=discord.Colour.orange(),
+description='''Shows the invite link to the official Gridcoin server.''')
+
 rules_help = discord.Embed(title='Show the bot rules: %rules', colour=discord.Colour.orange(),
 description='''
 Rules about using the bot and what may result in a ban.''')
@@ -117,6 +119,7 @@ help_dict = {
     'block'     :   block,
     'status'    :   status,
     'time'      :   time,
+    'invite'    :   invite,
     'rules'     :   rules_help,
     'terms'     :   terms_help,
     'info'      :   info_help
