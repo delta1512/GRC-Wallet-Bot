@@ -38,28 +38,6 @@ rbot = None
 main_chans = []
 
 
-### DECORATORS
-def in_udb():
-    async def predicate(ctx):
-        if not await q.uid_exists(str(ctx.author.id)):
-            raise errors.NotInUDB()
-        return True
-    return commands.check(predicate)
-
-
-def limit_to_main_channel():
-    def predicate(ctx):
-        return str(ctx.channel.id) in main_chans or isinstance(ctx.channel, discord.DMChannel)
-    return commands.check(predicate)
-
-
-def is_owner():
-    def predicate(ctx):
-        return str(ctx.author.id) == g.owner_id
-    return commands.check(predicate)
-###
-
-
 ### GENERAL FUNCTIONS
 def checkspam(user): # Possible upgrade: use discord.utils.snowflake_time to get their discord account creation date
     global latest_users
@@ -90,6 +68,34 @@ async def check_rain(ctx):
 ###
 
 
+### DECORATORS
+def in_udb():
+    async def predicate(ctx):
+        if not await q.uid_exists(str(ctx.author.id)):
+            raise errors.NotInUDB()
+        return True
+    return commands.check(predicate)
+
+
+def limit_to_main_channel():
+    def predicate(ctx):
+        return str(ctx.channel.id) in main_chans or isinstance(ctx.channel, discord.DMChannel)
+    return commands.check(predicate)
+
+
+def is_owner():
+    def predicate(ctx):
+        return str(ctx.author.id) == g.owner_id
+    return commands.check(predicate)
+
+
+def new_user_restriction():
+    def predicate(ctx):
+        return user_time(ctx.message.author.created_at)+24*60*60*g.NEW_USR_TIME < time()
+    return commands.check(predicate)
+###
+
+
 @client.event
 async def on_command_error(ctx, error):
     if hasattr(ctx.command, 'on_error'):
@@ -99,6 +105,8 @@ async def on_command_error(ctx, error):
         return await ctx.send(f'{e.INFO}Invalid command. Type `%help` for help.')
     if isinstance(error, errors.NotInUDB):
         return await ctx.send(f'{e.ERROR}You do not have an account. (type `%new` to register or type `%help` for help)')
+    if isinstance(error, error.TooNew):
+        return await ctx.send(docs.too_new_msg)
     if isinstance(error, commands.MissingRequiredArgument):
         if ctx.command.name == 'withdraw':
             return await ctx.send(f'{e.INFO}To withdraw from your account type: `%wdr [address to send to] [amount-GRC]`\nA service fee of {g.tx_fee} GRC is subtracted from what you send. If you wish to send GRC to someone in the server, use `%give`')
@@ -183,6 +191,7 @@ async def status(ctx):
 
 
 @client.command()
+@new_user_restriction()
 async def new(ctx):
     if not await q.uid_exists(str(ctx.author.id)):
         await ctx.send(docs.welcome)
@@ -330,6 +339,7 @@ async def faucet(ctx):
 
 
 @client.command()
+@in_udb
 @commands.guild_only()
 async def rain(ctx, amount: float):
     user_obj = await q.get_user(str(ctx.author.id))
@@ -441,11 +451,6 @@ async def on_message(msg):
     if a.bot or checkspam(user) or blacklister.is_banned(user, is_private):
         return
 
-    # Check for new user
-    if iscommand and time() < user_time(a.created_at)+24*60*60*g.NEW_USR_TIME:
-        return await msg.channel.send(docs.too_new_msg)
-
-    # Execute command if it is more than a single prefix character
     if iscommand and (len(cmd) > 1):
         cmd = cmd[1:]
         log_msg = 'COMMAND "%s" executed by %s (%s)'
