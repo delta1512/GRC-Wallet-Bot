@@ -34,7 +34,9 @@ async def dump_cfg(price_fetcher):
     if block_height < 5 or not isinstance(block_hash, str): # 5 is largest error return value
         return '{}Could not access the Gridcoin client.'.format(e.ERROR)
 
-    return '''{}Bot is up. Configuration:```
+    return '''{}Bot is up. Configuration:
+
+```
 Withdraw fee: {} GRC
 Min. transfer limit: {} GRC
 Required confirmations per withdraw: {}
