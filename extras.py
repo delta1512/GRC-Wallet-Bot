@@ -206,13 +206,13 @@ def user_stats(user_obj, client, user_time):
     for member in client.get_all_members():
         if str(member.id) == user_obj.usrID:
             user = member
-            crtime = round(user_time(member.created_at))
+            crtime = round(member.created_at.timestamp())
             break
     if user is None:
         return '```{}```'.format(final)
     final += user_obj.get_stats().replace('`', '') + '\n'
     final += 'Created at: {} {}\n'.format(crtime, time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(time.time()-crtime)))
-    jtime = round(time.mktime(member.joined_at.timetuple()))
+    jtime = round(member.joined_at.timestamp())
     final += 'Joined at: {} {}'.format(jtime, time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(time.time()-jtime)))
     return '```{}```'.format(final)
 
