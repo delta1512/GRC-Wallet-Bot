@@ -1,6 +1,7 @@
 import aiohttp
 import logging
 import json
+from datetime import datetime
 
 import grcconf as g
 
@@ -50,7 +51,7 @@ async def get_block(height):
             return None
         data['Height: '] = height
         data['Hash: '] = block_hash
-        data['Timestamp: '] = block_data['time']
+        data['Timestamp (UTC): '] = datetime.utcfromtimestamp(block_data['time']).isoformat(' ')
         data['Difficulty: '] = "{:4f}".format(block_data['difficulty'])
         data['No. of TXs: '] = len(block_data['tx'])
         data['Amount Minted: '] = block_data['mint']
