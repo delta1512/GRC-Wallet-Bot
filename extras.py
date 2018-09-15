@@ -34,23 +34,20 @@ async def dump_cfg(price_fetcher):
     if block_height < 5 or not isinstance(block_hash, str): # 5 is largest error return value
         return '{}Could not access the Gridcoin client.'.format(e.ERROR)
 
-    return '''{}Bot is up. Configuration:
+    return f'''{e.ONLINE}Bot is up. Configuration:
 
 ```
-Withdraw fee: {} GRC
-Min. transfer limit: {} GRC
-Required confirmations per withdraw: {}
-Faucet timeout: {} Hours
-Users: {}
-Block height: {}
-Latest hash: {}
-Price (USD): ${}
+Withdraw fee: {g.tx_fee} GRC
+Min. transfer limit: {g.MIN_TX} GRC
+Required confirmations per withdraw: {g.tx_timeout}
+Faucet timeout: {g.FCT_REQ_LIM} Hours
+Users: {len(await q.get_addr_uid_dict())}
+Block height: {block_height}
+Latest hash: {block_hash}
+Price (USD): ${round(await price_fetcher.price(), 4)}
 
-Faucet funds: {} GRC ({})
-Rain Funds: {} GRC ({})```'''.format(e.ONLINE, g.tx_fee, g.MIN_TX, g.tx_timeout,
-g.FCT_REQ_LIM, len(await q.get_addr_uid_dict()), block_height, block_hash,
-round(await price_fetcher.price(), 4), round(fct_info[0], 8), fct_info[1],
-round(rain_info[0], 8), rain_info[1])
+Faucet funds: {round(fct_info[0], 8)} GRC ({fct_info[1]})
+Rain Funds: {round(rain_info[0], 8)} GRC ({rain_info[1]})```'''
 
 
 async def donate(user_obj, selection, amount):
