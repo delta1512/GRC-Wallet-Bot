@@ -76,7 +76,7 @@ fail_dm = '{}It appears the bot cannot PM you.'.format(e.INFO)
 
 cannot_send_self = '{}You cannot send funds to yourself.'.format(e.ERROR)
 
-rule_fail_send = fail_dm + '\nPlease enable direct messages via discord and type `%rules` and `%terms` or check the pinned messages.'.format(e.INFO)
+rule_fail_send = fail_dm + '\nPlease enable direct messages via discord and type `%rules` and `%terms` or check the pinned messages.'
 
 wait_confirm = '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
 
