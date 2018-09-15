@@ -6,7 +6,7 @@ This bot aims to be a third part wallet service for the Gridcoin cryptocurrency 
 
 ## Requirements
 
-* Python 3.6
+* Python 3.7
 
 * A remote MYSQL database (such as [MariaDB](https://mariadb.com/))
 
