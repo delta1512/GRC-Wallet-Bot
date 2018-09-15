@@ -178,7 +178,7 @@ async def on_ready():
 
     try:
         main_chans = await q.get_main_chans()
-        logging.info('Loaded main channels:' + ''.join(['\n{}'.format(c) for c in main_chans]))
+        logging.info('Loaded main channels:' + ''.join([f'\n{c}' for c in main_chans]))
     except Exception as E:
         logging.error('Failed to load main channels: %s', E)
 

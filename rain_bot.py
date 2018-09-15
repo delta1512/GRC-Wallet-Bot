@@ -42,7 +42,7 @@ class Rainbot:
 
         for member in online_members:
             await dm_user(member, docs.dm_rain_msg)
-        await do_announce('Rainbot has rained `{} GRC` on {} users!'.format(rain_amt, num_rain), docs.rain_title, client)
+        await do_announce(f'Rainbot has rained `{rain_amt} GRC` on {num_rain} users!', docs.rain_title, client)
 
         self.get_next_thresh()
 
