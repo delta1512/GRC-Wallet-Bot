@@ -91,7 +91,7 @@ def is_owner():
 
 def new_user_restriction():
     def predicate(ctx):
-        if user_time(ctx.message.author.created_at)+24*60*60*g.NEW_USR_TIME > time():
+        if ctx.message.author.created_at + timedelta(days=g.NEW_USR_TIME) > datetime.utcnow():
             raise errors.TooNew()
         return True
     return commands.check(predicate)
