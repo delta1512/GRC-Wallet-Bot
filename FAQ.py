@@ -149,7 +149,7 @@ The official pool guide can be found [here]({})'''.format(links[4], links[5], li
 
 # How do I get started with solo mining?
 solo_mining = discord.Embed(title='How do I get started with solo mining?', colour=discord.Colour.purple(),
-description='''
+description=r'''
 1. Download and install [BOINC]({}) and choose a project in the [whitelist]({}) to begin crunching from.
 
 2. In your BOINC manager click View > Advanced View..., then click the projects tab.
@@ -299,7 +299,7 @@ Running the GRC client on multiple machines with the same CPID may get you tempo
 ''')
 
 # Example GRC config windows
-example_windows = discord.Embed(description='''```
+example_windows = discord.Embed(description=r'''```
 email=YOUREMAIL@example.com
 boincdatadir=C:\ProgramData\BOINC\
 boincappdir=C:\Program Files\BOINC\
@@ -318,7 +318,7 @@ addnode=de.gridcoin.pl # Germany
 ```''')
 
 # Example GRC config linux
-example_linux = discord.Embed(description='''```
+example_linux = discord.Embed(description=r'''```
 email=YOUREMAIL@example.com
 boincdatadir=/var/lib/boinc-client/
 addnode=la.grcnode.co.uk
