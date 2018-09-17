@@ -198,7 +198,7 @@ async def burn_coins(args):
     return f'Burned `{amt} GRC` from `{args[0]}`'
 
 
-def user_stats(user_obj, client, user_time):
+def user_stats(user_obj, client):
     final = f'User ID: {user_obj.usrID}\n'
     user = None
     for member in client.get_all_members():
