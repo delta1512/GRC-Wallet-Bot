@@ -5,8 +5,8 @@ import discord
 def help_main():
     acc = 'Type %help [topic] for more detailed information about the following:\n'
     for topic in help_dict:
-        acc += '- {}\n'.format(topic)
-    return '```{}```'.format(acc)
+        acc += f'- {topic}\n'
+    return f'```{acc}```'
 
 new = discord.Embed(title='Create a new account: %new', colour=discord.Colour.orange(),
 description='''
@@ -21,12 +21,12 @@ Deposits should arrive within 5 minutes of a transaction taking place.
 If the bot is offline, you are still safe to make deposits.''')
 
 wdr = discord.Embed(title='Withdraw your funds: %wdr %withdraw %send', colour=discord.Colour.orange(),
-description='''
+description=f'''
 **Format: %wdr [address to send to] [amount-GRC]**
 
 Takes your GRC out of the bot's wallet.
-Fee for withdraw is {} GRC and is automatically deducted.
-If you wish to transfer to another user, use %give instead.'''.format(g.tx_fee))
+Fee for withdraw is {g.tx_fee} GRC and is automatically deducted.
+If you wish to transfer to another user, use %give instead.''')
 
 donate = discord.Embed(title='Donate to someone: %donate', colour=discord.Colour.orange(),
 description='''
@@ -57,10 +57,10 @@ Typing %rain on its own will display the current rain balance and threshold.
 Once the balance of the rainbot exceeds the threshold, it will rain on all **online** users.''')
 
 faucet = discord.Embed(title='Get some free GRC: %faucet %get', colour=discord.Colour.orange(),
-description='''
+description=f'''
 Type this command to get some free Gridcoins.
-Amounts are random and you can only request once per {} hours.
-To help fund the faucet, you can type `%fgive [amount-GRC]`.'''.format(g.FCT_REQ_LIM))
+Amounts are random and you can only request once per {g.FCT_REQ_LIM} hours.
+To help fund the faucet, you can type `%fgive [amount-GRC]`.''')
 
 qr = discord.Embed(title='Generate a QR code: %qr', colour=discord.Colour.orange(),
 description='''

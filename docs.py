@@ -3,7 +3,7 @@ import emotes as e
 import discord
 
 ### GENERAL MESSAGES
-welcome = '{}Welcome to the GRC Wallet Bot! Type `%help` for more commands and be sure to read the `%terms` and `%rules`'.format(e.CELEBRATE)
+welcome = f'{e.CELEBRATE}Welcome to the GRC Wallet Bot! Type `%help` for more commands and be sure to read the `%terms` and `%rules`'
 
 faucet_msg = '''The faucet currently contains `{} GRC`.
 
@@ -30,11 +30,11 @@ Last transaction amount: {}```'''
 balance_template = '''{}Your balance for: `{}`
 ```{} GRC (${} USD)```'''
 
-faucet_thankyou = '{}Thank you for donating to the faucet!'.format(e.HEART)
+faucet_thankyou = f'{e.HEART}Thank you for donating to the faucet!'
 
 rain_thankyou = ' The rain pot is now at `{} GRC`'
 
-faq_msg = '{}The following are currently documented FAQ articles. To read, type `%faq [selection no.]` '.format(e.BOOK)
+faq_msg = f'{e.BOOK}The following are currently documented FAQ articles. To read, type `%faq [selection no.]` '
 
 donation_recipient = '\nYou donated to {}!'
 
@@ -53,11 +53,11 @@ Notable mentions:
 
 claim = '{}You claimed `{} GRC` from the faucet!'
 
-server_invite = '{}Come join us over at the Gridcoin Discord! {} https://discord.me/gridcoin'.format(e.HEART, e.ARR_RIGHT)
+server_invite = f'{e.HEART}Come join us over at the Gridcoin Discord! {e.ARR_RIGHT} https://discord.me/gridcoin'
 
 announce_title = 'Announcement from the Wallet Bot Owner'
 
-rain_title = '{} RAIN!!!! {}'.format(e.RAIN, e.RAIN)
+rain_title = f'{e.RAIN} RAIN!!!! {e.RAIN}'
 
 ### SUCCESS MESSAGES
 new_user_success = '{}User account created successfully. Your address is `{}`'
@@ -68,31 +68,31 @@ internal_tx_success = '{}In-server transaction of `{} GRC` was successful.'
 
 
 ### ERROR MESSAGES
-new_user_fail = '{}Something went wrong when trying to make your account, please contact the owner.'.format(e.ERROR)
+new_user_fail = f'{e.ERROR}Something went wrong when trying to make your account, please contact the owner.'
 
-already_user = '{}Cannot create new account, you already have one.'.format(e.CANNOT)
+already_user = f'{e.CANNOT}Cannot create new account, you already have one.'
 
-fail_dm = '{}It appears the bot cannot PM you.'.format(e.INFO)
+fail_dm = f'{e.INFO}It appears the bot cannot PM you.'
 
-cannot_send_self = '{}You cannot send funds to yourself.'.format(e.ERROR)
+cannot_send_self = f'{e.ERROR}You cannot send funds to yourself.'
 
 rule_fail_send = fail_dm + '\nPlease enable direct messages via discord and type `%rules` and `%terms` or check the pinned messages.'
 
-wait_confirm = '{}Please wait for your previous transaction to be confirmed.'.format(e.CANNOT)
+wait_confirm = f'{e.CANNOT}Please wait for your previous transaction to be confirmed.'
 
-invalid_val = '{}The value provided was invalid.'.format(e.ERROR)
+invalid_val = f'{e.ERROR}The value provided was invalid.'
 
-invalid_selection = '{}Invalid selection.'.format(e.ERROR)
+invalid_selection = f'{e.ERROR}Invalid selection.'
 
-insufficient_funds = '{}You have insufficient funds to make that transfer.'.format(e.ERROR)
+insufficient_funds = f'{e.ERROR}You have insufficient funds to make that transfer.'
 
-more_than_fee_and_min = '{}You must provide an amount that is greater than the fee and minimum (`{} GRC`).'.format(e.ERROR, g.tx_fee + g.MIN_TX)
+more_than_fee_and_min = f'{e.ERROR}You must provide an amount that is greater than the fee and minimum (`{g.tx_fee + g.MIN_TX} GRC`).'
 
-tx_error = '{}Error: A transaction could not be made.'.format(e.ERROR)
+tx_error = f'{e.ERROR}Error: A transaction could not be made.'
 
-pm_restrict = '{}The bot cannot process this command through private messages.'.format(e.CANNOT)
+pm_restrict = f'{e.CANNOT}The bot cannot process this command through private messages.'
 
-too_new_msg = '{}Your account is too new to be using the bot, please ensure your account is at least {} days old.'.format(e.CANNOT, g.NEW_USR_TIME)
+too_new_msg = f'{e.CANNOT}Your account is too new to be using the bot, please ensure your account is at least {g.NEW_USR_TIME} days old.'
 
 
 ### RULES AND TERMS

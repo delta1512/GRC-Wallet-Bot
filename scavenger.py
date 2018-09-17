@@ -74,7 +74,7 @@ async def scavenge():
     global last_block
     with open(g.LST_BLK, 'r') as last_block_file:
         last_block = int(last_block_file.read().replace('\n', ''))
-        logging.info('Starting blockchain scavenger at height: {}.'.format(last_block))
+        logging.info(f'Starting blockchain scavenger at height: {last_block}.')
     while True:
         try:
             await blk_searcher()

@@ -33,7 +33,7 @@ async def dump_cfg(price_fetcher):
     fct_info = await q.get_bal('FAUCET')
     rain_info = await q.get_bal('RAIN')
     if block_height < 5 or not isinstance(block_hash, str): # 5 is largest error return value
-        return '{}Could not access the Gridcoin client.'.format(e.ERROR)
+        return f'{e.ERROR}Could not access the Gridcoin client.'
 
     return f'''{e.ONLINE}Bot is up. Configuration:
 
@@ -85,7 +85,7 @@ async def faucet(uid):
         return '{}Request too recent. Faucet timeout is {} hours. Try again in: {}'.format(e.CANNOT, g.FCT_REQ_LIM,
         time.strftime("%H Hours %M Minutes %S Seconds", time.gmtime(ceil(user_obj.next_fct()-ctime))))
     if exit_code == 2:
-        return '{}Unfortunately the faucet balance is too low. Try again soon.'.format(e.DOWN)
+        return f'{e.DOWN}Unfortunately the faucet balance is too low. Try again soon.'
     return docs.claim.format(e.GOOD, amount) + ' Your new balance is `{} GRC`'.format(round(user_obj.balance, 8))
 
 
@@ -122,11 +122,11 @@ def faq(query):
 async def show_block(height):
     data = await w.get_block(height)
     if data is None:
-        return '{}Could not fetch block data.'.format(e.ERROR)
+        return f'{e.ERROR}Could not fetch block data.'
     acc = ''
     for key in data:
         acc += key + str(data[key]) + '\n'
-    return '```{}```'.format(acc)
+    return f'```{acc}```'
 
 
 def moon():
@@ -173,14 +173,14 @@ async def blist_iface(args, blist_obj):
         if len(args) == 3:
             await blist_obj.new_blist(args[1], True if args[2] == 'priv' else False)
             return e.GOOD[:-3]
-        return '{}Invalid args'.format(e.ERROR)
+        return f'{e.ERROR}Invalid args'
     elif args[0] == 'unban':
         if len(args) == 2:
             await blist_obj.remove_blist(args[1])
             return e.GOOD[:-3]
-        return '{}Invalid args'.format(e.ERROR)
+        return f'{e.ERROR}Invalid args'
     else:
-        return '{}Invalid command'.format(e.ERROR)
+        return f'{e.ERROR}Invalid command'
 
 
 async def burn_coins(args):
@@ -195,11 +195,11 @@ async def burn_coins(args):
     else:
         from_user.balance -= amt
         await q.save_user(from_user)
-    return 'Burned `{} GRC` from `{}`'.format(amt, args[0])
+    return f'Burned `{amt} GRC` from `{args[0]}`'
 
 
-def user_stats(user_obj, client):
-    final = 'User ID: {}\n'.format(user_obj.usrID)
+def user_stats(user_obj, client, user_time):
+    final = f'User ID: {user_obj.usrID}\n'
     user = None
     for member in client.get_all_members():
         if str(member.id) == user_obj.usrID:
@@ -207,12 +207,12 @@ def user_stats(user_obj, client):
             crtime = round(member.created_at.replace(tzinfo=timezone.utc).timestamp())
             break
     if user is None:
-        return '```{}```'.format(final)
+        return f'```{final}```'
     final += user_obj.get_stats().replace('`', '') + '\n'
     final += 'Created at: {} {}\n'.format(crtime, time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(time.time()-crtime)))
     jtime = round(member.joined_at.replace(tzinfo=timezone.utc).timestamp())
     final += 'Joined at: {} {}'.format(jtime, time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(time.time()-jtime)))
-    return '```{}```'.format(final)
+    return f'```{final}```'
 
 
 def check_times(user_obj):
