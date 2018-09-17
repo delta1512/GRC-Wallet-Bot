@@ -53,15 +53,6 @@ def checkspam(user): # Possible upgrade: use discord.utils.snowflake_time to get
         return False
 
 
-def user_time(crtime):
-    crtime = str(crtime)
-    try:
-        crtime = crtime[:crtime.index('.')]
-    except ValueError:
-        pass
-    return mktime(strptime(crtime, '%Y-%m-%d %H:%M:%S'))
-
-
 async def check_rain(ctx):
     if rbot.can_rain():
         await rbot.do_rain(client)
@@ -397,7 +388,7 @@ async def stat(ctx, *args):
     else:
         user_obj = await q.get_user(args[0])
         if user_obj is None: return;
-    await ctx.send(extras.user_stats(user_obj, client, user_time))
+    await ctx.send(extras.user_stats(user_obj, client))
 
 
 @client.command()

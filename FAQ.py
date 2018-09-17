@@ -160,7 +160,7 @@ description=r'''
 
 5. Configure the client according to the prompts or follow the [guide]({})
 
-6. After configuration, close the client completely and then open your configuration folder (Windows: C:\[User]\Appdata\Roaming\Gridcoinresearch\) (Linux: ~/.GridcoinResearch/)
+6. After configuration, close the client completely and then open your configuration folder (Windows: C:\\[User]\\Appdata\\Roaming\\Gridcoinresearch\\) (Linux: ~/.GridcoinResearch/)
 
 7. Delete everything in this folder apart from the wallet.dat, gridcoinresearch.conf and the walletbackups folder.
 
