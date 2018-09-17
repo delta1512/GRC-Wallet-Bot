@@ -3,6 +3,7 @@ import discord
 import random as r
 import time
 import io
+from datetime import timezone
 
 import qrcode
 
@@ -203,13 +204,13 @@ def user_stats(user_obj, client):
     for member in client.get_all_members():
         if str(member.id) == user_obj.usrID:
             user = member
-            crtime = round(member.created_at.timestamp())
+            crtime = round(member.created_at.replace(tzinfo=timezone.utc).timestamp())
             break
     if user is None:
         return '```{}```'.format(final)
     final += user_obj.get_stats().replace('`', '') + '\n'
     final += 'Created at: {} {}\n'.format(crtime, time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(time.time()-crtime)))
-    jtime = round(member.joined_at.timestamp())
+    jtime = round(member.joined_at.replace(tzinfo=timezone.utc).timestamp())
     final += 'Joined at: {} {}'.format(jtime, time.strftime("(%m Months %d Days %H Hours %M Minutes ago)", time.gmtime(time.time()-jtime)))
     return '```{}```'.format(final)
 
