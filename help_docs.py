@@ -56,7 +56,7 @@ Format: %rain [amount-GRC]
 Typing %rain on its own will display the current rain balance and threshold.
 Once the balance of the rainbot exceeds the threshold, it will rain on all **online** users.''')
 
-faucet = discord.Embed(title='Get some free GRC: %faucet %get', colour=discord.Colour.orange(),
+faucet = discord.Embed(title='Get some free GRC: %faucet %get %fct', colour=discord.Colour.orange(),
 description=f'''
 Type this command to get some free Gridcoins.
 Amounts are random and you can only request once per {g.FCT_REQ_LIM} hours.
