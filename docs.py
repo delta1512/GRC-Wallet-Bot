@@ -47,7 +47,7 @@ If there are any problems, glitches or crashes, please notify me or the contribu
 Notable mentions:
 - [Jorkermc](https://github.com/jorkermc)
 - [Chrstphrchvz](https://github.com/chrstphrchvz)
-- Nathanielcwm
+- [Nathanielcwm](https://github.com/nathanielcwm)
 - Foxifi
 - [LavRadis](https://steemit.com/@lavradis)
 ''')

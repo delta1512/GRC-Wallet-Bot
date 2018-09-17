@@ -5,3 +5,4 @@ grcconf.py.bak
 *.log
 blist
 priv_blist
+testing.py
