@@ -15,7 +15,7 @@ Donate GRC to this address `{}`
 or type `%rain [amount-GRC]` to build up rain.'''
 
 dm_rain_msg = discord.Embed(title='RAIN!!!', colour=discord.Colour.orange(),
-description='You\'ve been rained on! Check your new balance with %bal')
+description="You've been rained on! Check your new balance with %bal")
 
 user_data_template = '''```
 Address: {}
