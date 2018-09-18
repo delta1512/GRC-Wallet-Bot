@@ -131,7 +131,7 @@ async def show_block(height):
 
 def moon():
     clock = ':clock{}:'.format(r.randint(1, 12))
-    day = '{}{}'.format(r.choice(e.NUMS[:3]), r.choice(e.NUMS))
+    day = '{}{}'.format(r.choice(e.NUMS[:3]), r.choice(e.NUMS[1:]))
     month0 = r.choice(e.NUMS[:2])
     month1 = r.choice(e.NUMS[:3]) if e.NUMS.index(month0) == 1 else r.choice(e.NUMS)
     month = month0 + month1
