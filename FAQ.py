@@ -95,7 +95,7 @@ Yes. Solo mining rewards are received by staking, which requires an existing bal
 ''')
 
 # Should I join the pool or do solo mining?
-pool_or_solo = discord.Embed(title='I\'m new to Gridcoin, should I join the pool or do solo mining?', colour=discord.Colour.purple(),
+pool_or_solo = discord.Embed(title="I'm new to Gridcoin, should I join the pool or do solo mining?", colour=discord.Colour.purple(),
 description='''
 If you do not want to invest a small amount of money to perform staking and earn research rewards, you should join the [GRC Pool]({}).
 The pool allows you to crunch projects and earn rewards without having any existing GRC to stake with. To learn how to join the pool, see `%faq 7`.

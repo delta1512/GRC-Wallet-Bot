@@ -48,7 +48,7 @@ Latest hash: {block_hash}
 Price (USD): ${round(await price_fetcher.price(), 4)}
 
 Faucet funds: {round(fct_info[0], 8)} GRC ({fct_info[1]})
-Rain Funds: {round(rain_info[0], 8)} GRC ({rain_info[1]})```'''
+Rain funds: {round(rain_info[0], 8)} GRC ({rain_info[1]})```'''
 
 
 async def donate(user_obj, selection, amount):
@@ -198,7 +198,7 @@ async def burn_coins(args):
     return f'Burned `{amt} GRC` from `{args[0]}`'
 
 
-def user_stats(user_obj, client, user_time):
+def user_stats(user_obj, client):
     final = f'User ID: {user_obj.usrID}\n'
     user = None
     for member in client.get_all_members():
