@@ -112,8 +112,8 @@ async def on_command_error(ctx, error):
         if ctx.command.name == 'fgive':
             return await ctx.send(f'{e.ERROR}Please specify an amount to give.')
         if ctx.command.name == 'rain':
-            return await ctx.send(await rbot.status())
-            await check_rain(ctx)
+            await ctx.send(await rbot.status())
+            return await check_rain(ctx)
         if ctx.command.name == 'faq':
             return await ctx.send(extras.index_displayer(docs.faq_msg, index) + '\n*Thanks to LavRadis and Foxifi for making these resources.*')
         if ctx.command.name == 'block':

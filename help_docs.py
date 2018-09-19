@@ -10,9 +10,8 @@ def help_main():
         description=f'''
 Type `%help [topic]` for more detailed information about the following:
 
-```
 {topics}
-```''')
+''')
 
 new = discord.Embed(title='Create a new account: %new', colour=discord.Colour.orange(),
 description='''
