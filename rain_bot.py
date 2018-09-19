@@ -8,14 +8,11 @@ import emotes as e
 import docs
 
 class Rainbot:
-    RBOT = None
     thresh = 0
+    balance = 0
 
 
-    def __init__(self, rainuser):
-        if rainuser is None:
-            raise TypeError
-        self.RBOT = rainuser
+    def __init__(self):
         self.get_next_thresh()
 
 
@@ -25,7 +22,7 @@ class Rainbot:
         online_ids = set()
         online_members = set()
         remainder = uniform(0.001, 0.01)
-        rain_amt = round(self.RBOT.balance - remainder, 8)
+        rain_amt = round(self.balance - remainder, 8)
 
         for member in client.get_all_members():
             if member.status == discord.Status.online and str(member.id) in ulist:
@@ -34,11 +31,10 @@ class Rainbot:
         num_rain = len(online_ids)
 
         final_rains = {}
-        for val in self.get_rain_vals(num_rain, self.RBOT.balance-remainder):
+        for val in self.get_rain_vals(num_rain, self.balance-remainder):
             final_rains[online_ids.pop()] = val
+        final_rains['RAIN'] = -rain_amt
         await q.apply_balance_changes(final_rains)
-        self.RBOT.balance -= rain_amt
-        await q.save_user(self.RBOT)
 
         for member in online_members:
             await dm_user(member, docs.dm_rain_msg)
@@ -47,22 +43,27 @@ class Rainbot:
         self.get_next_thresh()
 
 
+    async def get_balance(self):
+        self.balance = (await q.get_bal('RAIN'))[0]
+        return self.balance
+
+
     def get_next_thresh(self):
         self.thresh = round(uniform(g.MIN_RAIN, g.MAX_RAIN), 8)
 
 
-    def can_rain(self):
-        return self.RBOT.balance > self.thresh
+    async def can_rain(self):
+        return await self.get_balance() > self.thresh
 
 
-    def status(self):
-        return docs.rain_msg.format(round(self.RBOT.balance, 8), round(self.thresh, 8), self.RBOT.address)
+    async def status(self):
+        return docs.rain_msg.format(round(await self.get_balance(), 8), round(self.thresh, 8), (await q.get_bal('RAIN'))[1])
 
 
     async def contribute(self, amount, user_obj):
-        result = await user_obj.send_internal_tx(self.RBOT, amount, True)
+        result = await user_obj.send_internal_tx(await q.get_user('RAIN'), amount, True)
         if result.startswith(e.GOOD):
-            result += docs.rain_thankyou.format(round(self.RBOT.balance, 3))
+            result += docs.rain_thankyou.format(round(await self.get_balance(), 3))
         return result
 
 

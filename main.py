@@ -54,7 +54,7 @@ def checkspam(user): # Possible upgrade: use discord.utils.snowflake_time to get
 
 
 async def check_rain(ctx):
-    if rbot.can_rain():
+    if await rbot.can_rain():
         await rbot.do_rain(client)
 ###
 
@@ -112,7 +112,7 @@ async def on_command_error(ctx, error):
         if ctx.command.name == 'fgive':
             return await ctx.send(f'{e.ERROR}Please specify an amount to give.')
         if ctx.command.name == 'rain':
-            return await ctx.send(rbot.status())
+            return await ctx.send(await rbot.status())
             await check_rain(ctx)
         if ctx.command.name == 'faq':
             return await ctx.send(extras.index_displayer(docs.faq_msg, index) + '\n*Thanks to LavRadis and Foxifi for making these resources.*')
@@ -160,7 +160,8 @@ async def on_ready():
         return
 
     try:
-        rbot = Rainbot(await q.get_user(RN))
+        rbot = Rainbot()
+        await rbot.get_balance()
         logging.info('Rainbot service loaded correctly')
     except Exception as E:
         logging.error('Rainbot service failed to load: %s', E)
