@@ -3,10 +3,16 @@ import emotes as e
 import discord
 
 def help_main():
-    acc = 'Type %help [topic] for more detailed information about the following:\n'
-    for topic in help_dict:
-        acc += f'- {topic}\n'
-    return f'```{acc}```'
+    topics = '\n'.join(f'- {topic}' for topic in help_dict)
+    return discord.Embed(
+        title='GRC Wallet Bot Help',
+        colour=discord.Colour.orange(),
+        description=f'''
+Type `%help [topic]` for more detailed information about the following:
+
+```
+{topics}
+```''')
 
 new = discord.Embed(title='Create a new account: %new', colour=discord.Colour.orange(),
 description='''

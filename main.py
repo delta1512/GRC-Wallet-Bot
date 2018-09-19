@@ -119,7 +119,7 @@ async def on_command_error(ctx, error):
         if ctx.command.name == 'block':
             return await ctx.send(await extras.show_block(await w.query('getblockcount', [])))
         if ctx.command.name == 'help':
-            return await ctx.send(help_docs.help_main())
+            return await ctx.send(embed=help_docs.help_main())
     if isinstance(error, commands.NoPrivateMessage):
         return await ctx.send(docs.pm_restrict)
 
