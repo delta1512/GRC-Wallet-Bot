@@ -242,14 +242,14 @@ async def terms(ctx):
         await ctx.message.add_reaction(e.WHITE_CHECK)
 
 
-@client.command(aliases=['bal'])
+@client.command(aliases=['bal', 'b'])
 @in_udb()
 async def balance(ctx):
     data = await q.get_bal(str(ctx.author.id))
     await ctx.send(docs.balance_template.format(e.BAL, data[1], '{:.8f}'.format(abs(data[0])), await price_fetcher.conv(abs(data[0]))))
 
 
-@client.command(aliases=['addr', 'deposit'])
+@client.command(aliases=['addr', 'deposit', 'a'])
 @in_udb()
 @limit_to_main_channel()
 async def address(ctx):
