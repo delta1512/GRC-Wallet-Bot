@@ -27,6 +27,13 @@ def amt_filter(inp):
         return None
 
 
+def stringify_dict_data(data):
+    acc = ''
+    for key in data:
+        acc += key + ': ' + str(data[key]) + '\n'
+    return f'```{acc}```'
+
+
 async def dump_cfg(price_fetcher):
     block_height = await w.query('getblockcount', [])
     block_hash = await w.query('getblockhash', [block_height])
@@ -122,11 +129,15 @@ def faq(query):
 async def show_block(height):
     data = await w.get_block(height)
     if data is None:
-        return f'{e.ERROR}Could not fetch block data.'
-    acc = ''
-    for key in data:
-        acc += key + str(data[key]) + '\n'
-    return f'```{acc}```'
+        return docs.wallet_data_error
+    return stringify_dict_data(data)
+
+
+async def show_superblock():
+    data = await w.get_last_superblock()
+    if data is None:
+        return docs.wallet_data_error
+    return stringify_dict_data(data)
 
 
 def moon():

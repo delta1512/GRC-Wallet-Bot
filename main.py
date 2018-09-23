@@ -230,6 +230,11 @@ async def block(ctx, query: int):
     await ctx.send(await extras.show_block(query))
 
 
+@client.command(aliases=['sb', 'sblock'])
+async def superblock(ctx):
+    await ctx.send(await extras.show_superblock())
+
+
 @client.command()
 async def rules(ctx):
     if await extras.dm_user(ctx, docs.rules, msg_on_fail=True):

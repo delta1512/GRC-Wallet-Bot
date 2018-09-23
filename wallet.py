@@ -1,6 +1,7 @@
 import aiohttp
 import logging
 import json
+from re import finditer
 from datetime import datetime
 
 import grcconf as g
@@ -12,6 +13,19 @@ import grcconf as g
 4 - invalid type
 '''
 
+
+def scan_projects(data):
+    final = {}
+    start_projects = list(finditer('<AVERAGES>', data))[0].end()
+    end_projects = list(finditer('</AVERAGES>', data))[0].start()-1
+    for project_info in data[start_projects:end_projects].split(';'):
+        project = project_info.split(',')[0]
+        team_rac = project_info.split(',')[1]
+        if project != 'NeuralNetwork':
+            final[project] = team_rac + ' RAC'
+    return final
+
+
 async def query(cmd, params):
     if not all([isinstance(cmd, str), isinstance(params, list)]):
         logging.warning('Invalid data sent to wallet query')
@@ -20,7 +34,9 @@ async def query(cmd, params):
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(g.rpc_url, data=command, headers={'content-type': "application/json", 'cache-control': "no-cache"}, auth=aiohttp.BasicAuth(g.rpc_usr, password=g.rpc_pass)) as resp:
-                response = await resp.json()
+                raw = await resp.read()
+                text = raw.decode('utf-8', 'ignore')
+                response = json.loads(text)
     except Exception as E:
         logging.warning('Exception triggered in communication with GRC client: %s', E)
         logging.warning('CMD: %s ARGS: %s', cmd, params)
@@ -34,10 +50,12 @@ async def query(cmd, params):
     else:
         return response['result']
 
+
 async def tx(addr, amount):
     if isinstance(addr, str) and len(addr) > 1:
         return await query('sendtoaddress', [addr, amount])
     return 4
+
 
 async def get_block(height):
     current_block = await query('getblockcount', [])
@@ -49,14 +67,27 @@ async def get_block(height):
         block_data = await query('getblock', [block_hash])
         if type(block_data) is int:
             return None
-        data['Height: '] = height
-        data['Hash: '] = block_hash
-        data['Timestamp (UTC): '] = datetime.utcfromtimestamp(block_data['time']).isoformat(' ')
-        data['Difficulty: '] = "{:4f}".format(block_data['difficulty'])
-        data['No. of TXs: '] = len(block_data['tx'])
-        data['Amount Minted: '] = block_data['mint']
-        data['Superblock: '] = 'No' if (block_data['IsSuperBlock'] == 0) else 'Yes'
+        data['Height'] = height
+        data['Hash'] = block_hash
+        data['Timestamp (UTC)'] = datetime.utcfromtimestamp(block_data['time']).isoformat(' ')
+        data['Difficulty'] = "{:4f}".format(block_data['difficulty'])
+        data['No. of TXs'] = len(block_data['tx'])
+        data['Amount Minted'] = block_data['mint']
+        data['Superblock'] = 'No' if (block_data['IsSuperBlock'] == 0) else 'Yes'
         return data
+
+
+async def get_last_superblock():
+    superblocks = await query('superblocks', [])
+    height_key_string = list(superblocks[1].keys())[0]
+    height = height_key_string[height_key_string.index('#')+1:]
+    last_time = superblocks[1]['Date'] + ' UTC'
+    superblock = await query('getblock', [superblocks[1][height_key_string]])
+    super_tx = await query('gettransaction', [superblock['tx'][0]])
+    final = {'Height' : height, 'Time' : last_time}
+    final.update(scan_projects(super_tx['hashboinc']))
+    return final
+
 
 async def unlock():
     return await query('walletpassphrase', [g.grc_pass, 999999999, False])

@@ -95,6 +95,7 @@ pm_restrict = f'{e.CANNOT}The bot cannot process this command through private me
 
 too_new_msg = f'{e.CANNOT}Your account is too new to be using the bot, please ensure your account is at least {g.NEW_USR_TIME} days old.'
 
+wallet_data_error = f'{e.ERROR}Could not fetch data.'
 
 ### RULES AND TERMS
 rules = discord.Embed(title='GRC Wallet Bot Rules', colour=discord.Colour.purple(),
