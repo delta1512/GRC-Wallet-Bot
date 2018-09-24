@@ -19,8 +19,7 @@ def scan_projects(data):
     start_projects = list(finditer('<AVERAGES>', data))[0].end()
     end_projects = list(finditer('</AVERAGES>', data))[0].start()-1
     for project_info in data[start_projects:end_projects].split(';'):
-        project = project_info.split(',')[0]
-        team_rac = project_info.split(',')[1]
+        project, team_rac, __ = project_info.split(',')
         if project != 'NeuralNetwork':
             final[project] = team_rac + ' RAC'
     return final
