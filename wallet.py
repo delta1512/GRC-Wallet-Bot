@@ -70,7 +70,8 @@ async def get_block(height):
         data['Height'] = height
         data['Hash'] = block_hash
         data['Timestamp (UTC)'] = datetime.utcfromtimestamp(block_data['time']).isoformat(' ')
-        data['Difficulty'] = "{:4f}".format(block_data['difficulty'])
+        data['Difficulty'] = round(block_data['difficulty'], 4)
+        data['Net Weight'] = round(g.NET_W_MULT * block_data['difficulty'])
         data['No. of TXs'] = len(block_data['tx'])
         data['Amount Minted'] = block_data['mint']
         data['Superblock'] = 'No' if (block_data['IsSuperBlock'] == 0) else 'Yes'
@@ -79,7 +80,7 @@ async def get_block(height):
 
 async def get_last_superblock():
     superblocks = await query('superblocks', [])
-    height_key_string = list(superblocks[1].keys())[0]
+    height_key_string = [k for k in list(superblocks[1].keys()) if 'Block #' in k][0]
     height = height_key_string[height_key_string.index('#')+1:]
     last_time = superblocks[1]['Date'] + ' UTC'
     superblock = await query('getblock', [superblocks[1][height_key_string]])

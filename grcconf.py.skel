@@ -27,3 +27,4 @@ NEW_USR_TIME = 3          # Days
 MAX_RAIN = 30             # (GRC) Must be greater than MIN_RAIN
 MIN_RAIN = 10             # (GRC)
 BLK_TIME = 60             # Seconds
+NET_W_MULT = 9544517.41
