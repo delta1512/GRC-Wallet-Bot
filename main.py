@@ -100,7 +100,7 @@ async def on_command_error(ctx, error):
         return await ctx.send(f'{e.ERROR}You do not have an account. (type `%new` to register or type `%help` for help)')
     if isinstance(error, errors.TooNew):
         return await ctx.send(docs.too_new_msg)
-    if isinstance(error, commands.MissingRequiredArgument):
+    if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
         if ctx.command.name == 'withdraw':
             return await ctx.send(f'{e.INFO}To withdraw from your account type: `%wdr [address to send to] [amount-GRC]`\nA service fee of {g.tx_fee} GRC is subtracted from what you send. If you wish to send GRC to someone in the server, use `%give`')
         if ctx.command.name == 'donate':
