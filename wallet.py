@@ -33,7 +33,7 @@ async def query(cmd, params):
             async with session.post(g.rpc_url, data=command, headers={'content-type': "application/json", 'cache-control': "no-cache"}, auth=aiohttp.BasicAuth(g.rpc_usr, password=g.rpc_pass)) as resp:
                 # split up steps as a workaround for resp.json() not working
                 # with output from `gettransaction` for superblock transactions
-                # (aiohttp trying to decode <BINARY> part in hashboinc string?) 
+                # (aiohttp trying to decode <BINARY> part in hashboinc string) 
                 raw = await resp.read()
                 text = raw.decode('utf-8', 'ignore')
                 response = json.loads(text)
