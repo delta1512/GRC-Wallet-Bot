@@ -65,12 +65,11 @@ async def get_block(height):
         return None
     else:
         data = {}
-        block_hash = await query('getblockhash', [height])
-        block_data = await query('getblock', [block_hash])
+        block_data = await query('getblockbynumber', [height])
         if type(block_data) is int:
             return None
         data['Height'] = height
-        data['Hash'] = block_hash
+        data['Hash'] = block_data['hash']
         data['Timestamp (UTC)'] = datetime.utcfromtimestamp(block_data['time']).isoformat(' ')
         data['Difficulty'] = round(block_data['difficulty'], 4)
         data['Net Weight'] = round(g.NET_W_MULT * block_data['difficulty'])
