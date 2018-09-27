@@ -206,6 +206,10 @@ async def new(ctx):
 @client.command(name='help')
 @limit_to_main_channel()
 async def _help(ctx, command):  # Not overwriting the built-in help function
+    # Look up the command in case it is an alias
+    lookup_command = client.get_command(command)
+    if lookup_command is not None:
+        command = lookup_command.name
     await ctx.send(embed=extras.help_interface(command))
 
 
