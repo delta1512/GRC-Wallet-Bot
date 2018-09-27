@@ -14,13 +14,10 @@ import grcconf as g
 '''
 
 
-def scan_projects(data):
+def scan_projects(averages: str) -> dict:
     final = {}
-    start_projects = list(finditer('<AVERAGES>', data))[0].end()
-    end_projects = list(finditer('</AVERAGES>', data))[0].start()-1
-    for project_info in data[start_projects:end_projects].split(';'):
-        project = project_info.split(',')[0]
-        team_rac = project_info.split(',')[1]
+    for project_info in averages.split(';')[:-1]:
+        project, team_rac, __ = project_info.split(',')
         if project != 'NeuralNetwork':
             final[project] = team_rac + ' RAC'
     return final
@@ -34,6 +31,9 @@ async def query(cmd, params):
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(g.rpc_url, data=command, headers={'content-type': "application/json", 'cache-control': "no-cache"}, auth=aiohttp.BasicAuth(g.rpc_usr, password=g.rpc_pass)) as resp:
+                # split up steps as a workaround for resp.json() not working
+                # with output from `gettransaction` for superblock transactions
+                # (aiohttp trying to decode <BINARY> part in hashboinc string) 
                 raw = await resp.read()
                 text = raw.decode('utf-8', 'ignore')
                 response = json.loads(text)
@@ -63,13 +63,12 @@ async def get_block(height):
         return None
     else:
         data = {}
-        block_hash = await query('getblockhash', [height])
-        block_data = await query('getblock', [block_hash])
+        block_data = await query('getblockbynumber', [height])
         if type(block_data) is int:
             return None
         data['Height'] = height
-        data['Hash'] = block_hash
-        data['Timestamp (UTC)'] = datetime.utcfromtimestamp(block_data['time']).isoformat(' ')
+        data['Hash'] = block_data['hash']
+        data['Time (UTC)'] = datetime.utcfromtimestamp(block_data['time']).isoformat(' ')
         data['Difficulty'] = round(block_data['difficulty'], 4)
         data['Net Weight'] = round(g.NET_W_MULT * block_data['difficulty'])
         data['No. of TXs'] = len(block_data['tx'])
@@ -79,14 +78,12 @@ async def get_block(height):
 
 
 async def get_last_superblock():
-    superblocks = await query('superblocks', [])
-    height_key_string = [k for k in list(superblocks[1].keys()) if 'Block #' in k][0]
-    height = height_key_string[height_key_string.index('#')+1:]
-    last_time = superblocks[1]['Date'] + ' UTC'
-    superblock = await query('getblock', [superblocks[1][height_key_string]])
-    super_tx = await query('gettransaction', [superblock['tx'][0]])
-    final = {'Height' : height, 'Time' : last_time}
-    final.update(scan_projects(super_tx['hashboinc']))
+    listdata_sb = await query('listdata superblock', [])
+    height = listdata_sb['block_number']
+    sb_details = await query('getblockbynumber', [height])
+    sb_time = datetime.utcfromtimestamp(sb_details['time']).isoformat(' ')
+    final = {'Height' : height, 'Time (UTC)' : sb_time}
+    final.update(scan_projects(listdata_sb['averages']))
     return final
 
 
