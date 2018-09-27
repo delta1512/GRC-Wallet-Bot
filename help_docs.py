@@ -18,7 +18,7 @@ description='''
 An account is required to use the bot. (No personal details required)
 Be sure to also read the %rules and %terms.''')
 
-bal = discord.Embed(title='Check your balance: %bal %balance', colour=discord.Colour.orange(),
+bal = discord.Embed(title='Check your balance: %bal %balance %b', colour=discord.Colour.orange(),
 description='''
 Checks your current balance and shows your deposit address.
 To get a clipboard friendly address, use %addr.
