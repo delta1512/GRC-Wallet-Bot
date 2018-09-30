@@ -114,7 +114,7 @@ address = discord.Embed(title='Find out your address Address: %addr, %address, %
 description='''
 Format: %address
 
-Pretty self explanatory. This commmand gives you your address which you can use to deposit Gridcoin into the bot with.''')
+Pretty self explanatory. This commmand gives you your address which you can use to deposit Gridcoin into the bot with. Mobile Device Friendly.''')
 
 help_dict = {
     'new'       :   new,
