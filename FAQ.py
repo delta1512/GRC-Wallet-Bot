@@ -43,27 +43,26 @@ links = [
 'https://play.google.com/store/apps/details?id=com.bitshares.bitshareswallet', #39
 'http://gridcoin.ch/faucet.php', #40
 'https://gridcoinstats.eu/faucet.php', #41
-'https://www.eobot.com/faucet', #42
-'http://uscore.net/', #43
-'https://bittrex.com/Market/', #44
-'https://poloniex.com/', #45
-'https://c-cex.com/', #46
-'https://tradebytrade.com/', #47
-'https://bisq.network/', #48
-'https://flyp.me/', #49
-'https://bitshares.org/', #50
-'https://bit.btsabc.org/', #51
-'https://openledger.io/', #52
-'https://market.rudex.org/', #53
-'https://gridcoin.ml/', #54
-'https://gridcoin.io/', #55
-'https://gridcoin.tumblr.com/', #56
-'http://netbook.arikado.ru/faucet/', #57
-'https://www.southxchange.com/Market/List', #58
-'https://fold.it/portal/', #59
-'https://www.vodafone.co.uk/dreamlab/', #60
-'https://csgrid.org/csg/wildlife/video_selector.php', #61
-'https://voice.mozilla.org/en' #62
+'http://uscore.net/', #42
+'https://bittrex.com/Market/', #43
+'https://poloniex.com/', #44
+'https://c-cex.com/', #45
+'https://tradebytrade.com/', #46
+'https://bisq.network/', #47
+'https://flyp.me/', #48
+'https://bitshares.org/', #49
+'https://bit.btsabc.org/', #50
+'https://openledger.io/', #51
+'https://market.rudex.org/', #52
+'https://gridcoin.ml/', #53
+'https://gridcoin.io/', #54
+'https://gridcoin.tumblr.com/', #55
+'https://grc.arikado.ru/#faucet', #56
+'https://www.southxchange.com/Market/List', #57
+'https://fold.it/portal/', #58
+'https://www.vodafone.co.uk/dreamlab/', #59
+'https://csgrid.org/csg/wildlife/video_selector.php', #60
+'https://voice.mozilla.org/en' #61
 ]
 
 # What is Gridcoin?
@@ -224,12 +223,11 @@ faucet_list = discord.Embed(title='Faucets', colour=discord.Colour.purple(),
 description='''
 - [GRC Switzerland]({})
 - [Gridcoin Stats]({})
-- [Eobot]({})
 - [Uscore]({})
 - [Delta's GRC Discord bot]({})
 - [Gridcoin Faucet Android App]({})
 - [Arikado Pool Faucet]({})
-'''.format(links[40], links[41], links[42], links[43], links[11], links[54], links[57]))
+'''.format(links[40], links[41], links[42], links[11], links[53], links[56]))
 
 # Supported exchanges
 exchanges = discord.Embed(title='Supported exchanges', colour=discord.Colour.purple(),
@@ -245,8 +243,8 @@ description='''
 - [Openledger]({})
 - [Rudex]({})
 - [Southxchange]({})
-'''.format(links[44], links[45], links[46], links[47], links[48],
-            links[49], links[50], links[51], links[52], links[53], links[58]))
+'''.format(links[43], links[44], links[45], links[46], links[47],
+            links[48], links[49], links[50], links[51], links[52], links[57]))
 
 # Useful links
 useful_links = discord.Embed(title='Useful links', colour=discord.Colour.purple(),
@@ -288,7 +286,7 @@ Media and community:
             links[19], links[10], links[20], links[21], links[22], links[23],
             links[24], links[0], links[25], links[26], links[27], links[28],
             links[11], links[29], links[30], links[7], links[8], links[31],
-            links[9], links[56]))
+            links[9], links[55]))
 
 # Do I need to put the GRC client on all computers running BOINC?
 client_on_many_pc = discord.Embed(title='Do I need to put the GRC client on all computers running BOINC?', colour=discord.Colour.purple(),
@@ -342,7 +340,7 @@ description='''
 - [Dream lab]({})
 - [CSG NN training]({})
 - [Mozilla common voice]({})
-'''.format(links[59], links[60], links[61], links[62]))
+'''.format(links[58], links[59], links[60], links[61]))
 
 index = [{'What is Gridcoin?': what_is_grc},
         {'What is BOINC?' : what_is_boinc},
