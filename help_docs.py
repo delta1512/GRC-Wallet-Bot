@@ -110,6 +110,12 @@ info_help = discord.Embed(title='Information about the bot: %info', colour=disco
 description='''
 Shows information about authors and contributors.''')
 
+address = discord.Embed(title='Find out your address Address: %addr, %address, %a, %deposit', colour=discord.Colour.orange(),
+description='''
+Format: %address
+
+Pretty self explanatory. This commmand gives you your address which you can use to deposit Gridcoin into the bot with. Mobile Device Friendly.''')
+
 help_dict = {
     'new'       :   new,
     'balance'   :   bal,
@@ -127,5 +133,6 @@ help_dict = {
     'invite'    :   invite,
     'rules'     :   rules_help,
     'terms'     :   terms_help,
-    'info'      :   info_help
+    'info'      :   info_help,
+    'address'   :   address
 }
