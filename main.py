@@ -93,13 +93,14 @@ def new_user_restriction():
 async def on_command_error(ctx, error):
     if hasattr(ctx.command, 'on_error'):
         return
-
     if isinstance(error, commands.CommandNotFound):
         return await ctx.send(f'{e.INFO}Invalid command. Type `%help` for help.')
     if isinstance(error, errors.NotInUDB):
         return await ctx.send(f'{e.ERROR}You do not have an account. (type `%new` to register or type `%help` for help)')
     if isinstance(error, errors.TooNew):
         return await ctx.send(docs.too_new_msg)
+    if isinstance(error, errors.LimChannel):
+        return await ctx.send(docs.change_channel)
     if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
         if ctx.command.name == 'withdraw':
             return await ctx.send(f'{e.INFO}To withdraw from your account type: `%wdr [address to send to] [amount-GRC]`\nA service fee of {g.tx_fee} GRC is subtracted from what you send. If you wish to send GRC to someone in the server, use `%give`')
@@ -203,23 +204,23 @@ async def new(ctx):
         await ctx.send(docs.already_user)
 
 
-@client.command(name='help')
+@client.command(name='help', aliases=['Help'])
 @limit_to_main_channel()
 async def _help(ctx, command):  # Not overwriting the built-in help function
     # Look up the command in case it is an alias
-    lookup_command = client.get_command(command)
+    lookup_command = client.get_command(command.replace('[', '').replace(']', '').lower())
     if lookup_command is not None:
         command = lookup_command.name
     await ctx.send(embed=extras.help_interface(command))
 
 
-@client.command()
+@client.command(aliases=['Info'])
 @limit_to_main_channel()
 async def info(ctx):
     await ctx.send(embed=docs.info)
 
 
-@client.command()
+@client.command(aliases=['Faq', 'FAQ'])
 @limit_to_main_channel()
 async def faq(ctx, query: int):
     reply = extras.faq(query)
@@ -229,43 +230,44 @@ async def faq(ctx, query: int):
         await ctx.message.add_reaction(e.WHITE_CHECK)
 
 
-@client.command()
+@client.command(aliases=['blk', 'Block'])
 async def block(ctx, query: int):
     await ctx.send(await extras.show_block(query))
 
 
-@client.command(aliases=['sb', 'sblock'])
+@client.command(aliases=['sb', 'sblock', 'Sblock', 'Sb'])
+@limit_to_main_channel()
 async def superblock(ctx):
     await ctx.send(await extras.show_superblock())
 
 
-@client.command()
+@client.command(aliases=['Rules', 'rule', 'Rule'])
 async def rules(ctx):
     if await extras.dm_user(ctx, docs.rules, msg_on_fail=True):
         await ctx.message.add_reaction(e.WHITE_CHECK)
 
 
-@client.command()
+@client.command(aliases=['Terms', 'term', 'Term'])
 async def terms(ctx):
     if await extras.dm_user(ctx, docs.terms, msg_on_fail=True):
         await ctx.message.add_reaction(e.WHITE_CHECK)
 
 
-@client.command(aliases=['bal', 'b'])
+@client.command(aliases=['bal', 'Bal', 'BAL', 'b', 'B', 'Balance'])
 @in_udb()
 async def balance(ctx):
     data = await q.get_bal(str(ctx.author.id))
     await ctx.send(docs.balance_template.format(e.BAL, data[1], '{:.8f}'.format(abs(data[0])), await price_fetcher.conv(abs(data[0]))))
 
 
-@client.command(aliases=['addr', 'deposit', 'a'])
+@client.command(aliases=['addr', 'Addr', 'deposit', 'Deposit', 'a', 'A'])
 @in_udb()
 @limit_to_main_channel()
 async def address(ctx):
     await ctx.send((await q.get_bal(str(ctx.author.id)))[1])
 
 
-@client.command(aliases=['wdr', 'send'])
+@client.command(aliases=['wdr', 'WDR', 'send', 'Send', 'SEND', 'Withdraw'])
 @in_udb()
 @limit_to_main_channel()
 async def withdraw(ctx, address: str, amount: float):
@@ -273,7 +275,7 @@ async def withdraw(ctx, address: str, amount: float):
     await ctx.send(await user_obj.withdraw(extras.amt_filter(amount), address, g.tx_fee))
 
 
-@client.command()
+@client.command(aliases=['d', 'D', 'Donate'])
 @in_udb()
 @limit_to_main_channel()
 async def donate(ctx, selection: int, amount: float):
@@ -281,7 +283,7 @@ async def donate(ctx, selection: int, amount: float):
     await ctx.send(await extras.donate(user_obj, selection, extras.amt_filter(amount)))
 
 
-@client.command()
+@client.command(aliases=['rd', 'Rd', 'RD', 'Rdonate'])
 @in_udb()
 @limit_to_main_channel()
 async def rdonate(ctx, amount: float):
@@ -289,7 +291,7 @@ async def rdonate(ctx, amount: float):
     await ctx.send(await extras.rdonate(user_obj, extras.amt_filter(amount)))
 
 
-@client.command(aliases=['tip'])
+@client.command(aliases=['tip', 'Tip', 'TIP', 'Give'])
 @commands.guild_only()
 @in_udb()
 async def give(ctx, receiver: discord.User, amount: float):
@@ -302,7 +304,7 @@ async def give(ctx, receiver: discord.User, amount: float):
     await ctx.send(await sender_obj.send_internal_tx(receiver_obj, extras.amt_filter(amount)))
 
 
-@client.command()
+@client.command(aliases=['faucetgive', 'Faucetgive', 'fctgive', 'Fctgive', 'Fgive'])
 @in_udb()
 async def fgive(ctx, amount: float):
     user_obj = await q.get_user(str(ctx.author.id))
@@ -312,7 +314,7 @@ async def fgive(ctx, amount: float):
         await ctx.send(docs.faucet_thankyou)
 
 
-@client.command(aliases=['fct', 'get'])
+@client.command(aliases=['fct', 'Fct', 'FCT', 'get', 'Get', 'GET', 'Faucet'])
 @commands.guild_only()
 @in_udb()
 @limit_to_main_channel()
@@ -320,7 +322,7 @@ async def faucet(ctx):
     await ctx.send(await extras.faucet(str(ctx.author.id)))
 
 
-@client.command()
+@client.command(aliases=['rn', 'Rn', 'RN', 'Rain'])
 @in_udb()
 async def rain(ctx, amount: float):
     user_obj = await q.get_user(str(ctx.author.id))
@@ -328,7 +330,7 @@ async def rain(ctx, amount: float):
     await check_rain(ctx)
 
 
-@client.command()
+@client.command(aliases=['Qr', 'QR'])
 @commands.guild_only()
 @limit_to_main_channel()
 @in_udb()
@@ -339,7 +341,7 @@ async def qr(ctx, text=None):
     await ctx.send(file=discord.File(extras.get_qr(text), filename=f'{ctx.author.name}.png'))
 
 
-@client.command(name='time')
+@client.command(name='time', aliases=['Time', 'TIME', 't', 'T'])
 @in_udb()
 @limit_to_main_channel()
 async def _time(ctx):
@@ -347,12 +349,12 @@ async def _time(ctx):
     await ctx.send(extras.check_times(user_obj))
 
 
-@client.command(aliases=['grcmoon', 'whenmoon', 'lambo', 'whenlambo'])
+@client.command(aliases=['grcmoon', 'whenmoon', 'lambo', 'whenlambo', 'coffee'])
 async def moon(ctx):
     await ctx.send(extras.moon())
 
 
-@client.command(aliases=['me', 'acc'])
+@client.command(aliases=['me', 'Me', 'ME', 'acc', 'Acc', 'ACC'])
 @in_udb()
 @limit_to_main_channel()
 async def account(ctx):
@@ -360,7 +362,7 @@ async def account(ctx):
     await ctx.send(user_obj.get_stats())
 
 
-@client.command()
+@client.command(aliases=['Ping', 'PING'])
 async def ping(ctx):
     t1 = perf_counter()
     await ctx.trigger_typing()
@@ -369,9 +371,10 @@ async def ping(ctx):
     await ctx.send(f"`{time_delta}ms`")
 
 
-@client.command()
+@client.command(aliases=['i', 'I', 'Invite'])
 async def invite(ctx):
     await ctx.send(docs.server_invite)
+
 
 ### ADMINISTRATION COMMANDS
 @client.command()

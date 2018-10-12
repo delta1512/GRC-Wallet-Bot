@@ -6,3 +6,6 @@ class NotInUDB(commands.CommandError):
 
 class TooNew(commands.CommandError):
     pass
+
+class LimChannel(commands.CommandError):
+    pass

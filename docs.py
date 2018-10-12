@@ -2,6 +2,7 @@ import grcconf as g
 import emotes as e
 import discord
 
+
 ### GENERAL MESSAGES
 welcome = f'{e.CELEBRATE}Welcome to the GRC Wallet Bot! Type `%help` for more commands and be sure to read the `%terms` and `%rules`'
 
@@ -60,6 +61,7 @@ announce_title = 'Announcement from the Wallet Bot Owner'
 
 rain_title = f'{e.RAIN} RAIN!!!! {e.RAIN}'
 
+
 ### SUCCESS MESSAGES
 new_user_success = '{}User account created successfully. Your address is `{}`'
 
@@ -96,6 +98,9 @@ pm_restrict = f'{e.CANNOT}The bot cannot process this command through private me
 too_new_msg = f'{e.CANNOT}Your account is too new to be using the bot, please ensure your account is at least {g.NEW_USR_TIME} days old.'
 
 wallet_data_error = f'{e.ERROR}Could not fetch data.'
+
+change_channel = 'f{e.CANNOT}Please use the designated channel in this server for that command.'
+
 
 ### RULES AND TERMS
 rules = discord.Embed(title='GRC Wallet Bot Rules', colour=discord.Colour.purple(),
