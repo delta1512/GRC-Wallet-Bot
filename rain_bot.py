@@ -10,6 +10,7 @@ import docs
 class Rainbot:
     thresh = 0
     balance = 0
+    lock = False
 
 
     def __init__(self):
@@ -17,6 +18,10 @@ class Rainbot:
 
 
     async def do_rain(self, client):
+        if self.lock:
+            return
+        else:
+            self.lock = True
         ulist_dict = await q.get_addr_uid_dict()
         ulist = [ulist_dict[addr] for addr in ulist_dict]
         online_ids = set()
@@ -41,6 +46,7 @@ class Rainbot:
         await do_announce(f'Rainbot has rained `{rain_amt} GRC` on {num_rain} users!', docs.rain_title, client)
 
         self.get_next_thresh()
+        self.lock = False
 
 
     async def get_balance(self):
@@ -53,7 +59,7 @@ class Rainbot:
 
 
     async def can_rain(self):
-        return await self.get_balance() > self.thresh
+        return await self.get_balance() > self.thresh and not self.lock
 
 
     async def status(self):
