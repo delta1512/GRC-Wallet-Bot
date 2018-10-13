@@ -43,10 +43,10 @@ links = [
 'https://play.google.com/store/apps/details?id=com.bitshares.bitshareswallet', #39
 'http://gridcoin.ch/faucet.php', #40
 'https://gridcoinstats.eu/faucet.php', #41
-'https://www.eobot.com/faucet', #42
+'', #42
 'http://uscore.net/', #43
 'https://bittrex.com/Market/', #44
-'https://poloniex.com/', #45
+'', #45
 'https://c-cex.com/', #46
 'https://tradebytrade.com/', #47
 'https://bisq.network/', #48
@@ -58,8 +58,8 @@ links = [
 'https://gridcoin.ml/', #54
 'https://gridcoin.io/', #55
 'https://gridcoin.tumblr.com/', #56
-'http://netbook.arikado.ru/faucet/', #57
-'https://www.southxchange.com/Market/List', #58
+'https://grc.arikado.ru/#faucet', #57
+'https://www.southxchange.com/Market/Book/GRC/BTC', #58
 'https://fold.it/portal/', #59
 'https://www.vodafone.co.uk/dreamlab/', #60
 'https://csgrid.org/csg/wildlife/video_selector.php', #61
@@ -107,7 +107,7 @@ Solo mining is where you crunch your own work and earn rewards through interest 
 # How much GRC is enough to start staking?
 how_much_grc = discord.Embed(title='How much GRC is enough to start mining/staking?', colour=discord.Colour.purple(),
 description='''
-A good amount of GRC to hold in your wallet is about 1000-2000 GRC and will allow you to stake on a regular basis. Time to get rewards depends on network difficulty (the collective amount of GRC online and trying to stake) and the amount of GRC you own.
+A good amount of GRC to hold in your wallet is about 1000-5000 GRC and will allow you to stake on a regular basis. Time to get rewards depends on network difficulty (the collective amount of GRC online and trying to stake) and the amount of GRC you own.
 ''')
 
 # Where can I report issues and where can I get help?
@@ -170,7 +170,7 @@ description=r'''
 
 10. Click the “Receive” tab to find your GRC address and get some coins to stake and beacon with.
 
-11. Once you have some coins and your client is fully synchronised, in the GRC client go to Help > Debug Window > Console and type “execute advertisebeacon”.
+11. Once you have some coins and your client is fully synchronised, in the GRC client go to Help > Debug Window > Console and type “advertisebeacon”.
 
 12. If the return message says “SUCCESS”, then you must wait about a day for your client to be recognised for your crunching. If it says “FAIL” Then make sure you have over 100 RAC and a small GRC balance before contacting a Gridcoin community member to help you troubleshoot issues.
 '''.format(links[5], links[2], links[3], links[10], links[12], links[13], links[14]))
@@ -224,18 +224,16 @@ faucet_list = discord.Embed(title='Faucets', colour=discord.Colour.purple(),
 description='''
 - [GRC Switzerland]({})
 - [Gridcoin Stats]({})
-- [Eobot]({})
 - [Uscore]({})
 - [Delta's GRC Discord bot]({})
 - [Gridcoin Faucet Android App]({})
 - [Arikado Pool Faucet]({})
-'''.format(links[40], links[41], links[42], links[43], links[11], links[54], links[57]))
+'''.format(links[40], links[41], links[43], links[11], links[54], links[57]))
 
 # Supported exchanges
 exchanges = discord.Embed(title='Supported exchanges', colour=discord.Colour.purple(),
 description='''
 - [Bittrex]({})
-- [Poloniex]({})
 - [C-CEX]({})
 - [Trade by Trade]({})
 - [Bisq]({})
@@ -245,7 +243,7 @@ description='''
 - [Openledger]({})
 - [Rudex]({})
 - [Southxchange]({})
-'''.format(links[44], links[45], links[46], links[47], links[48],
+'''.format(links[44], links[46], links[47], links[48],
             links[49], links[50], links[51], links[52], links[53], links[58]))
 
 # Useful links

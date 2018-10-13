@@ -45,6 +45,8 @@ The source code for the bot can be found [here](https://github.com/delta1512/GRC
 
 If there are any problems, glitches or crashes, please notify me or the contributors below as soon as possible. Any queries can be sent to `boincosdelta@gmail.com`.
 
+To add the bot to your server, please provide a channel ID to Delta.
+
 Notable mentions:
 - [Jorkermc](https://github.com/jorkermc)
 - [Chrstphrchvz](https://github.com/chrstphrchvz)
