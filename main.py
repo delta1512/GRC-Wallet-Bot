@@ -70,7 +70,9 @@ def in_udb():
 
 def limit_to_main_channel():
     def predicate(ctx):
-        return str(ctx.channel.id) in main_chans or isinstance(ctx.channel, discord.DMChannel)
+        if not (str(ctx.channel.id) in main_chans or isinstance(ctx.channel, discord.DMChannel)):
+            raise errors.LimChannel()
+        return True
     return commands.check(predicate)
 
 
@@ -185,7 +187,7 @@ async def status(ctx):
     await ctx.send(await extras.dump_cfg(price_fetcher))
 
 
-@client.command()
+@client.command(aliases=['New', 'NEW', 'register', 'Register', 'reg', 'Reg', 'REG'])
 @new_user_restriction()
 async def new(ctx):
     if not await q.uid_exists(str(ctx.author.id)):
