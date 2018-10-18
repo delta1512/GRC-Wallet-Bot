@@ -35,8 +35,8 @@ def stringify_dict_data(data):
 
 
 async def dump_cfg(price_fetcher):
-    block_height = await w.query('getblockcount', [])
-    block_hash = await w.query('getblockhash', [block_height])
+    block_height = await w.query('getblockcount')
+    block_hash = await w.query('getblockhash', block_height)
     fct_info = await q.get_bal('FAUCET')
     rain_info = await q.get_bal('RAIN')
     if block_height < 5 or not isinstance(block_hash, str): # 5 is largest error return value

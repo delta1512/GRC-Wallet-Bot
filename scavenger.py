@@ -17,7 +17,7 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s: %(message)s',
 
 
 async def check_tx(txid):
-    tx = await w.query('gettransaction', [txid])
+    tx = await w.query('gettransaction', txid)
     receivers = []
     send_addrs = []
     try:
@@ -46,15 +46,15 @@ async def check_tx(txid):
 
 async def blk_searcher():
     global last_block
-    newblock = await w.query('getblockcount', [])
+    newblock = await w.query('getblockcount')
     if newblock > last_block:
         try:
             users = await q.get_addr_uid_dict()
             for blockheight in range(last_block+1, newblock+1):
                 last_block = blockheight
-                blockhash = await w.query('getblockhash', [blockheight])
+                blockhash = await w.query('getblockhash', blockheight)
                 await asyncio.sleep(0.05) # Protections to guard against reusing the bind address
-                blockdata = await w.query('getblock', [blockhash])
+                blockdata = await w.query('getblock', blockhash)
                 if isinstance(blockdata, dict):
                     for txid in blockdata['tx']:
                         for received in await check_tx(txid):

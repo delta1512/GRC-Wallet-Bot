@@ -120,7 +120,7 @@ async def on_command_error(ctx, error):
         if ctx.command.name == 'faq':
             return await ctx.send(extras.index_displayer(docs.faq_msg, index) + '\n*Thanks to LavRadis and Foxifi for making these resources.*')
         if ctx.command.name == 'block':
-            return await ctx.send(await extras.show_block(await w.query('getblockcount', [])))
+            return await ctx.send(await extras.show_block(await w.query('getblockcount')))
         if ctx.command.name == 'help':
             return await ctx.send(embed=help_docs.help_main())
     if isinstance(error, commands.NoPrivateMessage):
@@ -133,7 +133,7 @@ async def on_ready():
     if hasattr(client, 'initialised'):
         return  # Prevents multiple on_ready call
 
-    if await w.query('getblockcount', []) > 5:  # 5 is largest error return value
+    if await w.query('getblockcount') > 5:  # 5 is largest error return value
         logging.info('Gridcoin client is online')
     else:
         logging.error('GRC client is not online')
@@ -193,7 +193,7 @@ async def new(ctx):
     if not await q.uid_exists(str(ctx.author.id)):
         await ctx.send(docs.welcome)
         try:
-            addr = await w.query('getnewaddress', [])
+            addr = await w.query('getnewaddress')
             await q.new_user(str(ctx.author.id), addr)
             await ctx.send(docs.new_user_success.format(e.GOOD, addr))
         except Exception as E:
