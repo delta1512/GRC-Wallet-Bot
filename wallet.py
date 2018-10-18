@@ -23,11 +23,14 @@ def scan_projects(averages: str) -> dict:
     return final
 
 
-async def query(cmd, params):
-    if not all([isinstance(cmd, str), isinstance(params, list)]):
+async def query(cmd: str, *params):
+    try:
+        assert isinstance(cmd, str)
+        command = json.dumps({'method' : cmd, 'params' : params})
+    except (AssertionError, TypeError):
+        # Either cmd isn't str, or params isn't serializable
         logging.warning('Invalid data sent to wallet query')
         return 2
-    command = json.dumps({'method' : cmd, 'params' : params})
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(g.rpc_url, data=command, headers={'content-type': "application/json", 'cache-control': "no-cache"}, auth=aiohttp.BasicAuth(g.rpc_usr, password=g.rpc_pass)) as resp:
@@ -53,17 +56,17 @@ async def query(cmd, params):
 
 async def tx(addr, amount):
     if isinstance(addr, str) and len(addr) > 1:
-        return await query('sendtoaddress', [addr, amount])
+        return await query('sendtoaddress', addr, amount)
     return 4
 
 
 async def get_block(height):
-    current_block = await query('getblockcount', [])
+    current_block = await query('getblockcount')
     if height < 0 or height > current_block:
         return None
     else:
         data = {}
-        block_data = await query('getblockbynumber', [height])
+        block_data = await query('getblockbynumber', height)
         if type(block_data) is int:
             return None
         data['Height'] = height
@@ -78,9 +81,9 @@ async def get_block(height):
 
 
 async def get_last_superblock():
-    listdata_sb = await query('listdata', ['superblock'])
+    listdata_sb = await query('listdata', 'superblock')
     height = listdata_sb['block_number']
-    sb_details = await query('showblock', [int(height)])
+    sb_details = await query('showblock', int(height))
     sb_time = datetime.utcfromtimestamp(sb_details['time']).isoformat(' ')
     final = {'Height' : height, 'Time (UTC)' : sb_time}
     final.update(scan_projects(listdata_sb['averages']))
@@ -88,4 +91,4 @@ async def get_last_superblock():
 
 
 async def unlock():
-    return await query('walletpassphrase', [g.grc_pass, 999999999, False])
+    return await query('walletpassphrase', g.grc_pass, 999999999, False)
