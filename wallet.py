@@ -65,18 +65,20 @@ async def get_block(height):
     if height < 0 or height > current_block:
         return None
     else:
-        data = {}
         block_data = await query('getblockbynumber', height)
         if type(block_data) is int:
             return None
-        data['Height'] = height
-        data['Hash'] = block_data['hash']
-        data['Time (UTC)'] = datetime.utcfromtimestamp(block_data['time']).isoformat(' ')
-        data['Difficulty'] = round(block_data['difficulty'], 4)
-        data['Net Weight'] = round(g.NET_W_MULT * block_data['difficulty'])
-        data['No. of TXs'] = len(block_data['tx'])
-        data['Amount Minted'] = block_data['mint']
-        data['Superblock'] = 'No' if (block_data['IsSuperBlock'] == 0) else 'Yes'
+        data = {
+            'Height': height,
+            'Hash': block_data['hash'],
+            'Time (UTC)':
+                datetime.utcfromtimestamp(block_data['time']).isoformat(' '),
+            'Difficulty': round(block_data['difficulty'], 4),
+            'Net Weight': round(g.NET_W_MULT * block_data['difficulty']),
+            'No. of TXs': len(block_data['tx']),
+            'Amount Minted': block_data['mint'],
+            'Superblock': 'No' if (block_data['IsSuperBlock'] == 0) else 'Yes',
+        }
         return data
 
 
