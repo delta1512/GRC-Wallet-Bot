@@ -103,8 +103,8 @@ async def on_command_error(ctx, error):
         return await ctx.send(docs.too_new_msg)
     if isinstance(error, errors.LimChannel):
         try:
-            return await ctx.send(docs.change_channel.format([*set(main_chans).intersection(map(lambda x: str(x.id), ctx.guild.channels))][0].name))
-        except IndexError:
+            return await ctx.send(docs.change_channel.format((set(main_chans) & {*map(lambda x: str(x.id), ctx.guild.channels)}).pop().name))
+        except KeyError:
             return await ctx.send('Cannot locate the default channel. Please contact the owner to get a channel verified.')
     if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
         if ctx.command.name == 'withdraw':
