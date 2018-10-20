@@ -101,7 +101,7 @@ too_new_msg = f'{e.CANNOT}Your account is too new to be using the bot, please en
 
 wallet_data_error = f'{e.ERROR}Could not fetch data.'
 
-change_channel = f'{e.CANNOT}Please use the designated channel in this server for that command.'
+change_channel = f'\u26d4Please use the designated channel in this server for that command.'
 
 
 ### RULES AND TERMS
