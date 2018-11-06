@@ -15,7 +15,6 @@ import grcconf as g
 import wallet as w
 import queries as q
 import help_docs
-from grc_pricebot import price_bot
 from blacklist import Blacklister
 from rain_bot import Rainbot
 from FAQ import index
@@ -32,7 +31,6 @@ client.remove_command('help')
 FCT = 'FAUCET'
 RN = 'RAIN'
 latest_users = {}
-price_fetcher = price_bot()
 blacklister = None
 rbot = None
 main_chans = []
@@ -55,7 +53,10 @@ def checkspam(user): # Possible upgrade: use discord.utils.snowflake_time to get
 
 async def check_rain(ctx):
     if await rbot.can_rain():
+        await ctx.send(docs.rain_feedback)
         await rbot.do_rain(client)
+    elif rbot.balance > rbot.thresh:
+        await ctx.send(docs.rain_wait)
 ###
 
 
@@ -453,6 +454,5 @@ try:
 except Exception:
     logging.error('Failed to load API key')
     exit(1)
-
 
 client.run(API_KEY)

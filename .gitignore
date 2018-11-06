@@ -6,3 +6,6 @@ grcconf.py.bak
 blist
 priv_blist
 testing.py
+dapp/
+cogs/price.py
+testmain.py

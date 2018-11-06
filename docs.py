@@ -63,6 +63,10 @@ announce_title = 'Announcement from the Wallet Bot Owner'
 
 rain_title = f'{e.RAIN} RAIN!!!! {e.RAIN}'
 
+rain_feedback = f'{e.RAIN} Here comes the rain!'
+
+rain_wait = f'{e.INFO} Please wait for the current rain to process.'
+
 
 ### SUCCESS MESSAGES
 new_user_success = '{}User account created successfully. Your address is `{}`'
