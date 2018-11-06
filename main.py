@@ -3,6 +3,7 @@ import logging
 from time import time, mktime, strptime, perf_counter
 from logging.handlers import RotatingFileHandler
 from datetime import datetime, timedelta
+from random import choice as rchoice
 
 import discord
 from discord.ext import commands
@@ -331,6 +332,16 @@ async def rain(ctx, amount: float):
     user_obj = await q.get_user(str(ctx.author.id))
     await ctx.send(await rbot.contribute(extras.amt_filter(amount), user_obj))
     await check_rain(ctx)
+
+
+@client.command(aliases=['DM', 'Dm', 'messages', 'Messages'])
+@in_udb()
+@limit_to_main_channel()
+async def dm(ctx):
+    if q.toggle_dms(str(ctx.author.id)):
+        ctx.send(docs.dm_enabled)
+    else:
+        ctx.send(docs.dm_disabled)
 
 
 @client.command(aliases=['Qr', 'QR'])

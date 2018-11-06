@@ -17,3 +17,5 @@ HEART = ':heart: | '
 NUMS = [':zero:', ':one:', ':two:', ':three:', ':four:', ':five:', ':six:',
         ':seven:', ':eight:', ':nine:']
 WHITE_CHECK = '\u2705'
+ON = ':red_circle: | '
+OFF = ':large_blue_circle: | '

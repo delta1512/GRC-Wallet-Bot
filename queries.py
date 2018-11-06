@@ -4,6 +4,11 @@ from user import User
 import grcconf as g
 import wallet as w
 
+
+def bit_to_bool(bit):
+    return int.from_bytes(bit) == 0
+
+
 async def uid_exists(uid):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
@@ -72,21 +77,31 @@ async def save_user(user_objs):
 async def new_user(uid, address):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
-    await c.execute('INSERT INTO {}.udb VALUES (%s, %s, %s, %s, %s, %s, %s, %s);'.format(g.db_name),
-                    (uid, address, 0, 0, 0, 0, 0, ''))
+    await c.execute('INSERT INTO {}.udb VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);'.format(g.db_name),
+                    (uid, address, 0, 0, 0, 0, 0, '', b'\x00'))
     await db.commit()
     db.close()
 
 
-async def get_addr_uid_dict():
+async def get_addr_uid_dict(dm_enables=False):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
-    await c.execute('SELECT address, uid FROM {}.udb'.format(g.db_name))
-    user_data = {}
-    for tup in await c.fetchall():
-        user_data[tup[0]] = tup[1]
-    db.close()
-    return user_data
+    if dm_enables:
+        await c.execute('SELECT address, uid, dm_enable FROM {}.udb'.format(g.db_name))
+        user_data = {}
+        enables_data = {}
+        for tup in await c.fetchall():
+            user_data[tup[0]] = tup[1]
+            enables_data[tup[1]] = bit_to_bool(tup[2])
+        db.close()
+        return user_data, enables_data
+    else:
+        await c.execute('SELECT address, uid FROM {}.udb'.format(g.db_name))
+        user_data = {}
+        for tup in await c.fetchall():
+            user_data[tup[0]] = tup[1]
+        db.close()
+        return user_data
 
 
 async def apply_balance_changes(user_vals):
@@ -168,6 +183,22 @@ async def get_donors():
     db.close()
     return final
 
+
+async def toggle_dms(uid):
+    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
+    c = await db.cursor()
+    await c.execute('SELECT dm_enable FROM {}.udb WHERE uid=%s'.format(g.db_name), (uid))
+    result = await c.fetchone()
+    print(result)
+    out = bit_to_bool(result)
+    if out:
+        bit = b'\x01'
+    else:
+        bit = b'\x00'
+    await c.execute('UPDATE {}.udb SET dm_enable=%s WHERE uid=%s;'.format(g.db_name), (bit, uid))
+    await db.commit()
+    db.close()
+    return not out
 
 # Highly redundant but efficient faucet operation
 async def faucet_operations(uid, amount, ctime):

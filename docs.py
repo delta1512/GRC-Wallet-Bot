@@ -67,6 +67,10 @@ rain_feedback = f'{e.RAIN} Here comes the rain!'
 
 rain_wait = f'{e.INFO} Please wait for the current rain to process.'
 
+dm_enabled = f'{e.ON} Direct messages for rain have been enabled.'
+
+dm_disabled = f'{e.OFF} Direct messages for rain have been disabled.'
+
 
 ### SUCCESS MESSAGES
 new_user_success = '{}User account created successfully. Your address is `{}`'

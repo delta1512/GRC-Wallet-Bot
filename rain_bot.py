@@ -7,6 +7,7 @@ import grcconf as g
 import emotes as e
 import docs
 
+
 class Rainbot:
     thresh = 0
     balance = 0
@@ -22,7 +23,7 @@ class Rainbot:
             return
         else:
             self.lock = True
-        ulist_dict = await q.get_addr_uid_dict()
+        ulist_dict, enables_data = await q.get_addr_uid_dict(dm_enables=True)
         ulist = [ulist_dict[addr] for addr in ulist_dict]
         online_ids = set()
         online_members = set()
@@ -42,7 +43,8 @@ class Rainbot:
         await q.apply_balance_changes(final_rains)
 
         for member in online_members:
-            await dm_user(member, docs.dm_rain_msg)
+            if enables_data[str(member.id)]:
+                await dm_user(member, docs.dm_rain_msg)
         await do_announce(f'Rainbot has rained `{rain_amt} GRC` on {num_rain} users!', docs.rain_title, client)
 
         self.get_next_thresh()
