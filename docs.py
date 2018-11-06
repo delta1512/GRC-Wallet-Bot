@@ -65,11 +65,18 @@ rain_title = f'{e.RAIN} RAIN!!!! {e.RAIN}'
 
 rain_feedback = f'{e.RAIN} Here comes the rain!'
 
-rain_wait = f'{e.INFO} Please wait for the current rain to process.'
+rain_wait = f'{e.INFO}Please wait for the current rain to process.'
 
-dm_enabled = f'{e.ON} Direct messages for rain have been enabled.'
+dm_enabled = f'{e.ON}Direct messages for rain have been enabled.'
 
-dm_disabled = f'{e.OFF} Direct messages for rain have been disabled.'
+dm_disabled = f'{e.OFF}Direct messages for rain have been disabled.'
+
+take_msgs = [
+f'{e.HALT1}HALT! You have violated the law. Pay the court a fine or serve your sentence.',
+f'{e.construction}Nah mate!',
+f'{e.GIVE}Sharing is caring, try %give instead.',
+f'{e.ROBOT}I\'m sorry, but I\'m afraid I can\'t do that...'
+]
 
 
 ### SUCCESS MESSAGES

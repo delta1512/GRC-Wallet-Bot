@@ -368,6 +368,11 @@ async def moon(ctx):
     await ctx.send(extras.moon())
 
 
+@client.command(aliases=['Take', 'steal', 'Steal'])
+async def take(ctx):
+    await ctx.send(rchoice(docs.take_msgs))
+
+
 @client.command(aliases=['me', 'Me', 'ME', 'acc', 'Acc', 'ACC'])
 @in_udb()
 @limit_to_main_channel()

@@ -19,3 +19,6 @@ NUMS = [':zero:', ':one:', ':two:', ':three:', ':four:', ':five:', ':six:',
 WHITE_CHECK = '\u2705'
 ON = ':red_circle: | '
 OFF = ':large_blue_circle: | '
+HALT1 = ':raised_hand: | '
+HALT2 = ':construction: | '
+ROBOT = ':robot: | '
