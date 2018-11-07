@@ -16,6 +16,7 @@ import grcconf as g
 import wallet as w
 import queries as q
 import help_docs
+from grc_pricebot import price_bot
 from blacklist import Blacklister
 from rain_bot import Rainbot
 from FAQ import index
@@ -33,6 +34,7 @@ FCT = 'FAUCET'
 RN = 'RAIN'
 latest_users = {}
 blacklister = None
+price_fetcher = price_bot()
 rbot = None
 main_chans = []
 
@@ -338,10 +340,10 @@ async def rain(ctx, amount: float):
 @in_udb()
 @limit_to_main_channel()
 async def dm(ctx):
-    if q.toggle_dms(str(ctx.author.id)):
-        ctx.send(docs.dm_enabled)
+    if await q.toggle_dms(str(ctx.author.id)):
+        await ctx.send(docs.dm_enabled)
     else:
-        ctx.send(docs.dm_disabled)
+        await ctx.send(docs.dm_disabled)
 
 
 @client.command(aliases=['Qr', 'QR'])

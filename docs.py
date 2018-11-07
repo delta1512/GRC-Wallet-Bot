@@ -73,7 +73,7 @@ dm_disabled = f'{e.OFF}Direct messages for rain have been disabled.'
 
 take_msgs = [
 f'{e.HALT1}HALT! You have violated the law. Pay the court a fine or serve your sentence.',
-f'{e.construction}Nah mate!',
+f'{e.HALT2}Nah mate!',
 f'{e.GIVE}Sharing is caring, try %give instead.',
 f'{e.ROBOT}I\'m sorry, but I\'m afraid I can\'t do that...'
 ]

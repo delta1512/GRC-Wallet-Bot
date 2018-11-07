@@ -6,7 +6,7 @@ import wallet as w
 
 
 def bit_to_bool(bit):
-    return int.from_bytes(bit) == 0
+    return int.from_bytes(bit, 'big') == 0
 
 
 async def uid_exists(uid):
@@ -189,8 +189,7 @@ async def toggle_dms(uid):
     c = await db.cursor()
     await c.execute('SELECT dm_enable FROM {}.udb WHERE uid=%s'.format(g.db_name), (uid))
     result = await c.fetchone()
-    print(result)
-    out = bit_to_bool(result)
+    out = bit_to_bool(result[0])
     if out:
         bit = b'\x01'
     else:
