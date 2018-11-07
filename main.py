@@ -346,6 +346,13 @@ async def dm(ctx):
         await ctx.send(docs.dm_disabled)
 
 
+@client.command(aliases=['Stake', 'stk', 'Stk', 'STK', 'steak', 'Steak'])
+@in_udb()
+@limit_to_main_channel()
+async def stake(ctx):
+    await ctx.send(docs.stake_template.format(await q.get_stakes(str(ctx.author.id))))
+
+
 @client.command(aliases=['Qr', 'QR'])
 @commands.guild_only()
 @limit_to_main_channel()

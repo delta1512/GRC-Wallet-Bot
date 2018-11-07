@@ -78,6 +78,8 @@ f'{e.GIVE}Sharing is caring, try %give instead.',
 f'{e.ROBOT}I\'m sorry, but I\'m afraid I can\'t do that...'
 ]
 
+stake_template = e.MONEY + 'Your total stake earnings are `{} GRC`'
+
 
 ### SUCCESS MESSAGES
 new_user_success = '{}User account created successfully. Your address is `{}`'

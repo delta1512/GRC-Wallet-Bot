@@ -16,6 +16,24 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s: %(message)s',
                     handlers=handler)
 
 
+async def split_stake(amount):
+    bals = await q.get_all_bals()
+    bals_sum = sum([tup[1] for tup in bals])
+    final_bals = {}
+    for tup in bals:
+        final_bals[tup[0]] = (tup[1]/bals_sum)*amount
+    await q.apply_balance_changes(final_bals, is_stake=True)
+
+
+async def stake_searcher():
+    txs = await w.get_latest_stakes()
+    for tx in txs:
+        amount_staked = txs[tx]
+        if await q.register_stake(tx, amount_staked):
+            logging.info('Processed stake of %s coins with txid: %s', (tx, amount_staked))
+            await split_stake(amount_staked)
+
+
 async def check_tx(txid):
     tx = await w.query('gettransaction', [txid])
     receivers = []
@@ -78,6 +96,7 @@ async def scavenge():
     while True:
         try:
             await blk_searcher()
+            await stake_searcher()
             with open(g.LST_BLK, 'w') as last_block_file:
                 last_block_file.write(str(last_block))
             await asyncio.sleep(g.SCAV_SLP)

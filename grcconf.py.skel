@@ -28,3 +28,4 @@ MAX_RAIN = 30             # (GRC) Must be greater than MIN_RAIN
 MIN_RAIN = 10             # (GRC)
 BLK_TIME = 60             # Seconds
 NET_W_MULT = 9544517.41
+STK_REWARD = 10           # (GRC)

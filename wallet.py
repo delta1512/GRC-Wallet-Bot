@@ -87,5 +87,14 @@ async def get_last_superblock():
     return final
 
 
+async def get_latest_stakes():
+    data = await query('listtransactions', ['', 350])
+    stakes = {}
+    for tx in data:
+        if tx['category'] == 'generate':
+            stakes[tx['txid']] = g.STK_REWARD
+    return stakes
+
+
 async def unlock():
     return await query('walletpassphrase', [g.grc_pass, 999999999, False])

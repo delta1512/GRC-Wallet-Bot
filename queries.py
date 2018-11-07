@@ -54,6 +54,18 @@ async def register_deposit(txid, amount, uid):
     return unique
 
 
+async def register_stake(txid, amount):
+    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
+    c = await db.cursor()
+    await c.execute('SELECT count(txid) FROM {}.stakes WHERE txid=%s'.format(g.db_name), (txid))
+    unique = (await c.fetchone())[0] == 0
+    if unique:
+        await c.execute('INSERT INTO {}.stakes VALUES (%s, %s)'.format(g.db_name), (txid, amount))
+        await db.commit()
+    db.close()
+    return unique
+
+
 async def save_user(user_objs):
     if not isinstance(user_objs, list): user_objs = [user_objs];
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
@@ -104,12 +116,16 @@ async def get_addr_uid_dict(dm_enables=False):
         return user_data
 
 
-async def apply_balance_changes(user_vals):
+async def apply_balance_changes(user_vals, is_stake=False):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
     for uid in user_vals:
-        await c.execute('UPDATE {}.udb SET balance = balance + %s WHERE uid=%s;'.format(g.db_name),
-                        (user_vals[uid], uid))
+        if is_stake:
+            await c.execute('UPDATE {}.udb SET balance = balance + %s, stake = stake + %s WHERE uid=%s;'.format(g.db_name),
+                            (user_vals[uid], user_vals[uid], uid))
+        else:
+            await c.execute('UPDATE {}.udb SET balance = balance + %s WHERE uid=%s;'.format(g.db_name),
+                            (user_vals[uid], uid))
     await db.commit()
     db.close()
 
@@ -124,6 +140,7 @@ async def get_blacklisted():
         blacklisted[tup[0]] = True if channel == 1 else False
     db.close()
     return blacklisted
+
 
 async def commit_ban(user, channel):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
@@ -198,6 +215,25 @@ async def toggle_dms(uid):
     await db.commit()
     db.close()
     return not out
+
+
+async def get_all_bals():
+    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
+    c = await db.cursor()
+    await c.execute('SELECT uid, balance FROM {}.udb'.format(g.db_name))
+    result = await c.fetchall()
+    db.close()
+    return result
+
+
+async def get_stakes(uid):
+    db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
+    c = await db.cursor()
+    await c.execute('SELECT stakes FROM {}.udb WHERE uid=%s'.format(g.db_name), (uid))
+    result = await c.fetchone()
+    db.close()
+    return result[0]
+
 
 # Highly redundant but efficient faucet operation
 async def faucet_operations(uid, amount, ctime):
