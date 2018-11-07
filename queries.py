@@ -121,7 +121,7 @@ async def apply_balance_changes(user_vals, is_stake=False):
     c = await db.cursor()
     for uid in user_vals:
         if is_stake:
-            await c.execute('UPDATE {}.udb SET balance = balance + %s, stake = stake + %s WHERE uid=%s;'.format(g.db_name),
+            await c.execute('UPDATE {}.udb SET balance = balance + %s, stakes = stakes + %s WHERE uid=%s;'.format(g.db_name),
                             (user_vals[uid], user_vals[uid], uid))
         else:
             await c.execute('UPDATE {}.udb SET balance = balance + %s WHERE uid=%s;'.format(g.db_name),

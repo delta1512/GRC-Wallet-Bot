@@ -30,7 +30,7 @@ async def stake_searcher():
     for tx in txs:
         amount_staked = txs[tx]
         if await q.register_stake(tx, amount_staked):
-            logging.info('Processed stake of %s coins with txid: %s', (tx, amount_staked))
+            logging.info('Processed stake of %s coins with txid: %s', tx, amount_staked)
             await split_stake(amount_staked)
 
 

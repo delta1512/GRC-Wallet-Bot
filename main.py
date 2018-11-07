@@ -350,7 +350,7 @@ async def dm(ctx):
 @in_udb()
 @limit_to_main_channel()
 async def stake(ctx):
-    await ctx.send(docs.stake_template.format(await q.get_stakes(str(ctx.author.id))))
+    await ctx.send(docs.stake_template.format('{:.8f}'.format(await q.get_stakes(str(ctx.author.id)))))
 
 
 @client.command(aliases=['Qr', 'QR'])
