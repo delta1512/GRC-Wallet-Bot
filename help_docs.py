@@ -24,6 +24,13 @@ Checks your current balance and shows your deposit address.
 To get a clipboard friendly address, use %addr.
 If the bot is offline, you are still safe to make deposits.''')
 
+stake = discord.Embed(title='Check your stake earnings: %stake %stk', colour=discord.Colour.orange(),
+description='''
+Shows your staking rewards.
+Any rewards earned go directly to your balance.
+The bigger of a balance you have, the more stake you will earn.
+You must have a minimum of {} GRC to stake using your balance''')
+
 wdr = discord.Embed(title='Withdraw your funds: %wdr %withdraw %send', colour=discord.Colour.orange(),
 description=f'''
 **Format: %wdr [address to send to] [amount-GRC]**
@@ -97,6 +104,10 @@ time = discord.Embed(title='Show your timeouts: %time', colour=discord.Colour.or
 description='''
 Shows when you are able to use %faucet, %donate and %withdraw again.''')
 
+dm = discord.Embed(title='Toggle rain DM messages: %dm %messages', colour=discord.Colour.orange(),
+description='''
+Changes whether the bot should DM you during a rain.''')
+
 invite = discord.Embed(title='Get the link to the main server: %invite', colour=discord.Colour.orange(),
 description='''Shows the invite link to the official Gridcoin server.''')
 
@@ -115,6 +126,7 @@ Shows information about authors, contributors and how to contact the bot owner.'
 help_dict = {
     'new'       :   new,
     'balance'   :   bal,
+    'stake'     :   stake,
     'withdraw'  :   wdr,
     'donate'    :   donate,
     'rdonate'   :   rdonate,
@@ -126,6 +138,7 @@ help_dict = {
     'block'     :   block,
     'status'    :   status,
     'time'      :   time,
+    'dm'        :   dm,
     'invite'    :   invite,
     'rules'     :   rules_help,
     'terms'     :   terms_help,
