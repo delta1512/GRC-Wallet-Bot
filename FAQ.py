@@ -83,10 +83,18 @@ description='''
 # How is GRC staked/mined?
 how_to_stake = discord.Embed(title='How is GRC mined/staked?', colour=discord.Colour.purple(),
 description='''
-Stakers are people that hold Gridcoin and earn 1.5% annual interest (stake) on their mature reserve (coins not moved for at least 16hr). Likelihood of gaining these rewards (by definition of POSv2) is dependent on your balance.
+Stakers are people that hold Gridcoin and earn a constant reward of 10 GRC for every block validated through POS. Likelihood of gaining these rewards is dependent on your balance.
 
 Crunchers (AKA Miners) are individuals that participate in [BOINC]({}) computing and earn rewards from Gridcoin through Proof Of Research (POR). To be eligible for GRC rewards, miners must have a minimum of 100 Recent Average Credit (RAC) from BOINC for any [whitelisted project]({}) and an existing GRC balance.
 '''.format(links[0], links[2]))
+
+# Technical staking explanation
+how_to_stake_technical = discord.Embed(title='How is GRC mined/staked? (technical version)', colour=discord.Colour.purple(),
+description='''
+Staking looks at your Unspent Transaction Outputs (UTXOs, the sets of coins in your wallets that you can spend). Even though your wallet may say 1k GRC, there might be 250GRC in one UTXO and 700 in another and 50 in another and so forth. The amount of coins in one UTXO relates to how likely you are to stake a block and earn the block reward with it.
+
+In GRC, basic POS operates meaning that you can earn the block reward once you stake any of your UTXOs. This process is similar for research too, one UTXO will simply stake all crunching rewards along with the constant block reward (ie, block reward + research in one stake).
+''')
 
 # Do I need GRC to earn mining rewards?
 initial_grc = discord.Embed(title='Do I need GRC to earn mining rewards?', colour=discord.Colour.purple(),
@@ -101,7 +109,7 @@ If you do not want to invest a small amount of money to perform staking and earn
 The pool allows you to crunch projects and earn rewards without having any existing GRC to stake with. To learn how to join the pool, see `%faq 7`.
 
 If you have an existing amount of GRC (see `%faq 6`), you may want to start solo mining.
-Solo mining is where you crunch your own work and earn rewards through interest on the Gridcoin blockchain. To learn how to do solo mining, see `%faq 8`.
+Solo mining is where you crunch your own work and earn rewards through validating blocks via POS on the Gridcoin blockchain. To learn how to do solo mining, see `%faq 8`.
 '''.format(links[4]))
 
 # How much GRC is enough to start staking?
@@ -204,6 +212,24 @@ description='''
 
 **Neural Network**: A collection of computer nodes that download project data and gather RAC values of Gridcoin users in order to calculate their MAG values.
 ''')
+
+# List of equations
+equations = discord.Embed(title='Useful equations', colour=discord.Colour.purple(),
+description='''
+**Many thanks to Jim Owens for developing these equations!**
+
+Net weight = `10000000 * Difficulty`
+
+Estimated time to stake (ETTS no cooldown) = `(10000/Balance) * Difficulty`
+
+Estimated time to stake (ETTS with cooldown) = `(1/960) * (net weight) / Balance`
+
+UTXO size for max efficiency = `15000 * Difficulty * (1/E - 1)`
+Where E is the desired efficiency % as a decimal, i.e. 95% is 0.95
+
+E can also be = `(ETTS no cooldown) / (ETTS with cooldown)`
+''')
+
 
 # Third-party wallets
 other_wallets = discord.Embed(title='Third-party wallets', colour=discord.Colour.purple(),
@@ -346,7 +372,8 @@ index = [{'What is Gridcoin?': what_is_grc},
         {'What is BOINC?' : what_is_boinc},
         {'Do I need GRC to earn mining rewards?' : initial_grc},
         {'Should I join the pool or do solo mining?' : pool_or_solo},
-        {'How is GRC staked/mined?' : how_to_stake},
+        {'How is GRC mined/staked?' : how_to_stake},
+        {'How is GRC mined/staked? (technical version)' : how_to_stake_technical},
         {'How much GRC is enough to start staking?' : how_much_grc},
         {'How do I get started with pool mining?' : pool_mining},
         {'How do I get started with solo mining?' : solo_mining},
@@ -355,6 +382,7 @@ index = [{'What is Gridcoin?': what_is_grc},
         {'Example GRC config linux' : example_linux},
         {'Where can I report issues and where can I get help?' : additional_help},
         {'Terminology' : terms},
+        {'Useful equations' : equations},
         {'Third-party wallets' : other_wallets},
         {'Supported exchanges' : exchanges},
         {'Faucets' : faucet_list},
