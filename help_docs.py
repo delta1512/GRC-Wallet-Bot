@@ -25,11 +25,11 @@ To get a clipboard friendly address, use %addr.
 If the bot is offline, you are still safe to make deposits.''')
 
 stake = discord.Embed(title='Check your stake earnings: %stake %stk', colour=discord.Colour.orange(),
-description='''
+description=f'''
 Shows your staking rewards.
 Any rewards earned go directly to your balance.
 The bigger of a balance you have, the more stake you will earn.
-You must have a minimum of {} GRC to stake using your balance''')
+You must have a minimum of {g.min_deposit} GRC to stake using your balance''')
 
 wdr = discord.Embed(title='Withdraw your funds: %wdr %withdraw %send', colour=discord.Colour.orange(),
 description=f'''
