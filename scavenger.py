@@ -1,3 +1,5 @@
+import testing
+
 import asyncio
 import logging
 from logging.handlers import RotatingFileHandler
@@ -21,7 +23,10 @@ async def split_stake(amount):
     bals_sum = sum([tup[1] for tup in bals])
     final_bals = {}
     for tup in bals:
-        final_bals[tup[0]] = (tup[1]/bals_sum)*amount
+        if tup[1] >= g.min_deposit:
+            final_bals[tup[0]] = (tup[1]/bals_sum)*amount
+        else:
+            final_bals[tup[0]] = 0
     await q.apply_balance_changes(final_bals, is_stake=True)
 
 
@@ -78,6 +83,8 @@ async def blk_searcher():
                         for received in await check_tx(txid):
                             addr = list(received.keys())[0]
                             uid = users[addr]
+                            if received[addr] < g.min_deposit:
+                                continue
                             if await q.register_deposit(txid, received[addr], uid):
                                 logging.info('Processed deposit with TXID: %s for %s', txid, uid)
                 elif blockdata == 3:
