@@ -27,7 +27,8 @@ async def get_user(uid):
     if len(result) == 0: return None;
     result = result[0]
     return User(uid, address=result[1], last_faucet=result[2], balance=result[3],
-                donations=result[4], lastTX=[result[5], result[6], result[7]])
+                donations=result[4], lastTX=[result[5], result[6], result[7]],
+                dm_enable=result[8], stakes=result[9])
 
 
 async def get_bal(uid):

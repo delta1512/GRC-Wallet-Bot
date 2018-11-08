@@ -15,6 +15,8 @@ class User:
         self.donations = k.get('donations', 0.0)
         self.last_faucet = k.get('last_faucet', 0)
         self.address = k.get('address', None)
+        self.stakes = k.get('stakes', None)
+        self.dm_enable = k.get('dm_enable', None)
 
 
     async def withdraw(self, amount, addr, fee, donation=False):
@@ -50,9 +52,13 @@ class User:
 
 
     def get_stats(self):
+        if q.bit_to_bool(self.dm_enable):
+            enabled = 'Yes'
+        else:
+            enabled = 'No'
         return docs.user_data_template.format(self.address, self.balance,
-                    self.donations, self.last_faucet, self.active_tx[1],
-                    self.active_tx[2], self.active_tx[0])
+                    self.donations, self.stakes, enabled, self.last_faucet,
+                    self.active_tx[1], self.active_tx[2], self.active_tx[0])
 
 
     def next_net_tx(self):

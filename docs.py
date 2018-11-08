@@ -22,7 +22,9 @@ user_data_template = '''```
 Address: {}
 Balance: {}
 Donated: {}
+Staked: {}
 
+DM rain messages enabled: {}
 Last faucet request (unix): {}
 Last transaction (unix): {}
 Last TXID out: {}
