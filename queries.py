@@ -91,7 +91,7 @@ async def new_user(uid, address):
     db = await aiomysql.connect(host=g.sql_db_host, user=g.sql_db_usr, password=g.sql_db_pass)
     c = await db.cursor()
     await c.execute('INSERT INTO {}.udb VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);'.format(g.db_name),
-                    (uid, address, 0, 0, 0, 0, 0, '', b'\x00'))
+                    (uid, address, 0, 0, 0, 0, 0, '', b'\x00', 0))
     await db.commit()
     db.close()
 
