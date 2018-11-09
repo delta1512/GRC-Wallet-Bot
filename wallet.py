@@ -88,7 +88,7 @@ async def get_last_superblock():
 
 
 async def get_latest_stakes():
-    data = await query('listtransactions', ['', 350])
+    data = await query('listtransactions', ['', g.tx_lookback])
     stakes = {}
     for tx in data:
         if tx['category'] == 'generate':

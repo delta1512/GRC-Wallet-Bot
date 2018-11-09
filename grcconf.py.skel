@@ -14,6 +14,7 @@ sql_db_pass = '[password]'
 db_name = '[name of database]'
 log_dir = '[where to save the log file]'
 min_deposit = 0.0125
+tx_lookback = 500         # How many transactions to look back upon when checking for stakes (increase this when tx volume increases)
 
 ### CONFIGURATION CONSTANTS
 pre = '%'
